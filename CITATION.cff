@@ -6,7 +6,7 @@ authors:
   - given-names: Kunal
     alias: ckryptickunal
 repository-code: "https://github.com/ckryptickunal/OpenWiki"
-url: "https://ckryptickunal.github.io/OpenWiki/"
+url: "https://openwiki-delta.vercel.app/openwiki/"
 license: MIT
 version: 0.2.0
 date-released: "2026-09-24"

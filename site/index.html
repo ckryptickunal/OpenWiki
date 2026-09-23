@@ -3,605 +3,105 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenWiki — Turn YouTube &amp; Blogs into a Markdown Knowledge Base</title>
-<meta name="description" content="Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and essays into a linked, Obsidian-compatible Markdown wiki and second brain.">
-<meta name="keywords" content="YouTube to Markdown, YouTube transcript to notes, LLM wiki, second brain, Obsidian, knowledge base, RAG, essays to Markdown, open source CLI">
+<title>OpenWiki | Turn YouTube &amp; Blogs into a Markdown Knowledge Base</title>
+<meta name="description" content="Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.">
+<link rel="canonical" href="https://openwiki-delta.vercel.app/openwiki/">
+<meta name="theme-color" content="#faf6f2">
 <meta name="author" content="Kunal">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<link rel="canonical" href="https://ckryptickunal.github.io/OpenWiki/">
-<meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#111311" media="(prefers-color-scheme: dark)">
-<meta name="color-scheme" content="light dark">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b6b55'/%3E%3Cpath d='M18 16h-6v32h6M46 16h6v32h-6' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 24l5 16 5-12 5 12 5-16' fill='none' stroke='%23ffc766' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="OpenWiki">
-<meta property="og:url" content="https://ckryptickunal.github.io/OpenWiki/">
-<meta property="og:title" content="OpenWiki — Turn YouTube &amp; Blogs into a Markdown Knowledge Base">
-<meta property="og:description" content="Turn YouTube videos, playlists, channels, blogs and essays into a linked Markdown wiki: an LLM-built second brain you own. Open source, Obsidian-compatible.">
-<meta property="og:image" content="https://ckryptickunal.github.io/OpenWiki/og.png">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="OpenWiki: YouTube, blogs and notes flow into a linked Markdown wiki">
+<meta property="og:title" content="OpenWiki | Turn YouTube &amp; Blogs into a Markdown Knowledge Base">
+<meta property="og:description" content="Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.">
+<meta property="og:url" content="https://openwiki-delta.vercel.app/openwiki/">
+<meta property="og:image" content="https://openwiki-delta.vercel.app/openwiki/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@kunalbairwa232">
 <meta name="twitter:creator" content="@kunalbairwa232">
-<meta name="twitter:title" content="OpenWiki — Turn YouTube &amp; Blogs into a Markdown Knowledge Base">
-<meta name="twitter:description" content="Open-source Python CLI: YouTube videos, playlists, channels, blogs and essays in; a linked, Obsidian-compatible Markdown wiki out.">
-<meta name="twitter:image" content="https://ckryptickunal.github.io/OpenWiki/og.png">
-<meta name="twitter:image:alt" content="OpenWiki: YouTube, blogs and notes flow into a linked Markdown wiki">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
-  "name": "OpenWiki",
-  "description": "Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and essays into a linked, Obsidian-compatible Markdown knowledge base (an LLM wiki / second brain).",
-  "url": "https://ckryptickunal.github.io/OpenWiki/",
-  "codeRepository": "https://github.com/ckryptickunal/OpenWiki",
-  "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"},
-  "runtimePlatform": "Python 3.10+",
-  "license": "https://github.com/ckryptickunal/OpenWiki/blob/main/LICENSE",
-  "image": "https://ckryptickunal.github.io/OpenWiki/og.png",
-  "keywords": "YouTube to Markdown, LLM wiki, second brain, Obsidian, knowledge base, RAG, transcripts, essays",
-  "author": {
-    "@type": "Person",
-    "name": "Kunal",
-    "url": "https://github.com/ckryptickunal",
-    "sameAs": ["https://github.com/ckryptickunal", "https://x.com/kunalbairwa232"]
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {"@type": "Question", "name": "How do I turn a YouTube channel into notes?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Install OpenWiki, set a YOUTUBE_API_KEY, and run openwiki youtube --channel https://www.youtube.com/@handle --folder \"Channel\". It downloads the captions of every video as plain text files. Then run openwiki ingest --all to turn them into linked Markdown pages for sources, people, companies and topics."}},
-    {"@type": "Question", "name": "Can I turn a YouTube playlist or online course into study notes?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Yes. Run openwiki youtube --playlist with the playlist URL and a folder name, then openwiki ingest --all. Each lecture becomes a source page, and recurring concepts become topic pages linked back to every lecture that mentions them."}},
-    {"@type": "Question", "name": "Does it work without an API key?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Partly. Downloading captions for a single video, fetching essays and importing local notes need no YouTube key, although video titles and channel names are only filled in when a YOUTUBE_API_KEY is set. Discovering all videos in a channel needs the key. Ingest needs an LLM, but that can be a local model through Ollama or LM Studio, or you can pass precomputed JSON instead."}},
-    {"@type": "Question", "name": "Can I run it fully offline?",
-     "acceptedAnswer": {"@type": "Answer", "text": "The ingest step can run fully offline by pointing OpenWiki at a local OpenAI-compatible server such as Ollama or LM Studio. Fetching captions and articles needs the internet, but once your text files are on disk, building and linting the wiki can happen entirely on your machine."}},
-    {"@type": "Question", "name": "Is it compatible with Obsidian?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Yes. The wiki is plain Markdown with YAML frontmatter and Obsidian-style [[wikilinks]], and entity and topic pages keep backlinks to their sources. Open the wiki folder as an Obsidian vault and the graph view, backlinks and search work immediately."}},
-    {"@type": "Question", "name": "Which LLMs are supported?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Google Gemini, or any OpenAI-compatible API: OpenAI, OpenRouter, Groq, and local servers such as Ollama and LM Studio. You can also skip the LLM call entirely and ingest a precomputed JSON analysis."}},
-    {"@type": "Question", "name": "What does it cost?",
-     "acceptedAnswer": {"@type": "Answer", "text": "OpenWiki is free and open source under the MIT license. The only possible cost is whatever your chosen LLM provider charges for ingest; a local model through Ollama or LM Studio costs nothing beyond your own hardware."}},
-    {"@type": "Question", "name": "What happens when I run it again on the same sources?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Nothing is duplicated. Already-downloaded videos and essays are skipped, ingest dedupes by file modification time, and videos without captions are remembered and skipped. That makes openwiki sync safe to run on a schedule."}}
-  ]
-}
-</script>
-
-<style>
-:root{
-  --bg:#f6f4ee; --surface:#fffdf8; --surface-2:#efece3; --ink:#1b1c19; --muted:#55564e;
-  --line:#dedad0; --accent:#0b6b55; --accent-ink:#ffffff; --accent-soft:#dcefe8;
-  --link:#b3470c; --code-bg:#1a1d1b; --code-ink:#e9e8e1; --code-muted:#9aa197; --code-key:#7fdcb9; --code-str:#ffc766;
-  --focus:#b3470c; --shadow:0 1px 0 rgba(0,0,0,.04),0 12px 32px -18px rgba(30,30,20,.25);
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Charter","Georgia",ui-serif,serif;
-  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#111311; --surface:#181b19; --surface-2:#202421; --ink:#ecebe4; --muted:#a8aa9f;
-    --line:#2d322e; --accent:#52d1a6; --accent-ink:#08231b; --accent-soft:#17332a;
-    --link:#ffb36b; --code-bg:#0b0d0c; --focus:#ffb36b; --shadow:0 1px 0 rgba(255,255,255,.03),0 12px 32px -18px rgba(0,0,0,.7);
-  }
-}
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);overflow-wrap:break-word}
-img,svg{max-width:100%}
-a{color:var(--link);text-underline-offset:3px}
-a:hover{text-decoration-thickness:2px}
-:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
-.skip{position:absolute;left:-9999px;top:8px;background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;z-index:10}
-.skip:focus{left:12px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-h1,h2,h3{font-family:var(--serif);line-height:1.15;letter-spacing:-.01em;margin:0 0 .5em}
-h1{font-size:clamp(2.1rem,5.6vw,3.9rem);font-weight:600}
-h2{font-size:clamp(1.65rem,3.6vw,2.4rem);font-weight:600}
-h3{font-size:1.2rem;font-weight:600}
-p{margin:0 0 1em}
-code,pre,kbd{font-family:var(--mono);font-size:.88em}
-:not(pre)>code{background:var(--surface-2);border:1px solid var(--line);padding:.08em .38em;border-radius:5px}
-.eyebrow{font:600 .78rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
-.lede{font-size:1.15rem;color:var(--muted);max-width:62ch}
-.wl{color:var(--link);font-family:var(--mono);font-size:.92em;white-space:nowrap}
-
-/* header */
-.site-head{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent);position:sticky;top:0;z-index:5;backdrop-filter:saturate(1.2) blur(8px)}
-.site-head .wrap{display:flex;align-items:center;gap:16px;min-height:60px}
-.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:700 1.12rem/1 var(--serif)}
-.brand svg{width:28px;height:28px;flex:none}
-.nav{margin-left:auto;display:flex;gap:4px;align-items:center}
-.nav a{color:var(--muted);text-decoration:none;font-size:.93rem;padding:8px 10px;border-radius:8px}
-.nav a:hover{color:var(--ink);background:var(--surface-2)}
-.nav .gh{color:var(--ink);border:1px solid var(--line);display:inline-flex;gap:6px;align-items:center}
-@media (max-width:760px){.nav .opt{display:none}}
-
-/* buttons */
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 22px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:600;font-size:.98rem;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--surface);transition:transform .15s,background .15s}
-.btn:hover{transform:translateY(-1px)}
-.btn svg{width:18px;height:18px;flex:none}
-.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.btn-sponsor svg{color:#d6336c}
-@media (prefers-color-scheme: dark){.btn-sponsor svg{color:#ff7aa8}}
-
-/* hero */
-.hero{padding:64px 0 56px}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:48px;align-items:center}
-@media (max-width:920px){.hero-grid{grid-template-columns:minmax(0,1fr);gap:36px}}
-.hero-grid>*{min-width:0}
-.install{display:flex;align-items:center;gap:8px;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:6px 6px 6px 14px;max-width:100%}
-.install code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;background:none;border:0;padding:8px 0;font-size:.84rem;color:var(--code-ink)}
-.install code::before{content:"$ ";color:var(--code-muted)}
-.copy{flex:none;font:600 .78rem/1 var(--mono);background:#2c312e;color:#e9e8e1;border:1px solid #3a403c;border-radius:7px;padding:9px 11px;cursor:pointer}
-.copy:hover{background:#3a403c}
-.meta-line{margin-top:12px;font-size:.88rem;color:var(--muted)}
-
-/* example window */
-.window{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.window-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);font:500 .78rem/1 var(--mono);color:var(--muted)}
-.window-bar i{width:10px;height:10px;border-radius:50%;background:var(--line);display:inline-block}
-.window-bar span{margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.window-body{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
-@media (max-width:520px){.window-body{grid-template-columns:1fr}.tree{border-right:0!important;border-bottom:1px solid var(--line)}}
-.tree{margin:0;padding:14px 12px;border-right:1px solid var(--line);font:.8rem/1.75 var(--mono);color:var(--muted);list-style:none;white-space:nowrap;overflow:hidden}
-.tree li{overflow:hidden;text-overflow:ellipsis}
-.tree .d{color:var(--ink);font-weight:600}
-.tree .on{color:var(--accent);font-weight:600}
-.tree .i1{padding-left:14px}.tree .i2{padding-left:28px}
-.page{padding:14px 16px;font:.8rem/1.7 var(--mono);color:var(--ink);overflow-x:auto}
-.page .fm{color:var(--muted)}
-.page .wl{white-space:normal;overflow-wrap:anywhere}
-.page .k{color:var(--accent)}
-.page .h{font-weight:700}
-.caption{font-size:.82rem;color:var(--muted);margin:10px 2px 0}
-
-section{padding:72px 0;border-top:1px solid var(--line);scroll-margin-top:60px}
-.section-head{max-width:68ch;margin-bottom:36px}
-
-/* pipeline */
-.pipeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;counter-reset:step}
-.pipeline li{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 18px 18px}
-.pipeline li::before{counter-increment:step;content:"0" counter(step);font:600 .78rem/1 var(--mono);color:var(--accent);display:block;margin-bottom:12px}
-.pipeline li:not(:last-child)::after{content:"";position:absolute;top:50%;right:-15px;width:12px;height:12px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);transform:translateY(-50%) rotate(45deg)}
-.pipeline h3{margin-bottom:.35em}
-.pipeline p{font-size:.94rem;color:var(--muted);margin:0 0 10px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
-.chips li{font:500 .74rem/1 var(--mono);padding:6px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
-.pipeline .chips li{border-radius:6px;padding:6px 8px}
-.pipeline .chips li::before,.pipeline .chips li::after{content:none}
-@media (max-width:900px){
-  .pipeline{grid-template-columns:1fr;gap:26px}
-  .pipeline li:not(:last-child)::after{top:auto;bottom:-20px;right:auto;left:28px;transform:rotate(135deg)}
-}
-
-/* features */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 20px}
-.card svg{width:26px;height:26px;color:var(--accent);margin-bottom:12px}
-.card p{color:var(--muted);font-size:.95rem;margin:0}
-
-/* quickstart */
-.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:860px){.qs{grid-template-columns:1fr}}
-.code{background:var(--code-bg);color:var(--code-ink);border-radius:12px;overflow:hidden}
-.code-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 10px 16px;border-bottom:1px solid #2a2f2c}
-.code-head h3{font:600 .82rem/1.3 var(--mono);color:var(--code-ink);margin:0;letter-spacing:0}
-.code pre{margin:0;padding:14px 16px 16px;overflow-x:auto;font-size:.84rem;line-height:1.75}
-.code pre code{color:var(--code-ink)}
-.c{color:var(--code-muted)}
-.p{color:var(--code-key)}
-.s{color:var(--code-str)}
-
-/* use cases */
-.uses{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
-@media (max-width:400px){.uses{grid-template-columns:1fr}}
-.uses > div{padding:20px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);margin:0 -1px -1px 0}
-.uses h3{font-size:1.08rem;margin-bottom:.3em}
-.uses p{margin:0;color:var(--muted);font-size:.94rem}
-
-/* providers */
-.providers{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:0 0 20px;padding:0}
-.providers li{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font-weight:600}
-.providers small{font-weight:400;color:var(--muted);font-size:.82rem}
-.providers .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
-.providers .local .dot{background:var(--link)}
-
-/* founder book */
-.showcase{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:16px;padding:28px}
-@media (max-width:720px){.showcase{grid-template-columns:1fr}}
-.showcase p{margin:0;color:var(--ink)}
-
-/* faq */
-.faq{max-width:820px}
-.faq details{border-bottom:1px solid var(--line)}
-.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:18px 2px}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary h3{margin:0;font-size:1.15rem}
-.faq summary::after{content:"+";font:400 1.5rem/1 var(--mono);color:var(--accent);flex:none;transition:transform .2s}
-.faq details[open] summary::after{transform:rotate(45deg)}
-.faq details p{color:var(--muted);margin:0 2px 20px;max-width:70ch}
-
-/* sponsor */
-.sponsor{text-align:center;max-width:720px;margin:0 auto}
-.sponsor .btns{justify-content:center}
-
-/* footer */
-footer{border-top:1px solid var(--line);padding:40px 0 48px;font-size:.92rem;color:var(--muted)}
-.foot{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start}
-.foot ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px}
-.foot a{color:var(--muted)}
-.foot a:hover{color:var(--ink)}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-</style>
+<meta name="twitter:title" content="OpenWiki | Turn YouTube &amp; Blogs into a Markdown Knowledge Base">
+<meta name="twitter:description" content="Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.">
+<meta name="twitter:image" content="https://openwiki-delta.vercel.app/openwiki/img/og.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=Inter:wght@400..600&family=Playwrite+US+Trad&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "OpenWiki", "description": "Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.", "codeRepository": "https://github.com/ckryptickunal/OpenWiki", "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://opensource.org/licenses/MIT", "url": "https://openwiki-delta.vercel.app/openwiki/", "author": {"@type": "Person", "name": "Kunal", "url": "https://github.com/ckryptickunal"}, "keywords": "YouTube transcript, knowledge base, LLM wiki, Obsidian, Markdown, second brain, RAG"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I download the transcript of a YouTube video as text?", "acceptedAnswer": {"@type": "Answer", "text": "Run openwiki youtube <url> --folder Talks. It writes a .txt file with the title, channel, language and full transcript. No API key is needed."}}, {"@type": "Question", "name": "How do I turn a whole YouTube channel or playlist into notes?", "acceptedAnswer": {"@type": "Answer", "text": "Set a free YOUTUBE_API_KEY, run openwiki youtube --channel @handle or --playlist <url>, then openwiki ingest --all to build the wiki pages."}}, {"@type": "Question", "name": "Does it work with non-English videos?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Use --lang to prefer languages; if none match, OpenWiki uses whatever caption track exists. Page names keep non-Latin scripts."}}, {"@type": "Question", "name": "Can I use it with Obsidian?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Open the wiki folder as a vault. Pages use YAML frontmatter and [[wikilinks]], so backlinks and the graph view work."}}, {"@type": "Question", "name": "Can I run it without sending data to the cloud?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Point it at Ollama or LM Studio. Only the caption and article downloads touch the internet."}}, {"@type": "Question", "name": "What does it cost?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWiki is free and MIT-licensed. You only pay for LLM calls if your provider charges; a local model costs nothing."}}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-
-<header class="site-head">
-  <div class="wrap">
-    <a class="brand" href="./" aria-label="OpenWiki home">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0b6b55"/><path d="M18 16h-6v32h6M46 16h6v32h-6" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 24l5 16 5-12 5 12 5-16" fill="none" stroke="#ffc766" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      OpenWiki
-    </a>
-    <nav class="nav" aria-label="Primary">
-      <a class="opt" href="#how-it-works">How it works</a>
-      <a class="opt" href="#features">Features</a>
-      <a class="opt" href="#quickstart">Quickstart</a>
-      <a class="opt" href="#faq">FAQ</a>
-      <a class="gh" href="https://github.com/ckryptickunal/OpenWiki">
-        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-    </nav>
-  </div>
+<main class="ow" id="main">
+<div class="page">
+<header class="head">
+<h1 class="stagger" style="--s:0;margin:0"><a href="./" class="wordmark" aria-label="OpenWiki home">openwiki<span class="wordmark-veil"></span></a><span class="sr-only">: turn YouTube videos, blogs and notes into a Markdown knowledge base</span></h1>
+<p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="obsidian/">Obsidian</a>.</p>
+<p class="body3 secondary stagger" style="--s:1"><a class="link" href="https://github.com/ckryptickunal/OpenWiki">source on github</a>, <a class="link" href="#start">get started</a>, or <a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor the project</a>.</p>
 </header>
-
-<main id="main">
-  <div class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="eyebrow">Open source · MIT · Python 3.10+</p>
-        <h1>Turn YouTube, blogs and essays into a linked Markdown wiki</h1>
-        <p class="lede">OpenWiki is a command-line tool that pulls transcripts from YouTube videos, playlists and channels, plus articles from any blog, and has an LLM organize them into an Obsidian-compatible knowledge base: source pages, people, companies and topics, all cross-linked. A second brain made of plain files you own.</p>
-        <div class="btns">
-          <a class="btn btn-primary" href="https://github.com/ckryptickunal/OpenWiki">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
-            Star on GitHub
-          </a>
-          <a class="btn" href="#quickstart">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-5-6-5M12 19h8"/></svg>
-            Get started
-          </a>
-          <a class="btn btn-sponsor" href="https://github.com/sponsors/ckryptickunal">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
-            Sponsor
-          </a>
-        </div>
-        <div class="install">
-          <code id="install-cmd">pip install "git+https://github.com/ckryptickunal/OpenWiki.git"</code>
-          <button class="copy" type="button" data-copy="#install-cmd" aria-label="Copy install command">Copy</button>
-        </div>
-        <p class="meta-line">Installs the <code>openwiki</code> command. Requires Python 3.10 or newer.</p>
-      </div>
-
-      <figure style="margin:0">
-        <div class="window" role="img" aria-label="Example OpenWiki output: a wiki folder with sources, entities and topics subfolders and an index file, next to a topic page with YAML frontmatter and wikilinks back to its sources">
-          <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>my-wiki/wiki/topics/product-market-fit.md</span></div>
-          <div class="window-body" aria-hidden="true">
-            <ul class="tree">
-              <li class="d">wiki/</li>
-              <li class="i1">index.md</li>
-              <li class="i1 d">sources/</li>
-              <li class="i2">VIDEO_ID-talk.md</li>
-              <li class="i2">pg-do-things.md</li>
-              <li class="i1 d">entities/</li>
-              <li class="i2">paul-graham.md</li>
-              <li class="i2">y-combinator.md</li>
-              <li class="i1 d">topics/</li>
-              <li class="i2 on">product-market-fit.md</li>
-              <li class="i2">fundraising.md</li>
-            </ul>
-            <div class="page">
-              <div class="fm">---</div>
-              <div><span class="k">type:</span> topic</div>
-              <div><span class="k">title:</span> Product-market fit</div>
-              <div><span class="k">updated:</span> 2026-09-24</div>
-              <div><span class="k">tags:</span> [startups]</div>
-              <div class="fm">---</div>
-              <div class="h"># Product-market fit</div>
-              <div>Mentioned by <span class="wl">[[entities/paul-graham|Paul Graham]]</span> and <span class="wl">[[entities/y-combinator|YC]]</span>…</div>
-              <div class="h">## Source Mentions</div>
-              <div>- <span class="wl">[[sources/pg-do-things]]</span></div>
-              <div>- <span class="wl">[[sources/VIDEO_ID-talk]]</span></div>
-            </div>
-          </div>
-        </div>
-        <figcaption class="caption">Illustrative example of the generated wiki layout and page format.</figcaption>
-      </figure>
-    </div>
-  </div>
-
-  <section id="how-it-works" aria-labelledby="how-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">How it works</p>
-        <h2 id="how-h">From a list of sources to a wiki you can browse, search and feed to an LLM</h2>
-        <p class="lede">Every stage writes plain files to disk, so you can inspect, edit or re-run any step on its own.</p>
-      </div>
-      <ol class="pipeline">
-        <li>
-          <h3>Collect</h3>
-          <p>List YouTube channels, playlists, videos and essay sites in <code>sources.json</code>, or add them one at a time from the CLI.</p>
-          <ul class="chips" aria-label="Source types"><li>YouTube</li><li>Playlists</li><li>Channels</li><li>Blogs</li><li>.txt / .md</li></ul>
-        </li>
-        <li>
-          <h3>Extract</h3>
-          <p>Captions come from <code>youtube-transcript-api</code>; articles come from any index page or single URL. Each source becomes a <code>.txt</code> file with a metadata header.</p>
-          <ul class="chips" aria-label="Output"><li>.txt + metadata header</li></ul>
-        </li>
-        <li>
-          <h3>Ingest</h3>
-          <p>An LLM reads each file and extracts a summary, the people, companies and products it mentions, and the topics it covers. Or feed it precomputed JSON.</p>
-          <ul class="chips" aria-label="Engines"><li>Gemini</li><li>OpenAI-compatible</li><li>Local</li></ul>
-        </li>
-        <li>
-          <h3>Wiki &amp; lint</h3>
-          <p>Markdown pages with YAML frontmatter, <span class="wl">[[wikilinks]]</span> and backlinks. <code>lint</code> catches broken links, missing frontmatter and orphan pages, then rebuilds the index.</p>
-          <ul class="chips" aria-label="Wiki folders"><li>sources/</li><li>entities/</li><li>topics/</li><li>index.md</li></ul>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="features" aria-labelledby="feat-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Features</p>
-        <h2 id="feat-h">Built for knowledge bases that keep growing</h2>
-      </div>
-      <div class="grid">
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg>
-          <h3>Videos, playlists and whole channels</h3>
-          <p>Point it at one video, a course playlist, or a creator's entire channel. Captions are saved as searchable text.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>
-          <h3>Blogs, essays and your own notes</h3>
-          <p>Scrape every post from a blog's index page, grab a single article, or import local <code>.txt</code> and <code>.md</code> files.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="10" cy="18" r="2.5"/><path d="M8.3 7l7.3.7M7.1 8.2l2 7.4M16.4 10l-4.7 6.2"/></svg>
-          <h3>Linked like a real wiki</h3>
-          <p>People, companies, products and topics get their own pages, with <span class="wl">[[wikilinks]]</span> and backlinks to every source that mentions them.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8 4.5v10l-8 4.5-8-4.5V7z"/><path d="M12 7.5l4 2.3v4.4l-4 2.3-4-2.3V9.8z"/></svg>
-          <h3>Obsidian-compatible</h3>
-          <p>Open the folder as a vault and graph view, backlinks and search just work. It's plain Markdown, so any editor works too.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 11-2.3-5.7M20 4v4h-4"/></svg>
-          <h3>Incremental and idempotent</h3>
-          <p>Re-run anytime. Downloaded videos and essays are skipped, ingest dedupes by file time, and caption-less videos are remembered.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9zM9 1.5V4M15 1.5V4M9 20v2.5M15 20v2.5M1.5 9H4M1.5 15H4M20 9h2.5M20 15h2.5"/></svg>
-          <h3>Bring your own LLM</h3>
-          <p>Use Google Gemini or any OpenAI-compatible API, including local Ollama or LM Studio for fully offline ingest.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
-          <h3>Lint keeps it healthy</h3>
-          <p><code>openwiki lint</code> finds broken links, missing frontmatter and orphan pages, and <code>--fix-index</code> rebuilds <code>index.md</code>.</p>
-        </article>
-        <article class="card">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-          <h3>Plain files, no lock-in</h3>
-          <p>No database, no server, no account. Raw text and Markdown on disk, ready for git, grep, or a RAG pipeline.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section id="quickstart" aria-labelledby="qs-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Quickstart</p>
-        <h2 id="qs-h">Your first wiki in four commands</h2>
-        <p class="lede">Needs Python 3.10+. Set <code>YOUTUBE_API_KEY</code> for channel discovery and an LLM key (or a local model) for ingest.</p>
-      </div>
-      <div class="qs">
-        <div class="code">
-          <div class="code-head"><h3>1. Install and create a wiki</h3><button class="copy" type="button" data-copy="#qs-1" aria-label="Copy install and init commands">Copy</button></div>
-<pre><code id="qs-1"><span class="p">pip install</span> <span class="s">"git+https://github.com/ckryptickunal/OpenWiki.git"</span>
-<span class="p">openwiki init</span> --root my-wiki</code></pre>
-        </div>
-        <div class="code">
-          <div class="code-head"><h3>2. Add a source</h3><button class="copy" type="button" data-copy="#qs-2" aria-label="Copy add source command">Copy</button></div>
-<pre><code id="qs-2"><span class="p">openwiki youtube</span> https://www.youtube.com/watch?v=VIDEO_ID --folder Talks</code></pre>
-        </div>
-        <div class="code">
-          <div class="code-head"><h3>3. Build the wiki with an LLM</h3><button class="copy" type="button" data-copy="#qs-3" aria-label="Copy ingest command">Copy</button></div>
-<pre><code id="qs-3"><span class="p">openwiki ingest</span> --all</code></pre>
-        </div>
-        <div class="code">
-          <div class="code-head"><h3>4. Check links and rebuild the index</h3><button class="copy" type="button" data-copy="#qs-4" aria-label="Copy lint command">Copy</button></div>
-<pre><code id="qs-4"><span class="p">openwiki lint</span> --fix-index</code></pre>
-        </div>
-      </div>
-
-      <div class="code" style="margin-top:18px">
-        <div class="code-head"><h3>More sources</h3><button class="copy" type="button" data-copy="#qs-5" aria-label="Copy more source commands">Copy</button></div>
-<pre><code id="qs-5"><span class="c"># A whole channel (needs YOUTUBE_API_KEY)</span>
-<span class="p">openwiki youtube</span> --channel https://www.youtube.com/@handle --folder <span class="s">"Channel"</span>
-
-<span class="c"># A playlist or course</span>
-<span class="p">openwiki youtube</span> --playlist https://www.youtube.com/playlist?list=... --folder Course
-
-<span class="c"># A blog post or essay</span>
-<span class="p">openwiki essay</span> --url https://example.com/post --folder Essays
-
-<span class="c"># Your own notes</span>
-<span class="p">openwiki text</span> notes.md --folder Notes
-
-<span class="c"># Pull every channel and essay site in sources.json, then ingest</span>
-<span class="p">openwiki sync</span></code></pre>
-      </div>
-    </div>
-  </section>
-
-  <section id="use-cases" aria-labelledby="uc-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Use cases</p>
-        <h2 id="uc-h">What you can build with it</h2>
-      </div>
-      <div class="uses">
-        <div><h3>Study notes from lectures</h3><p>Turn a course playlist into per-lecture notes with shared concept pages across the whole course.</p></div>
-        <div><h3>Podcast and talk archives</h3><p>Make years of episodes searchable by guest, company and idea instead of by episode number.</p></div>
-        <div><h3>Founder and startup learning</h3><p>Collect talks and essays from the founders you learn from and see where their advice overlaps.</p></div>
-        <div><h3>RAG and LLM knowledge bases</h3><p>Clean, cross-referenced Markdown with metadata is ready to embed for retrieval.</p></div>
-        <div><h3>An Obsidian second brain</h3><p>Fill a vault with linked notes from everything you watch and read, then grow it by hand.</p></div>
-        <div><h3>Competitive research</h3><p>Track what companies say in their talks, demos and blog posts, organized by product and topic.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="providers" aria-labelledby="prov-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">LLM providers</p>
-        <h2 id="prov-h">Works with the model you already use</h2>
-        <p class="lede">Ingest runs on Google Gemini or any OpenAI-compatible endpoint. Run a local model for fully offline, private ingest.</p>
-      </div>
-      <ul class="providers">
-        <li><span class="dot" aria-hidden="true"></span>Google Gemini</li>
-        <li><span class="dot" aria-hidden="true"></span>OpenAI</li>
-        <li><span class="dot" aria-hidden="true"></span>OpenRouter</li>
-        <li><span class="dot" aria-hidden="true"></span>Groq</li>
-        <li class="local"><span class="dot" aria-hidden="true"></span>Ollama <small>local</small></li>
-        <li class="local"><span class="dot" aria-hidden="true"></span>LM Studio <small>local</small></li>
-        <li><span class="dot" aria-hidden="true"></span>Any OpenAI-compatible API</li>
-        <li><span class="dot" aria-hidden="true"></span>Precomputed JSON <small>no LLM call</small></li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="built-with" aria-labelledby="bw-h">
-    <div class="wrap">
-      <div class="showcase">
-        <div>
-          <p class="eyebrow">Built with OpenWiki</p>
-          <h2 id="bw-h">Founder Book</h2>
-          <p>OpenWiki is the engine behind Founder Book, an open wiki built from Y Combinator videos and essays by Paul Graham and Sam Altman.</p>
-        </div>
-        <a class="btn" href="https://github.com/ckryptickunal/Founder-Book">Explore Founder Book</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq" aria-labelledby="faq-h">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">FAQ</p>
-        <h2 id="faq-h">Frequently asked questions</h2>
-      </div>
-      <div class="faq">
-        <details open>
-          <summary><h3>How do I turn a YouTube channel into notes?</h3></summary>
-          <p>Install OpenWiki, set a <code>YOUTUBE_API_KEY</code>, and run <code>openwiki youtube --channel https://www.youtube.com/@handle --folder "Channel"</code>. It downloads the captions of every video as plain text files. Then run <code>openwiki ingest --all</code> to turn them into linked Markdown pages for sources, people, companies and topics.</p>
-        </details>
-        <details>
-          <summary><h3>Can I turn a YouTube playlist or online course into study notes?</h3></summary>
-          <p>Yes. Run <code>openwiki youtube --playlist</code> with the playlist URL and a folder name, then <code>openwiki ingest --all</code>. Each lecture becomes a source page, and recurring concepts become topic pages linked back to every lecture that mentions them.</p>
-        </details>
-        <details>
-          <summary><h3>Does it work without an API key?</h3></summary>
-          <p>Partly. Downloading captions for a single video, fetching essays and importing local notes need no YouTube key, although video titles and channel names are only filled in when a <code>YOUTUBE_API_KEY</code> is set. Discovering all videos in a channel needs the key. Ingest needs an LLM, but that can be a local model through Ollama or LM Studio, or you can pass precomputed JSON instead.</p>
-        </details>
-        <details>
-          <summary><h3>Can I run it fully offline?</h3></summary>
-          <p>The ingest step can run fully offline by pointing OpenWiki at a local OpenAI-compatible server such as Ollama or LM Studio. Fetching captions and articles needs the internet, but once your text files are on disk, building and linting the wiki can happen entirely on your machine.</p>
-        </details>
-        <details>
-          <summary><h3>Is it compatible with Obsidian?</h3></summary>
-          <p>Yes. The wiki is plain Markdown with YAML frontmatter and Obsidian-style [[wikilinks]], and entity and topic pages keep backlinks to their sources. Open the wiki folder as an Obsidian vault and the graph view, backlinks and search work immediately.</p>
-        </details>
-        <details>
-          <summary><h3>Which LLMs are supported?</h3></summary>
-          <p>Google Gemini, or any OpenAI-compatible API: OpenAI, OpenRouter, Groq, and local servers such as Ollama and LM Studio. You can also skip the LLM call entirely and ingest a precomputed JSON analysis.</p>
-        </details>
-        <details>
-          <summary><h3>What does it cost?</h3></summary>
-          <p>OpenWiki is free and open source under the MIT license. The only possible cost is whatever your chosen LLM provider charges for ingest; a local model through Ollama or LM Studio costs nothing beyond your own hardware.</p>
-        </details>
-        <details>
-          <summary><h3>What happens when I run it again on the same sources?</h3></summary>
-          <p>Nothing is duplicated. Already-downloaded videos and essays are skipped, ingest dedupes by file modification time, and videos without captions are remembered and skipped. That makes <code>openwiki sync</code> safe to run on a schedule.</p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <section id="sponsor" aria-labelledby="sp-h">
-    <div class="wrap sponsor">
-      <p class="eyebrow">Support the project</p>
-      <h2 id="sp-h">Keep OpenWiki free and maintained</h2>
-      <p class="lede" style="margin:0 auto">OpenWiki is an independent open-source project by Kunal. If it saves you hours of note-taking, a star helps others find it and sponsorship keeps new sources and providers coming.</p>
-      <div class="btns">
-        <a class="btn btn-primary btn-sponsor" href="https://github.com/sponsors/ckryptickunal">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" style="color:inherit"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
-          Sponsor on GitHub
-        </a>
-        <a class="btn" href="https://github.com/ckryptickunal/OpenWiki">Star the repo</a>
-        <a class="btn" href="https://github.com/ckryptickunal/OpenWiki/issues">Report an issue</a>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap foot">
-    <div>
-      <p style="margin:0 0 6px;color:var(--ink);font:700 1.05rem/1.2 var(--serif)">OpenWiki</p>
-      <p style="margin:0">MIT licensed. Made by <a href="https://github.com/ckryptickunal">Kunal</a> · <a href="https://x.com/kunalbairwa232">@kunalbairwa232</a></p>
-    </div>
-    <nav aria-label="Footer">
-      <ul>
-        <li><a href="https://github.com/ckryptickunal/OpenWiki">GitHub</a></li>
-        <li><a href="https://github.com/ckryptickunal/OpenWiki/issues">Issues</a></li>
-        <li><a href="https://github.com/sponsors/ckryptickunal">Sponsor</a></li>
-        <li><a href="https://github.com/ckryptickunal/Founder-Book">Founder Book</a></li>
-        <li><a href="https://github.com/ckryptickunal/OpenWiki/blob/main/LICENSE">License (MIT)</a></li>
-      </ul>
-    </nav>
-  </div>
+<section class="section" aria-labelledby="h-sources">
+<h2 class="h2 stagger" id="h-sources" style="--s:1">sources</h2>
+<a class="row divider stagger" style="--s:2" href="youtube/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:-7deg;--tx:-2px;--ty:-2px;--fan-tilt:-12deg;--fan-tx:-7px;--fan-ty:-3px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="img/thumbs/youtube.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">YouTube</span><span class="row-meta">videos · playlists · channels</span></a>
+<a class="row divider stagger" style="--s:3" href="blogs/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:5deg;--tx:1px;--ty:-1px;--fan-tilt:9deg;--fan-tx:6px;--fan-ty:-4px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="img/thumbs/essays.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">Blogs &amp; essays</span><span class="row-meta">any site</span></a>
+<a class="row divider stagger" style="--s:4" href="notes/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:-4deg;--tx:-1px;--ty:1px;--fan-tilt:-10deg;--fan-tx:-6px;--fan-ty:2px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="img/thumbs/notes.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">Your notes</span><span class="row-meta">.md · .txt · .html</span></a>
+</section>
+<section class="section" aria-labelledby="h-the-wiki">
+<h2 class="h2 stagger" id="h-the-wiki" style="--s:5">the wiki</h2>
+<a class="row divider stagger" style="--s:6" href="wiki/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:-7deg;--tx:-2px;--ty:-2px;--fan-tilt:-12deg;--fan-tx:-7px;--fan-ty:-3px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="img/thumbs/wiki.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">Linked pages</span><span class="row-meta">sources · people · topics</span></a>
+<a class="row divider stagger" style="--s:7" href="obsidian/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:5deg;--tx:1px;--ty:-1px;--fan-tilt:9deg;--fan-tx:6px;--fan-ty:-4px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="img/thumbs/obsidian.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">Obsidian vault</span><span class="row-meta">[[wikilinks]]</span></a>
+<a class="row divider stagger" style="--s:8" href="providers/"><div class="pile" aria-hidden="true">
+<div class="pile-card" style="--tilt:-4deg;--tx:-1px;--ty:1px;--fan-tilt:-10deg;--fan-tx:-6px;--fan-ty:2px"><div class="polaroid polaroid--blank"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="img/thumbs/providers.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+</div><span class="row-title">Any LLM</span><span class="row-meta">gemini · openai · ollama</span></a>
+</section>
+<section class="section" id="start" aria-labelledby="h-start">
+<h2 class="h2 stagger" id="h-start" style="--s:9">get started</h2>
+<div class="stagger" style="--s:10">
+<p class="body3">Python 3.10 or newer. Grab a video and an essay without any keys, then add an LLM to build the wiki.</p>
+<div class="code"><pre><code><span class="p">$ </span><span class="cmd">pip install &quot;git+https://github.com/ckryptickunal/OpenWiki.git&quot;</span>
+<span class="p">$ </span><span class="cmd">openwiki init --root my-wiki &amp;&amp; cd my-wiki</span>
+<span class="p">$ </span><span class="cmd">openwiki youtube https://youtu.be/jNQXAC9IVRw --folder Talks</span>
+<span class="p">$ </span><span class="cmd">openwiki ingest --all</span></code></pre></div>
+<ul class="tags" aria-label="Highlights"><li>free &amp; MIT</li><li>no key for single videos</li><li>runs offline with Ollama</li><li>incremental</li></ul>
+</div>
+</section>
+<section class="section" aria-labelledby="h-faq">
+<h2 class="h2 stagger" id="h-faq" style="--s:11">questions</h2>
+<div class="stagger" style="--s:12">
+<details class="faq divider"><summary><h3>How do I download the transcript of a YouTube video as text?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>Run openwiki youtube &lt;url&gt; --folder Talks. It writes a .txt file with the title, channel, language and full transcript. No API key is needed.</p></div></details>
+<details class="faq divider"><summary><h3>How do I turn a whole YouTube channel or playlist into notes?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>Set a free YOUTUBE_API_KEY, run openwiki youtube --channel @handle or --playlist &lt;url&gt;, then openwiki ingest --all to build the wiki pages.</p></div></details>
+<details class="faq divider"><summary><h3>Does it work with non-English videos?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>Yes. Use --lang to prefer languages; if none match, OpenWiki uses whatever caption track exists. Page names keep non-Latin scripts.</p></div></details>
+<details class="faq divider"><summary><h3>Can I use it with Obsidian?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>Yes. Open the wiki folder as a vault. Pages use YAML frontmatter and [[wikilinks]], so backlinks and the graph view work.</p></div></details>
+<details class="faq divider"><summary><h3>Can I run it without sending data to the cloud?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>Yes. Point it at Ollama or LM Studio. Only the caption and article downloads touch the internet.</p></div></details>
+<details class="faq divider"><summary><h3>What does it cost?</h3><span class="faq-sign" aria-hidden="true"></span></summary><div class="faq-answer"><p>OpenWiki is free and MIT-licensed. You only pay for LLM calls if your provider charges; a local model costs nothing.</p></div></details>
+</div>
+</section>
+<footer class="foot stagger" style="--s:12">
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki">github</a>
+<a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/issues">issues</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/discussions">discussions</a>
+<a class="link" href="https://github.com/ckryptickunal/Founder-Book">founder book</a>
+<a class="link" href="sitemap.xml">sitemap</a>
+<p class="foot-note">MIT licensed. Built by <a class="link" href="https://github.com/ckryptickunal">Kunal</a>.</p>
 </footer>
-
-<script>
-document.querySelectorAll('.copy').forEach(function(b){
-  b.addEventListener('click',function(){
-    var el=document.querySelector(b.getAttribute('data-copy'));
-    if(!el)return;
-    var done=function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1600)};
-    var text=el.innerText.trim();
-    var fallback=function(){var t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{if(document.execCommand('copy'))done()}catch(e){}document.body.removeChild(t)};
-    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(done,fallback)}else{fallback()}
-  });
-});
-</script>
+</div>
+</main>
+<script src="assets/site.js" defer></script>
 </body>
 </html>

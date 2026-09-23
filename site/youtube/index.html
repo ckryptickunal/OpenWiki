@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Transcripts to Markdown Notes | OpenWiki</title>
+<meta name="description" content="Download YouTube transcripts from a video, playlist or whole channel as clean text, then turn them into linked Markdown notes. Free, open source, non-English captions supported.">
+<link rel="canonical" href="https://openwiki-delta.vercel.app/openwiki/youtube/">
+<meta name="theme-color" content="#faf6f2">
+<meta name="author" content="Kunal">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OpenWiki">
+<meta property="og:title" content="YouTube Transcripts to Markdown Notes | OpenWiki">
+<meta property="og:description" content="Download YouTube transcripts from a video, playlist or whole channel as clean text, then turn them into linked Markdown notes. Free, open source, non-English captions supported.">
+<meta property="og:url" content="https://openwiki-delta.vercel.app/openwiki/youtube/">
+<meta property="og:image" content="https://openwiki-delta.vercel.app/openwiki/img/youtube.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@kunalbairwa232">
+<meta name="twitter:title" content="YouTube Transcripts to Markdown Notes | OpenWiki">
+<meta name="twitter:description" content="Download YouTube transcripts from a video, playlist or whole channel as clean text, then turn them into linked Markdown notes. Free, open source, non-English captions supported.">
+<meta name="twitter:image" content="https://openwiki-delta.vercel.app/openwiki/img/youtube.jpg">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=Inter:wght@400..600&family=Playwrite+US+Trad&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "YouTube Transcripts to Markdown Notes", "description": "Download YouTube transcripts from a video, playlist or whole channel as clean text, then turn them into linked Markdown notes. Free, open source, non-English captions supported.", "url": "https://openwiki-delta.vercel.app/openwiki/youtube/", "image": "https://openwiki-delta.vercel.app/openwiki/img/youtube.jpg", "dateModified": "2026-09-24", "author": {"@type": "Person", "name": "Kunal", "url": "https://github.com/ckryptickunal"}, "about": {"@type": "SoftwareSourceCode", "name": "OpenWiki", "codeRepository": "https://github.com/ckryptickunal/OpenWiki"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "OpenWiki", "item": "https://openwiki-delta.vercel.app/openwiki/"}, {"@type": "ListItem", "position": 2, "name": "YouTube", "item": "https://openwiki-delta.vercel.app/openwiki/youtube/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<a class="back" href="../" aria-label="Back to OpenWiki home"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<main class="ow" id="main">
+<div class="page entry">
+<p class="rise" style="--s:0;margin:0 0 20px"><a href="../" class="wordmark wordmark--small" aria-label="OpenWiki home">openwiki</a></p>
+<figure class="hero rise" style="--s:1;--tilt:-.6deg"><img src="../img/youtube.jpg" alt="A small cream vintage television on a wooden desk, glowing with a blurred lecture." width="1500" height="1000" fetchpriority="high"></figure>
+<article>
+<h1 class="entry-title rise" style="--s:2">YouTube</h1>
+<p class="entry-kicker rise" style="--s:3">Videos, playlists and whole channels</p>
+<ul class="entry-links rise" style="--s:4">
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki/blob/main/docs/ADDING_SOURCES.md">docs: adding sources</a></li>
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki/blob/main/openwiki/youtube.py">source code</a></li>
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki">OpenWiki on GitHub</a></li>
+</ul>
+<div class="prose rise" style="--s:5">
+<p>Talks, lectures and interviews are some of the best material on the internet, and some of the hardest to search. OpenWiki downloads their captions as plain text so you can read, grep and build on them.</p>
+<h3>One video, no key needed</h3>
+<p>Paste a link. The title and channel come from YouTube's public oEmbed endpoint, so you don't need an API key for single videos or lists of links.</p>
+<div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki youtube https://www.youtube.com/watch?v=jNQXAC9IVRw --folder Talks</span></code></pre></div>
+<p>That writes <code>Talks/jNQXAC9IVRw.txt</code>: a short header (title, channel, language) followed by the full transcript.</p>
+<h3>Playlists and channels</h3>
+<p>With a free <a class="link" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com">YouTube Data API key</a>, OpenWiki lists every upload on a channel, newest first, or every video in a playlist, and only downloads what you don't have yet.</p>
+<div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki youtube --channel @ycombinator --limit 20</span>
+<span class="p">$ </span><span class="cmd">openwiki youtube --playlist https://www.youtube.com/playlist?list=PL... --folder Course</span></code></pre></div>
+<h3>Any language</h3>
+<p>Pass <code>--lang hi,en</code> to prefer certain caption languages. If none match, OpenWiki uses whatever track the video has instead of skipping it. Videos with no captions at all are remembered and never retried; rate limits are retried on the next run.</p>
+<h3>Next</h3>
+<p>Turn the transcripts into wiki pages with <code>openwiki ingest --all</code>. See <a class="link" href="../wiki/">how the wiki is built</a>.</p>
+</div>
+</article>
+<a class="next divider rise" style="--s:6" href="../blogs/"><span class="secondary">next</span><span>Blogs &amp; essays &rarr;</span></a>
+<footer class="foot stagger" style="--s:12">
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki">github</a>
+<a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/issues">issues</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/discussions">discussions</a>
+<a class="link" href="https://github.com/ckryptickunal/Founder-Book">founder book</a>
+<a class="link" href="../sitemap.xml">sitemap</a>
+<p class="foot-note">MIT licensed. Built by <a class="link" href="https://github.com/ckryptickunal">Kunal</a>.</p>
+</footer>
+</div>
+</main>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

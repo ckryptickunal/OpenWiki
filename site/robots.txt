@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ckryptickunal.github.io/OpenWiki/sitemap.xml
+Sitemap: https://openwiki-delta.vercel.app/openwiki/sitemap.xml

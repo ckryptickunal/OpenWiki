@@ -11,7 +11,7 @@ An open-source Python CLI that downloads YouTube transcripts and web articles, t
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/ckryptickunal)
 
-[Website](https://ckryptickunal.github.io/OpenWiki/) · [Quickstart](#quickstart) · [Commands](#commands) · [LLM providers](#llm-providers) · [FAQ](#faq) · [Sponsor](https://github.com/sponsors/ckryptickunal)
+[Website](https://openwiki-delta.vercel.app/openwiki/) · [Quickstart](#quickstart) · [Commands](#commands) · [LLM providers](#llm-providers) · [FAQ](#faq) · [Sponsor](https://github.com/sponsors/ckryptickunal)
 
 </div>
 

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Save Blog Posts &amp; Essays as Markdown | OpenWiki</title>
+<meta name="description" content="Save any article or a whole blog as clean text with its title and date, then turn it into linked Markdown notes. Works with any site, no API key needed.">
+<link rel="canonical" href="https://openwiki-delta.vercel.app/openwiki/blogs/">
+<meta name="theme-color" content="#faf6f2">
+<meta name="author" content="Kunal">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OpenWiki">
+<meta property="og:title" content="Save Blog Posts &amp; Essays as Markdown | OpenWiki">
+<meta property="og:description" content="Save any article or a whole blog as clean text with its title and date, then turn it into linked Markdown notes. Works with any site, no API key needed.">
+<meta property="og:url" content="https://openwiki-delta.vercel.app/openwiki/blogs/">
+<meta property="og:image" content="https://openwiki-delta.vercel.app/openwiki/img/essays.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@kunalbairwa232">
+<meta name="twitter:title" content="Save Blog Posts &amp; Essays as Markdown | OpenWiki">
+<meta name="twitter:description" content="Save any article or a whole blog as clean text with its title and date, then turn it into linked Markdown notes. Works with any site, no API key needed.">
+<meta name="twitter:image" content="https://openwiki-delta.vercel.app/openwiki/img/essays.jpg">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=Inter:wght@400..600&family=Playwrite+US+Trad&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Save Blog Posts & Essays as Markdown", "description": "Save any article or a whole blog as clean text with its title and date, then turn it into linked Markdown notes. Works with any site, no API key needed.", "url": "https://openwiki-delta.vercel.app/openwiki/blogs/", "image": "https://openwiki-delta.vercel.app/openwiki/img/essays.jpg", "dateModified": "2026-09-24", "author": {"@type": "Person", "name": "Kunal", "url": "https://github.com/ckryptickunal"}, "about": {"@type": "SoftwareSourceCode", "name": "OpenWiki", "codeRepository": "https://github.com/ckryptickunal/OpenWiki"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "OpenWiki", "item": "https://openwiki-delta.vercel.app/openwiki/"}, {"@type": "ListItem", "position": 2, "name": "Blogs & essays", "item": "https://openwiki-delta.vercel.app/openwiki/blogs/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<a class="back" href="../" aria-label="Back to OpenWiki home"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<main class="ow" id="main">
+<div class="page entry">
+<p class="rise" style="--s:0;margin:0 0 20px"><a href="../" class="wordmark wordmark--small" aria-label="OpenWiki home">openwiki</a></p>
+<figure class="hero rise" style="--s:1;--tilt:.5deg"><img src="../img/essays.jpg" alt="A stack of printed essays with a brass clip, a pencil and reading glasses." width="1500" height="1000" fetchpriority="high"></figure>
+<article>
+<h1 class="entry-title rise" style="--s:2">Blogs &amp; essays</h1>
+<p class="entry-kicker rise" style="--s:3">Any article, or every post on a blog</p>
+<ul class="entry-links rise" style="--s:4">
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki/blob/main/docs/ADDING_SOURCES.md#essay--article-site">docs: essay sites</a></li>
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki/blob/main/openwiki/essays.py">source code</a></li>
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki">OpenWiki on GitHub</a></li>
+</ul>
+<div class="prose rise" style="--s:5">
+<p>Point OpenWiki at an article and it keeps only the part worth reading. It finds the main <code>&lt;article&gt;</code>, drops navigation and footers, and detects the title and publish date.</p>
+<div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki essay --url https://www.paulgraham.com/greatwork.html --folder Essays --id-prefix pg</span></code></pre></div>
+<h3>Follow a whole blog</h3>
+<p>Add the blog's index page to <code>sources.json</code>. Each time you run <code>openwiki sync</code>, only new posts are downloaded.</p>
+<div class="code"><pre><code><span class="c">// sources.json</span>
+{ &quot;essay_sources&quot;: [{
+  &quot;name&quot;: &quot;Some Blog&quot;, &quot;kind&quot;: &quot;generic&quot;,
+  &quot;index_url&quot;: &quot;https://example.com/blog/&quot;,
+  &quot;base_url&quot;: &quot;https://example.com/blog&quot;,
+  &quot;folder&quot;: &quot;Some Blog&quot;, &quot;id_prefix&quot;: &quot;sb&quot;
+}] }</code></pre></div>
+<p>The generic parser follows same-site links under <code>base_url</code> and ignores feeds, images and PDFs. There are dedicated parsers for Paul Graham and Sam Altman, and adding one for another site takes a few lines.</p>
+<h3>Next</h3>
+<p>Mix essays with <a class="link" href="../youtube/">video transcripts</a> and <a class="link" href="../notes/">your own notes</a> in the same wiki.</p>
+</div>
+</article>
+<a class="next divider rise" style="--s:6" href="../notes/"><span class="secondary">next</span><span>Your notes &rarr;</span></a>
+<footer class="foot stagger" style="--s:12">
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki">github</a>
+<a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/issues">issues</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/discussions">discussions</a>
+<a class="link" href="https://github.com/ckryptickunal/Founder-Book">founder book</a>
+<a class="link" href="../sitemap.xml">sitemap</a>
+<p class="foot-note">MIT licensed. Built by <a class="link" href="https://github.com/ckryptickunal">Kunal</a>.</p>
+</footer>
+</div>
+</main>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

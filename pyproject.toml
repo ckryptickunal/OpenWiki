@@ -47,7 +47,7 @@ dev = ["pytest>=8.0", "ruff>=0.6"]
 tor = ["pysocks>=1.7.1"]
 
 [project.urls]
-Homepage = "https://ckryptickunal.github.io/OpenWiki/"
+Homepage = "https://openwiki-delta.vercel.app/openwiki/"
 Repository = "https://github.com/ckryptickunal/OpenWiki"
 Documentation = "https://github.com/ckryptickunal/OpenWiki#readme"
 Issues = "https://github.com/ckryptickunal/OpenWiki/issues"

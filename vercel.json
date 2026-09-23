@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "true",
+  "buildCommand": "rm -rf dist && mkdir -p dist/openwiki && cp -R site/. dist/openwiki/ && cp site/404.html site/robots.txt dist/",
+  "outputDirectory": "dist",
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/", "destination": "/openwiki/", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/openwiki/(img|assets)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+    }
+  ]
+}

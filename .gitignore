@@ -42,3 +42,10 @@ failed_videos.json
 # Tooling caches
 .benchmarks/
 .ruff_cache/
+
+# Local editor/agent config
+.claude/
+dist/
+.vercel
+.env*
+!.env.example

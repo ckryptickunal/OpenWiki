@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use Gemini, OpenAI or Ollama Offline | OpenWiki</title>
+<meta name="description" content="OpenWiki works with Google Gemini, OpenAI, OpenRouter, Groq, or a local model through Ollama or LM Studio for fully offline use.">
+<link rel="canonical" href="https://openwiki-delta.vercel.app/openwiki/providers/">
+<meta name="theme-color" content="#faf6f2">
+<meta name="author" content="Kunal">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OpenWiki">
+<meta property="og:title" content="Use Gemini, OpenAI or Ollama Offline | OpenWiki">
+<meta property="og:description" content="OpenWiki works with Google Gemini, OpenAI, OpenRouter, Groq, or a local model through Ollama or LM Studio for fully offline use.">
+<meta property="og:url" content="https://openwiki-delta.vercel.app/openwiki/providers/">
+<meta property="og:image" content="https://openwiki-delta.vercel.app/openwiki/img/providers.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@kunalbairwa232">
+<meta name="twitter:title" content="Use Gemini, OpenAI or Ollama Offline | OpenWiki">
+<meta name="twitter:description" content="OpenWiki works with Google Gemini, OpenAI, OpenRouter, Groq, or a local model through Ollama or LM Studio for fully offline use.">
+<meta name="twitter:image" content="https://openwiki-delta.vercel.app/openwiki/img/providers.jpg">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=Inter:wght@400..600&family=Playwrite+US+Trad&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Use Gemini, OpenAI or Ollama Offline", "description": "OpenWiki works with Google Gemini, OpenAI, OpenRouter, Groq, or a local model through Ollama or LM Studio for fully offline use.", "url": "https://openwiki-delta.vercel.app/openwiki/providers/", "image": "https://openwiki-delta.vercel.app/openwiki/img/providers.jpg", "dateModified": "2026-09-24", "author": {"@type": "Person", "name": "Kunal", "url": "https://github.com/ckryptickunal"}, "about": {"@type": "SoftwareSourceCode", "name": "OpenWiki", "codeRepository": "https://github.com/ckryptickunal/OpenWiki"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "OpenWiki", "item": "https://openwiki-delta.vercel.app/openwiki/"}, {"@type": "ListItem", "position": 2, "name": "Any LLM", "item": "https://openwiki-delta.vercel.app/openwiki/providers/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<a class="back" href="../" aria-label="Back to OpenWiki home"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<main class="ow" id="main">
+<div class="page entry">
+<p class="rise" style="--s:0;margin:0 0 20px"><a href="../" class="wordmark wordmark--small" aria-label="OpenWiki home">openwiki</a></p>
+<figure class="hero rise" style="--s:1;--tilt:.4deg"><img src="../img/providers.jpg" alt="A beige vintage computer terminal with a soft green glow and a brass desk key." width="1500" height="1000" fetchpriority="high"></figure>
+<article>
+<h1 class="entry-title rise" style="--s:2">Any LLM</h1>
+<p class="entry-kicker rise" style="--s:3">Gemini, OpenAI-compatible, or fully offline</p>
+<ul class="entry-links rise" style="--s:4">
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki#llm-providers">docs: LLM providers</a></li>
+<li><a class="link" href="https://github.com/ckryptickunal/OpenWiki">OpenWiki on GitHub</a></li>
+</ul>
+<div class="prose rise" style="--s:5">
+<p>The LLM reads each source and writes the summary, claims and entity and topic lists. Pick whichever fits your budget and privacy needs; put the settings in <code>.env</code> in your workspace.</p>
+<h3>Google Gemini</h3>
+<div class="code"><pre><code>GEMINI_API_KEY=...
+<span class="c"># optional, this is the default:</span>
+GEMINI_MODEL=gemini-3.1-flash-lite</code></pre></div>
+<h3>OpenAI, OpenRouter, Groq</h3>
+<div class="code"><pre><code>LLM_PROVIDER=openai
+OPENAI_API_KEY=...
+OPENAI_MODEL=&lt;model id&gt;
+OPENAI_BASE_URL=https://openrouter.ai/api/v1   <span class="c"># or Groq, or leave unset for OpenAI</span></code></pre></div>
+<h3>Ollama or LM Studio, fully offline</h3>
+<div class="code"><pre><code>LLM_PROVIDER=openai
+OPENAI_BASE_URL=http://localhost:11434/v1   <span class="c"># LM Studio: :1234/v1</span>
+OPENAI_MODEL=llama3.1</code></pre></div>
+<p>No key is needed for a local server, and nothing leaves your machine except the caption and article downloads. Larger models extract entities and topics more reliably.</p>
+<h3>No model at all</h3>
+<p>Pass <code>--analysis-file</code> with precomputed JSON and OpenWiki builds the pages without calling any LLM.</p>
+</div>
+</article>
+<a class="next divider rise" style="--s:6" href="../youtube/"><span class="secondary">next</span><span>YouTube &rarr;</span></a>
+<footer class="foot stagger" style="--s:12">
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki">github</a>
+<a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/issues">issues</a>
+<a class="link" href="https://github.com/ckryptickunal/OpenWiki/discussions">discussions</a>
+<a class="link" href="https://github.com/ckryptickunal/Founder-Book">founder book</a>
+<a class="link" href="../sitemap.xml">sitemap</a>
+<p class="foot-note">MIT licensed. Built by <a class="link" href="https://github.com/ckryptickunal">Kunal</a>.</p>
+</footer>
+</div>
+</main>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

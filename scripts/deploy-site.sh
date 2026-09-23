@@ -5,4 +5,4 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 sha=$(git subtree split --prefix site)
 git push origin "$sha:refs/heads/gh-pages"
-echo "Deployed site/ ($sha) to gh-pages: https://ckryptickunal.github.io/OpenWiki/"
+echo "Deployed site/ ($sha) to gh-pages (GitHub Pages mirror; the main site deploys on Vercel)"
