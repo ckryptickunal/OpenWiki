@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from wikiblocks.textfmt import parse_source_file, write_essay_file, write_youtube_file
-from wikiblocks.youtube import classify_fetch_error, extract_video_id
+from openwiki.textfmt import parse_source_file, slugify, write_essay_file, write_youtube_file
+from openwiki.youtube import classify_fetch_error, extract_video_id
 
 
 def test_extract_video_id_from_watch_and_short_urls():
@@ -9,6 +9,9 @@ def test_extract_video_id_from_watch_and_short_urls():
     assert extract_video_id("https://youtu.be/dQw4w9WgXcQ?t=12") == "dQw4w9WgXcQ"
     assert extract_video_id("https://www.youtube.com/shorts/abc123XYZ_-") == "abc123XYZ_-"
     assert extract_video_id("dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+    assert extract_video_id("https://www.youtube.com/live/dQw4w9WgXcQ?si=x") == "dQw4w9WgXcQ"
+    assert extract_video_id("https://www.youtube.com/embed/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+    assert extract_video_id("https://m.youtube.com/watch?v=dQw4w9WgXcQ&list=PL1") == "dQw4w9WgXcQ"
 
 
 def test_youtube_header_roundtrip(tmp_path: Path):
@@ -66,7 +69,30 @@ def test_parse_fixture_transcript(fixtures: Path):
     assert "keep the failure" in record["transcript"]
 
 
-def test_classify_missing_captions():
-    assert classify_fetch_error(RuntimeError("No transcripts found")) == "no_captions"
+def _named_error(name: str, message: str = "") -> Exception:
+    return type(name, (Exception,), {})(message)
+
+
+def test_classify_by_exception_class():
+    assert classify_fetch_error(_named_error("TranscriptsDisabled")) == "no_captions"
+    assert classify_fetch_error(_named_error("VideoUnavailable")) == "unplayable"
+    assert classify_fetch_error(_named_error("AgeRestricted")) == "unplayable"
+    # An IP block is never a permanent skip, even if the message mentions transcripts.
+    assert classify_fetch_error(_named_error("IpBlocked", "no transcript, disabled")) == "ip_blocked"
+    assert classify_fetch_error(_named_error("RequestBlocked")) == "ip_blocked"
+
+
+def test_classify_by_message_fallback():
+    assert classify_fetch_error(RuntimeError("Subtitles are disabled for this video")) == "no_captions"
     assert classify_fetch_error(RuntimeError("unplayable live event")) == "unplayable"
-    assert classify_fetch_error(RuntimeError("429 Too Many Requests ip blocked")) == "ip_blocked"
+    assert classify_fetch_error(RuntimeError("429 Too Many Requests")) == "ip_blocked"
+    assert classify_fetch_error(RuntimeError("connection reset")) == "error"
+
+
+def test_slugify_keeps_non_latin_names_distinct():
+    assert slugify("Café Société") == "cafe-societe"
+    assert slugify("Jeff Dean: The 1% Rule") == "jeff-dean-the-1-rule"
+    assert slugify("नरेंद्र मोदी") != slugify("深度学习")
+    assert slugify("深度学习") == "深度学习"
+    assert slugify("नरेंद्र मोदी") == "नरेंद्र-मोदी"
+    assert slugify("???") == "untitled"

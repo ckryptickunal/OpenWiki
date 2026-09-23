@@ -7,18 +7,27 @@ Raw files are the source of truth; wiki pages are derived from them.
 from __future__ import annotations
 
 import re
+import unicodedata
 from pathlib import Path
 from typing import Any
 
 SEPARATOR = "=" * 60
+YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
 TRANSCRIPT_MARKER = "TRANSCRIPT"
 
 
 def slugify(value: str, fallback: str = "untitled", max_len: int = 90) -> str:
-    value = (value or "").strip().lower()
-    value = re.sub(r"[^a-z0-9]+", "-", value)
-    value = value.strip("-")
-    return value[:max_len] or fallback
+    """ASCII slug when the text has Latin letters; otherwise keep Unicode letters.
+
+    "Café Société" -> "cafe-societe", "深度学习" -> "深度学习" (not "untitled").
+    """
+    value = unicodedata.normalize("NFKC", value or "").strip().lower()
+    ascii_value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-z0-9]+", "-", ascii_value).strip("-")
+    if not slug:
+        kept = "".join(c if unicodedata.category(c)[0] in "LMN" else "-" for c in value)
+        slug = re.sub(r"-+", "-", kept).strip("-")
+    return slug[:max_len].strip("-") or fallback
 
 
 def _write_block(fh, body: str) -> None:
@@ -71,7 +80,7 @@ def write_youtube_file(
     is_generated: bool = False,
     snippet_count: int = 0,
 ) -> Path:
-    """YouTube header used by Founder Book `transcriptor.write_transcript_file`."""
+    """Write a YouTube transcript with the standard metadata header."""
     extra: dict[str, Any] = {}
     if metadata.get("duration"):
         extra["Duration"] = metadata.get("duration", "Unknown")
@@ -112,7 +121,7 @@ def write_essay_file(
     source: str,
     text: str,
 ) -> Path:
-    """Essay header used by Founder Book `fetch_essays.write_essay_file`."""
+    """Write an essay/article with the standard metadata header."""
     return write_source_file(
         path,
         title=title,
@@ -125,7 +134,7 @@ def write_essay_file(
 
 
 def parse_source_file(path: Path | str) -> dict:
-    """Parse header + body. Same rules as Founder Book `ingest.parse_transcript_file`."""
+    """Parse a source .txt file into {path, video_id, title, metadata, transcript}."""
     path = Path(path)
     text = path.read_text(encoding="utf-8", errors="replace")
     metadata: dict[str, str] = {}
@@ -162,6 +171,6 @@ def source_url(record: dict) -> str:
     if source.startswith("http"):
         return source
     video_id = record.get("video_id") or ""
-    if video_id and not video_id.startswith(("local-", "pg-", "sa-", "ex-")):
+    if YOUTUBE_ID_RE.match(video_id):
         return f"https://www.youtube.com/watch?v={video_id}"
     return source

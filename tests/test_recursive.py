@@ -2,9 +2,9 @@ import json
 import shutil
 from pathlib import Path
 
-from wikiblocks.links import walk_ingest_queue, walk_wiki_graph
-from wikiblocks.wiki import ingest_path
-from wikiblocks.workspace import Workspace
+from openwiki.links import walk_ingest_queue, walk_wiki_graph
+from openwiki.wiki import ingest_path
+from openwiki.workspace import Workspace
 
 
 def test_cycle_walk_is_finite(tmp_path: Path, fixtures: Path):
@@ -30,7 +30,7 @@ def test_ingest_shared_entity_does_not_loop(workspace: Workspace, fixtures: Path
     essays.mkdir()
     shutil.copy(fixtures / "transcripts" / "demo-talk.txt", talk / "demo-talk.txt")
 
-    from wikiblocks.essays import write_article_from_html
+    from openwiki.essays import write_article_from_html
 
     html = (fixtures / "articles" / "sample-essay.html").read_text(encoding="utf-8")
     essay_path = write_article_from_html(

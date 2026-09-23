@@ -6,7 +6,7 @@ import re
 from collections import deque
 from pathlib import Path
 
-from wikiblocks.workspace import Workspace
+from openwiki.workspace import Workspace
 
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
 SPECIAL_FILES = {"index.md", "log.md", "schema.md", "ingested.json"}

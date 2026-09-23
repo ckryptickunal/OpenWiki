@@ -3,13 +3,38 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wikiblocks"
-version = "0.1.0"
-description = "Reusable YouTube, essay, and wiki building blocks for LLM knowledge bases"
+name = "openwiki-cli"
+dynamic = ["version"]
+description = "Turn YouTube videos, playlists, channels, blogs, and notes into a linked Markdown knowledge base (LLM wiki) for Obsidian, RAG, and research."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Kunal", email = "ckryptickunal@users.noreply.github.com" }]
+keywords = [
+    "youtube-transcript", "youtube-transcripts", "youtube-to-text", "transcript", "captions",
+    "knowledge-base", "llm-wiki", "second-brain", "obsidian", "markdown", "wiki",
+    "rag", "gemini", "ollama", "openai", "web-scraping", "essays", "note-taking",
+    "personal-knowledge-management", "pkm",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Markup :: Markdown",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Utilities",
+]
 dependencies = [
     "youtube-transcript-api>=1.2.4",
     "google-api-python-client>=2.86.0",
@@ -18,14 +43,25 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
 tor = ["pysocks>=1.7.1"]
 
+[project.urls]
+Homepage = "https://ckryptickunal.github.io/OpenWiki/"
+Repository = "https://github.com/ckryptickunal/OpenWiki"
+Documentation = "https://github.com/ckryptickunal/OpenWiki#readme"
+Issues = "https://github.com/ckryptickunal/OpenWiki/issues"
+Changelog = "https://github.com/ckryptickunal/OpenWiki/blob/main/CHANGELOG.md"
+Funding = "https://github.com/sponsors/ckryptickunal"
+
 [project.scripts]
-wikiblocks = "wikiblocks.cli:main"
+openwiki = "openwiki.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "openwiki.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["wikiblocks*"]
+include = ["openwiki*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -33,3 +69,11 @@ addopts = "-q"
 markers = [
     "live: optional live network or API smoke tests (skipped unless keys are set)",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]

@@ -1,6 +1,6 @@
 # Architecture
 
-Wiki-Blocks is a small Python package around two artifacts: **raw `.txt` sources** and a generated **Markdown wiki**.
+OpenWiki is a small Python package around two artifacts: **raw `.txt` sources** and a generated **Markdown wiki**.
 
 ```
 sources.json
@@ -18,7 +18,7 @@ sources.json
                             ▼
                       parse header
                             │
-              analysis JSON or Gemini
+      analysis JSON, Gemini, or OpenAI-compatible LLM
                             │
                             ▼
               wiki/sources/<id>-<slug>.md
@@ -32,7 +32,7 @@ sources.json
 
 Every video, essay, or local article becomes one `.txt` file. The header is `Key: value` lines, then a `TRANSCRIPT` marker, then the body. Ingest never modifies these files.
 
-YouTube header (from `transcriptor.write_transcript_file`):
+YouTube header:
 
 ```
 Title: …
@@ -58,7 +58,7 @@ TRANSCRIPT
 <body>
 ```
 
-Essay header (from `fetch_essays.write_essay_file`):
+Essay header (local notes use the same format):
 
 ```
 Title: …
@@ -80,50 +80,55 @@ Filename rules:
 - Essay: `<id_prefix>-<slug>.txt` in the site folder
 - Skip `_new_urls.txt` during ingest
 
-## YouTube block (`wikiblocks/youtube.py`)
+## YouTube block (`openwiki/youtube.py`)
 
-1. `extract_video_id` — watch URL, `youtu.be`, shorts, or bare ID.
-2. `resolve_channel_id` / `get_all_videos` — YouTube Data API v3. Needs `YOUTUBE_API_KEY`.
-3. `select_new_ids` — walk uploads newest-first; stop after two pages that add nothing new (`auto_sync.py`).
-4. `fetch_transcript` — `youtube-transcript-api`, optional `YOUTUBE_PROXY`.
-5. `classify_fetch_error` — `no_captions` and `unplayable` are permanent skips; they are not retries.
+1. `extract_video_id` — watch URL, `youtu.be`, shorts, live, embed, or bare ID. `extract_playlist_id` for `list=` URLs.
+2. `resolve_channel_id` — `channels.list` by id, `forHandle`, or `forUsername` (1 quota unit each); free-text names fall back to `search.list` (100 units). Needs `YOUTUBE_API_KEY`.
+3. `select_new_ids` — walk uploads newest-first; stop after two pages that add nothing new.
+4. `fetch_transcript` / `pick_transcript` — `youtube-transcript-api`; preferred languages first, then any manual track, then any auto-generated track. Optional `YOUTUBE_PROXY`.
+5. `classify_fetch_error` — by exception class first, then message. `no_captions` and `unplayable` are permanent skips; `ip_blocked` and other errors are retried on the next run.
 6. `_extract_state.json` — `done` and `permanent_skip` lists so a rerun does not refetch.
 
-A single video works without the Data API. Metadata fields then stay `Unknown`.
+A single video works without the Data API: title and channel come from YouTube's public oEmbed endpoint; published date and view counts stay `Unknown`.
 
-## Essay block (`wikiblocks/essays.py`)
+## Essay block (`openwiki/essays.py`)
 
 1. Fetch the index URL (or accept saved HTML).
-2. Parse links with `kind=generic` (only URLs under `base_url`) or a named parser.
+2. Parse links with `kind=generic` (same-site URLs under `base_url`, resolved with `urljoin`) or a named parser.
 3. Diff against files already in `folder`.
-4. Fetch each new page, `html_to_text`, reject bodies shorter than `--min-chars` (default 400).
-5. Write the essay header format.
+4. Fetch each new page, keep the `<article>`/`<main>` region if present, `html_to_text`, reject bodies shorter than `--min-chars` (default 400).
+5. Detect the publish date, then write the essay header format.
 
 `fetch_url` is injectable so tests never hit the network.
 
-## Wiki block (`wikiblocks/wiki.py`)
+## Wiki block (`openwiki/wiki.py`)
 
 For each `.txt` not already in `wiki/ingested.json` with the same `mtime`:
 
 1. Parse header + body.
-2. Analyze: Gemini (`GEMINI_MODEL`, default `gemini-3.1-flash-lite`) **or** caller-supplied JSON.
-3. Write `wiki/sources/<video_id>-<slug>.md` with YAML frontmatter and `[[wikilinks]]`.
+2. Analyze with the configured LLM (`openwiki/llm.py`: Gemini, default `gemini-3.1-flash-lite`, or any OpenAI-compatible endpoint) **or** caller-supplied JSON.
+3. Write `wiki/sources/<video_id>-<slug>.md` with YAML frontmatter (values quoted when YAML needs it) and `[[wikilinks]]`. Slugs are ASCII when the name has Latin letters and keep Unicode letters otherwise.
 4. Upsert `wiki/entities/<slug>.md` and `wiki/topics/<slug>.md`. If the source link is already on the page, return; otherwise append a Source Mention. That is what prevents duplicate mentions and graph loops on re-ingest.
 5. Record `{source_file, wiki_page, title, mtime, ingested_at}` in `ingested.json`.
-6. Rebuild `wiki/index.md`.
+6. Record failures in `wiki/ingest_failures.json` (cleared when a file later succeeds).
+7. Rebuild `wiki/index.md`.
 
 `lint` walks every wiki page, counts inbound links, reports missing `[[targets]]`, missing frontmatter, and non-source orphans. `walk_wiki_graph` BFS-follows wikilinks with a visited set.
 
 ## Module map
 
-| Wiki-Blocks module | Founder Book source |
-|--------------------|---------------------|
-| `textfmt.py` | `transcriptor.write_transcript_file`, `fetch_essays.write_essay_file`, `ingest.parse_transcript_file` |
-| `youtube.py` | `transcriptor.py`, `fetch_transcript.py`, `extract_channel.py`, `auto_sync.discover_new_video_ids` |
-| `essays.py` | `fetch_new_essays.py` |
-| `wiki.py` | `ingest.py` (render, upsert, manifest, index) |
-| `gemini.py` | `ingest.configure_gemini`, `analyze_transcript`, `extract_json` |
-| `lint.py` | `lint_wiki.py` |
-| `links.py` | link regex from `lint_wiki.py`, plus a cycle-safe walk |
+| Module | Responsibility |
+|--------|----------------|
+| `cli.py` | `openwiki` command and subcommands |
+| `textfmt.py` | Raw `.txt` header format: write, parse, slugify |
+| `youtube.py` | Channel/playlist discovery, caption download, extract state |
+| `essays.py` | Blog index parsing, HTML to text, title/date detection, local notes |
+| `llm.py` | Gemini and OpenAI-compatible clients, analysis prompt, JSON repair |
+| `wiki.py` | Source/entity/topic pages, manifest, failures, index |
+| `lint.py` | Link/frontmatter/orphan report, optional LLM review |
+| `links.py` | Wikilink parsing and a cycle-safe graph walk |
+| `workspace.py` | Workspace paths and source discovery |
+| `env.py` | `.env` loading (workspace and current directory) |
+| `templates.py` | Files written by `openwiki init` |
 
-Not extracted: `query_wiki.py` / RAG Q&A, HuggingFace essay dumps, the Founder Book corpus, `auto_sync` as a background daemon, Tor worker-pool internals (proxy env is supported instead).
+Not included (yet): question answering over the wiki (RAG), a background scheduler (run `openwiki sync` from cron or a GitHub Action instead), and podcast/audio transcription.

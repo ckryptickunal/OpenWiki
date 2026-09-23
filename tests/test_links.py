@@ -1,9 +1,9 @@
 import shutil
 
-from wikiblocks.links import extract_links, walk_wiki_graph
-from wikiblocks.lint import build_report
-from wikiblocks.wiki import ingest_path, rebuild_index
-from wikiblocks.workspace import Workspace
+from openwiki.links import extract_links
+from openwiki.lint import build_report
+from openwiki.wiki import ingest_path, rebuild_index
+from openwiki.workspace import Workspace
 
 
 def test_entity_and_topic_links_created(workspace: Workspace, fixtures, demo_analysis: dict):

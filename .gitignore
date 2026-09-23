@@ -38,3 +38,7 @@ failed_videos.json
 /wiki/automation_state.json
 /single_videos/
 /Local Files/
+
+# Tooling caches
+.benchmarks/
+.ruff_cache/

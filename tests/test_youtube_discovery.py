@@ -1,4 +1,4 @@
-from wikiblocks.youtube import select_new_ids
+from openwiki.youtube import select_new_ids
 
 
 def test_newest_first_stops_after_known_pages():

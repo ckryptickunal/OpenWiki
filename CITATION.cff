@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use OpenWiki in research, please cite it as below."
+title: "OpenWiki: turn YouTube videos, blogs, and notes into a linked Markdown knowledge base"
+type: software
+authors:
+  - given-names: Kunal
+    alias: ckryptickunal
+repository-code: "https://github.com/ckryptickunal/OpenWiki"
+url: "https://ckryptickunal.github.io/OpenWiki/"
+license: MIT
+version: 0.2.0
+date-released: "2026-09-24"
+keywords:
+  - youtube transcripts
+  - knowledge base
+  - llm wiki
+  - obsidian
+  - markdown
+  - second brain
+  - rag

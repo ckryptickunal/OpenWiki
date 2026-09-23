@@ -1,9 +1,9 @@
 import re
 import shutil
 
-from wikiblocks.lint import has_frontmatter
-from wikiblocks.wiki import ingest_path, render_source_page
-from wikiblocks.workspace import Workspace
+from openwiki.lint import has_frontmatter
+from openwiki.wiki import ingest_path, render_source_page
+from openwiki.workspace import Workspace
 
 
 def test_source_frontmatter_fields(workspace: Workspace, fixtures, demo_analysis: dict):

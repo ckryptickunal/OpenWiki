@@ -1,20 +1,19 @@
 """Wiki ingest: transcript/essay → sources, entities, topics, manifest, index.
 
-Maps to Founder Book `ingest.py`. Gemini is required unless analysis JSON is supplied.
-There is no bundled offline model.
+Analysis comes from the configured LLM (see `openwiki.llm`) or from
+caller-supplied analysis JSON.
 """
 
 from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
 
-from wikiblocks.env import env_value
-from wikiblocks.textfmt import parse_source_file, slugify, source_url
-from wikiblocks.workspace import Workspace
+from openwiki.textfmt import parse_source_file, slugify, source_url
+from openwiki.workspace import Workspace
 
 
 def today() -> str:
@@ -46,6 +45,23 @@ def append_log(workspace: Workspace, kind: str, title: str, detail: str = "") ->
             fh.write(f"{detail}\n")
 
 
+YAML_RESERVED = {"true", "false", "yes", "no", "on", "off", "null", "~", ""}
+
+
+def yaml_scalar(value: object) -> str:
+    """Plain YAML scalar when unambiguous, otherwise a double-quoted (JSON) string."""
+    text = str(value)
+    if (
+        re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _.,()/'&+:?=%~-]*", text)
+        and ": " not in text
+        and not text.endswith((" ", ":"))
+        and text.lower() not in YAML_RESERVED
+        and not re.fullmatch(r"[0-9.+-]+", text)
+    ):
+        return text
+    return json.dumps(text, ensure_ascii=False)
+
+
 def yaml_list(items: list[str]) -> str:
     if not items:
         return " []"
@@ -72,13 +88,13 @@ def render_source_page(record: dict, analysis: dict) -> str:
     lines = [
         "---",
         "type: source",
-        f"title: {json.dumps(record['title'])[1:-1]}",
+        f"title: {yaml_scalar(record['title'])}",
         f"created: {today()}",
         f"updated: {today()}",
-        f"video_id: {record['video_id']}",
-        f"url: {video_url}",
-        f"channel: {channel}",
-        f"published: {published}",
+        f"video_id: {yaml_scalar(record['video_id'])}",
+        f"url: {yaml_scalar(video_url)}",
+        f"channel: {yaml_scalar(channel)}",
+        f"published: {yaml_scalar(published)}",
         "tags:" + yaml_list(tags),
         "---",
         "",
@@ -143,7 +159,7 @@ def upsert_reference_page(
         [
             "---",
             f"type: {page_type}",
-            f"title: {json.dumps(title)[1:-1]}",
+            f"title: {yaml_scalar(title)}",
             f"created: {today()}",
             f"updated: {today()}",
             "sources: []",
@@ -187,7 +203,13 @@ def read_title(path: Path) -> str:
     text = path.read_text(encoding="utf-8", errors="replace")
     match = re.search(r"^title:\s*(.+)$", text, re.MULTILINE)
     if match:
-        return match.group(1).strip().strip('"')
+        value = match.group(1).strip()
+        if value.startswith('"'):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return value.strip('"')
+        return value
     heading = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
     return heading.group(1).strip() if heading else path.stem
 
@@ -249,17 +271,9 @@ def ingest_path(
         return "skipped"
 
     if analysis is None:
-        if analyzer is not None:
-            analysis = analyzer(record, max_chars)
-        else:
-            if not env_value("GEMINI_API_KEY"):
-                raise RuntimeError(
-                    "Set GEMINI_API_KEY to ingest, or pass analysis JSON "
-                    "(--analysis-file). There is no offline model."
-                )
-            from wikiblocks.gemini import analyze_record, configure_gemini
-
-            analysis = analyze_record(configure_gemini(), record, max_chars)
+        if analyzer is None:
+            analyzer = default_analyzer()
+        analysis = analyzer(record, max_chars)
 
     workspace.ensure_dirs()
     output_path = workspace.sources_dir / f"{source_stem(record)}.md"
@@ -283,6 +297,21 @@ def ingest_path(
     return "processed"
 
 
+def default_analyzer(provider: str | None = None) -> Callable[[dict, int], dict]:
+    """Analyzer backed by the configured LLM. Raises LLMNotConfigured if there is none."""
+    from openwiki.llm import analyze_record, make_client
+
+    client = make_client(provider=provider)
+    return lambda record, max_chars: analyze_record(client, record, max_chars)
+
+
+def save_failures(workspace: Workspace, failures: dict[str, str]) -> None:
+    if failures:
+        workspace.failures_path.write_text(json.dumps(failures, indent=2, sort_keys=True), encoding="utf-8")
+    elif workspace.failures_path.exists():
+        workspace.failures_path.unlink()
+
+
 def ingest_paths(
     paths: list[Path],
     workspace: Workspace,
@@ -292,11 +321,22 @@ def ingest_paths(
     analyzer: Callable[[dict, int], dict] | None = None,
     max_chars: int = 120_000,
     rebuild: bool = True,
+    provider: str | None = None,
+    on_error: Callable[[str, Exception], None] | None = None,
 ) -> dict[str, int]:
+    """Ingest many files. Failures are recorded in wiki/ingest_failures.json."""
     workspace.ensure_dirs()
     manifest = load_manifest(workspace)
+    if analysis is None and analyzer is None:
+        pending = [p for p in paths if Path(p).exists() and not should_skip(manifest, parse_source_file(p), Path(p), force)]
+        if pending:
+            analyzer = default_analyzer(provider)
+    failures: dict[str, str] = {}
+    if workspace.failures_path.exists():
+        failures = json.loads(workspace.failures_path.read_text(encoding="utf-8"))
     counts = {"processed": 0, "skipped": 0, "failed": 0}
     for path in paths:
+        rel = workspace.rel(Path(path))
         try:
             result = ingest_path(
                 path,
@@ -307,10 +347,17 @@ def ingest_paths(
                 analyzer=analyzer,
                 max_chars=max_chars,
             )
-        except Exception:
+            if result == "failed":
+                failures[rel] = "file not found"
+        except Exception as exc:
             result = "failed"
-        key = "processed" if result == "processed" else "skipped" if result == "skipped" else "failed"
-        counts[key] += 1
+            failures[rel] = f"{type(exc).__name__}: {exc}"[:500]
+            if on_error:
+                on_error(rel, exc)
+        if result != "failed":
+            failures.pop(rel, None)
+        counts[result] += 1
+    save_failures(workspace, failures)
     if rebuild:
         rebuild_index(workspace)
         save_manifest(workspace, manifest)
