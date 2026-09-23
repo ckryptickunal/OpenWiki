@@ -23,7 +23,8 @@
   --ease-write: cubic-bezier(.22, .03, .35, .9);
   --ease-pop: cubic-bezier(.22, .03, .26, 1);
   --step: 65ms;
-  --hover-blur: 2.7px;
+  --hover-blur: .6px;
+  --hover-dim: .78;
 
   --shadow-soft: 0 1px 2px rgba(67, 40, 24, .06), 0 8px 22px -12px rgba(67, 40, 24, .18);
 }
@@ -215,10 +216,10 @@ img { display: block; max-width: 100%; }
 
 /* Hovering one row softly blurs everything else so the row stands out. */
 .divider, .h2, .head { transition: filter .25s ease-out, opacity .25s ease-out; }
-.ow:not([data-hover-cold]) .page:has(.row:hover) :is(.divider, .h2, .head) { filter: blur(var(--hover-blur)); opacity: .4; }
+.ow:not([data-hover-cold]) .page:has(.row:hover) :is(.divider, .h2, .head) { filter: blur(var(--hover-blur)); opacity: var(--hover-dim); }
 .ow:not([data-hover-cold]) .page:has(.row:hover) .row:hover.divider,
 .ow:not([data-hover-cold]) .page:has(.row:hover) .divider:has(.row:hover) { filter: none; opacity: 1; }
-.page:has(.row:hover) .divider::after { opacity: .3; }
+.page:has(.row:hover) .divider::after { opacity: .7; }
 
 /* ---------- FAQ rows ---------- */
 
