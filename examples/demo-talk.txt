@@ -1,0 +1,24 @@
+Title: How to keep a lab notebook
+Video ID: demo-talk
+URL: https://example.com/talks/demo-talk
+Channel: Example Channel
+Published: 2024-01-15T12:00:00Z
+Duration: PT4M10S
+Views: 120
+Likes: 8
+Tags: research, notes
+Transcript Language: English (en)
+Auto-generated: False
+Snippets: 4
+
+Description:
+A short talk about writing things down so other people can reuse them.
+
+============================================================
+TRANSCRIPT
+============================================================
+
+Write the date and the question you were asking.
+Record what you actually did, not what you meant to do.
+If a step failed, keep the failure. The next person needs that more than the success.
+Link related notes so the graph stays walkable.

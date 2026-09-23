@@ -1,0 +1,50 @@
+{
+  "_comment": "Copy to sources.json and edit. youtube_channels and essay_sources are the only keys the tools read. channel_id may be null; the first successful discovery writes it back if you pass --write-ids.",
+  "youtube_channels": [
+    {
+      "name": "Example Channel",
+      "query": "https://www.youtube.com/@example",
+      "channel_id": null,
+      "folder": "Example Channel"
+    }
+  ],
+  "essay_sources": [
+    {
+      "name": "Example Essays",
+      "kind": "generic",
+      "index_url": "https://example.com/articles",
+      "base_url": "https://example.com",
+      "folder": "Example Essays",
+      "id_prefix": "ex"
+    }
+  ],
+  "_examples_not_loaded": {
+    "_comment": "These entries are documentation only. The loader ignores this key. Founder Book-specific IDs belong here, not in the live lists above.",
+    "youtube_channels": [
+      {
+        "name": "Y Combinator",
+        "query": "https://www.youtube.com/@ycombinator",
+        "channel_id": "UCcefcZRL2oaA_uBNeo5UOWg",
+        "folder": "Y Combinator"
+      }
+    ],
+    "essay_sources": [
+      {
+        "name": "Paul Graham",
+        "kind": "paulgraham",
+        "index_url": "https://www.paulgraham.com/articles.html",
+        "base_url": "https://www.paulgraham.com/",
+        "folder": "Paul Graham",
+        "id_prefix": "pg"
+      },
+      {
+        "name": "Sam Altman",
+        "kind": "samaltman",
+        "index_url": "https://blog.samaltman.com/",
+        "base_url": "https://blog.samaltman.com",
+        "folder": "Sam Altman",
+        "id_prefix": "sa"
+      }
+    ]
+  }
+}

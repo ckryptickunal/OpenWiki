@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wikiblocks"
+version = "0.1.0"
+description = "Reusable YouTube, essay, and wiki building blocks for LLM knowledge bases"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Kunal", email = "ckryptickunal@users.noreply.github.com" }]
+dependencies = [
+    "youtube-transcript-api>=1.2.4",
+    "google-api-python-client>=2.86.0",
+    "python-dotenv>=1.0.0",
+    "google-genai>=1.70.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+tor = ["pysocks>=1.7.1"]
+
+[project.scripts]
+wikiblocks = "wikiblocks.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["wikiblocks*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "live: optional live network or API smoke tests (skipped unless keys are set)",
+]

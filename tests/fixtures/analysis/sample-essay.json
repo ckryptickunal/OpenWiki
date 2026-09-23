@@ -1,0 +1,31 @@
+{
+  "summary": "An article arguing that a checked index beats unauditable memory.",
+  "key_ideas": [
+    "Publish the claim and the date first.",
+    "Do not publish a claim you cannot source."
+  ],
+  "entities": [
+    {
+      "name": "Ada Lovelace",
+      "type": "person",
+      "description": "Shared with the demo talk so the graph has a cycle through one entity.",
+      "importance": "shared node"
+    }
+  ],
+  "topics": [
+    {
+      "name": "Indexes",
+      "summary": "A list you can check is more trustworthy than recall."
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Indexes beat memory.",
+      "evidence": "The article says an index can be checked and memory cannot."
+    }
+  ],
+  "quotes": [
+    "The index can be checked. Memory cannot."
+  ],
+  "tags": ["indexing"]
+}

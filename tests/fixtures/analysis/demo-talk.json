@@ -1,0 +1,32 @@
+{
+  "summary": "A short talk on writing lab notes that other people can reuse.",
+  "key_ideas": [
+    "Record the question and the date first.",
+    "Keep failures; they are more useful than polished successes.",
+    "Link related notes so the graph stays walkable."
+  ],
+  "entities": [
+    {
+      "name": "Ada Lovelace",
+      "type": "person",
+      "description": "Mentioned as someone who wrote notes others could follow.",
+      "importance": "example note-taker"
+    }
+  ],
+  "topics": [
+    {
+      "name": "Lab notebooks",
+      "summary": "How to write notes that survive a project handoff."
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Failures belong in the notebook.",
+      "evidence": "The speaker says the next person needs failures more than successes."
+    }
+  ],
+  "quotes": [
+    "If a step failed, keep the failure."
+  ],
+  "tags": ["research", "notes"]
+}

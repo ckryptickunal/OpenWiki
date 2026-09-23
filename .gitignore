@@ -1,0 +1,40 @@
+# Secrets — never commit
+.env
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+.cursor/
+.obsidian/
+
+# Runtime / ephemeral (created when you use the repo as a workspace)
+*.log
+.auto_sync.lock
+failed_videos.json
+**/_extract_state.json
+**/_video_list.json
+**/_new_urls.txt
+
+# Generated wiki at the repo root (fixtures under tests/ are kept)
+/wiki/sources/
+/wiki/entities/
+/wiki/topics/
+/wiki/synthesis/
+/wiki/ingested.json
+/wiki/log.md
+/wiki/ingest_failures.json
+/wiki/index.md
+/wiki/automation_state.json
+/single_videos/
+/Local Files/
