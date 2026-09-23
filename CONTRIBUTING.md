@@ -24,6 +24,14 @@ The test suite runs offline and needs no API keys. Two live smoke tests run only
 5. Update the README or `docs/` if commands, flags, or file formats change, and add a line to `CHANGELOG.md` under "Unreleased".
 6. Open a pull request and fill in the template.
 
+## Updating the website
+
+The landing page lives in `site/`. After changing it and pushing to `main`, publish it with:
+
+```bash
+scripts/deploy-site.sh
+```
+
 ## Good first contributions
 
 - A parser for a blog whose index the `generic` parser handles badly (see "Adding a site-specific parser" in [docs/ADDING_SOURCES.md](docs/ADDING_SOURCES.md)).
