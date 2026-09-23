@@ -6,12 +6,26 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/", "destination": "/openwiki/", "permanent": false }
+    {
+      "source": "/",
+      "destination": "/openwiki/",
+      "permanent": false
+    }
   ],
   "headers": [
     {
       "source": "/openwiki/(img|assets)/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "gh-pages": false
+    }
+  }
 }
