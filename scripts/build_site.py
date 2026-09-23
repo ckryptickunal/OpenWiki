@@ -2,9 +2,9 @@
 
     python scripts/build_site.py
 
-Pages share one head, footer, and stylesheet. All links and assets are
-relative, so the output works at any base path (/openwiki/, /OpenWiki/, /).
-SITE_URL is only used for canonical/Open Graph/sitemap URLs.
+Pages share one head, footer, and stylesheet. Links are absolute under BASE so
+pages render the same with or without a trailing slash (proxies such as
+Framer rewrites may strip it). SITE_URL is used for canonical/OG/sitemap URLs.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 SITE_URL = "https://openwiki-delta.vercel.app/openwiki/"
+BASE = "/openwiki/"  # path the site is served under; every link is absolute from here
 REPO = "https://github.com/ckryptickunal/OpenWiki"
 SPONSOR = "https://github.com/sponsors/ckryptickunal"
 INSTALL = 'pip install "git+https://github.com/ckryptickunal/OpenWiki.git"'
@@ -87,7 +88,7 @@ PAGES: list[Page] = [
 <h3>Any language</h3>
 <p>Pass <code>--lang hi,en</code> to prefer certain caption languages. If none match, OpenWiki uses whatever track the video has instead of skipping it. Videos with no captions at all are remembered and never retried; rate limits are retried on the next run.</p>
 <h3>Next</h3>
-<p>Turn the transcripts into wiki pages with <code>openwiki ingest --all</code>. See <a class="link" href="../wiki/">how the wiki is built</a>.</p>
+<p>Turn the transcripts into wiki pages with <code>openwiki ingest --all</code>. See <a class="link" href="{BASE}wiki/">how the wiki is built</a>.</p>
 """,
     ),
     Page(
@@ -115,7 +116,7 @@ PAGES: list[Page] = [
 {esc('}] }')}</code></pre></div>
 <p>The generic parser follows same-site links under <code>base_url</code> and ignores feeds, images and PDFs. There are dedicated parsers for Paul Graham and Sam Altman, and adding one for another site takes a few lines.</p>
 <h3>Next</h3>
-<p>Mix essays with <a class="link" href="../youtube/">video transcripts</a> and <a class="link" href="../notes/">your own notes</a> in the same wiki.</p>
+<p>Mix essays with <a class="link" href="{BASE}youtube/">video transcripts</a> and <a class="link" href="{BASE}notes/">your own notes</a> in the same wiki.</p>
 """,
     ),
     Page(
@@ -134,7 +135,7 @@ PAGES: list[Page] = [
 {code("openwiki text meeting-notes.md research/*.txt --folder Notes")}
 <p>The title comes from the first <code># heading</code> in Markdown, the page title in HTML, or the file name. Each file gets the same header as every other source, so ingest treats them all alike.</p>
 <h3>Next</h3>
-<p>Run <code>openwiki ingest --all</code> and your notes start linking to <a class="link" href="../wiki/">the same people and topics</a> as everything else.</p>
+<p>Run <code>openwiki ingest --all</code> and your notes start linking to <a class="link" href="{BASE}wiki/">the same people and topics</a> as everything else.</p>
 """,
     ),
     Page(
@@ -243,7 +244,7 @@ TOP_VARS = ["--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg", "--rot:1deg;--ro
 
 
 def head(page_title: str, description: str, url: str, depth: int, jsonld: list[dict], image: str = "img/og.jpg") -> str:
-    prefix = "../" * depth
+    prefix = BASE
     ld = "\n".join(f'<script type="application/ld+json">{json.dumps(item, ensure_ascii=False)}</script>' for item in jsonld)
     return f"""<!doctype html>
 <html lang="en">
@@ -280,7 +281,7 @@ def head(page_title: str, description: str, url: str, depth: int, jsonld: list[d
 
 
 def footer(depth: int) -> str:
-    prefix = "../" * depth
+    prefix = BASE
     return f"""<footer class="foot stagger" style="--s:12">
 <a class="link" href="{REPO}">github</a>
 <a class="link" href="{SPONSOR}">sponsor</a>
@@ -297,7 +298,7 @@ def pile(index: int, image: str, alt: str) -> str:
     top = TOP_VARS[index % len(TOP_VARS)]
     return f"""<div class="pile" aria-hidden="true">
 <div class="pile-card" style="{back}"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="{top}"><img src="{image.replace("img/", "img/thumbs/")}" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="{top}"><img src="{BASE}{image.replace("img/", "img/thumbs/")}" alt="" width="57" height="34" decoding="async"></div></div>
 </div>"""
 
 
@@ -314,7 +315,7 @@ def home() -> str:
         for slug in slugs:
             page = by_slug[slug]
             rows.append(
-                f'<a class="row divider stagger" style="--s:{stagger}" href="{slug}/">'
+                f'<a class="row divider stagger" style="--s:{stagger}" href="{BASE}{slug}/">'
                 f'{pile(index, page.image, page.image_alt)}'
                 f'<span class="row-title">{esc(page.name)}</span>'
                 f'<span class="row-meta">{esc(page.meta)}</span></a>'
@@ -362,8 +363,8 @@ def home() -> str:
 <main class="ow" id="main">
 <div class="page">
 <header class="head">
-<h1 class="stagger" style="--s:0;margin:0"><a href="./" class="wordmark" aria-label="OpenWiki home">openwiki<span class="wordmark-veil"></span></a><span class="sr-only">: turn YouTube videos, blogs and notes into a Markdown knowledge base</span></h1>
-<p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="obsidian/">Obsidian</a>.</p>
+<h1 class="stagger" style="--s:0;margin:0"><a href="{BASE}" class="wordmark" aria-label="OpenWiki home">openwiki<span class="wordmark-veil"></span></a><span class="sr-only">: turn YouTube videos, blogs and notes into a Markdown knowledge base</span></h1>
+<p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="{BASE}obsidian/">Obsidian</a>.</p>
 <p class="body3 secondary stagger" style="--s:1"><a class="link" href="{REPO}">source on github</a>, <a class="link" href="#start">get started</a>, or <a class="link" href="{SPONSOR}">sponsor the project</a>.</p>
 </header>
 {chr(10).join(sections)}
@@ -384,7 +385,7 @@ def home() -> str:
 {footer(0)}
 </div>
 </main>
-<script src="assets/site.js" defer></script>
+<script src="{BASE}assets/site.js" defer></script>
 </body>
 </html>
 """
@@ -422,11 +423,11 @@ def detail(page: Page, next_page: Page) -> str:
     ]
     return head(page.title, page.description, page.url, 1, jsonld, image=page.image) + f"""<body>
 <a class="skip" href="#main">Skip to content</a>
-<a class="back" href="../" aria-label="Back to OpenWiki home">{ICON_BACK}</a>
+<a class="back" href="{BASE}" aria-label="Back to OpenWiki home">{ICON_BACK}</a>
 <main class="ow" id="main">
 <div class="page entry">
-<p class="rise" style="--s:0;margin:0 0 20px"><a href="../" class="wordmark wordmark--small" aria-label="OpenWiki home">openwiki</a></p>
-<figure class="hero rise" style="--s:1;--tilt:{page.tilt}"><img src="../{page.image}" alt="{esc(page.image_alt)}" width="1500" height="1000" fetchpriority="high"></figure>
+<p class="rise" style="--s:0;margin:0 0 20px"><a href="{BASE}" class="wordmark wordmark--small" aria-label="OpenWiki home">openwiki</a></p>
+<figure class="hero rise" style="--s:1;--tilt:{page.tilt}"><img src="{BASE}{page.image}" alt="{esc(page.image_alt)}" width="1500" height="1000" fetchpriority="high"></figure>
 <article>
 <h1 class="entry-title rise" style="--s:2">{esc(page.name)}</h1>
 <p class="entry-kicker rise" style="--s:3">{esc(page.kicker)}</p>
@@ -437,27 +438,24 @@ def detail(page: Page, next_page: Page) -> str:
 {page.body.strip()}
 </div>
 </article>
-<a class="next divider rise" style="--s:6" href="../{next_page.slug}/"><span class="secondary">next</span><span>{esc(next_page.name)} &rarr;</span></a>
+<a class="next divider rise" style="--s:6" href="{BASE}{next_page.slug}/"><span class="secondary">next</span><span>{esc(next_page.name)} &rarr;</span></a>
 {footer(1)}
 </div>
 </main>
-<script src="../assets/site.js" defer></script>
+<script src="{BASE}assets/site.js" defer></script>
 </body>
 </html>
 """
 
 
 def not_found() -> str:
-    # Served from any path, so assets use the absolute Vercel base path with a relative fallback.
-    return head("Page not found | OpenWiki", "This page does not exist.", SITE_URL + "404.html", 0, []).replace(
-        'href="assets/site.css"', 'href="/openwiki/assets/site.css"'
-    ).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"') + f"""<body>
+    return head("Page not found | OpenWiki", "This page does not exist.", SITE_URL + "404.html", 0, []).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"') + f"""<body>
 <main class="ow" id="main">
 <div class="page">
 <header class="head">
-<p class="stagger" style="--s:0;margin:0"><a href="/openwiki/" class="wordmark">openwiki<span class="wordmark-veil"></span></a></p>
+<p class="stagger" style="--s:0;margin:0"><a href="{BASE}" class="wordmark">openwiki<span class="wordmark-veil"></span></a></p>
 <h1 class="h2 stagger" style="--s:1">nothing filed here</h1>
-<p class="body3 stagger" style="--s:2">This page isn't in the index. Try the <a class="link" href="/openwiki/">home page</a> or the <a class="link" href="{REPO}">project on GitHub</a>.</p>
+<p class="body3 stagger" style="--s:2">This page isn't in the index. Try the <a class="link" href="{BASE}">home page</a> or the <a class="link" href="{REPO}">project on GitHub</a>.</p>
 </header>
 </div>
 </main>

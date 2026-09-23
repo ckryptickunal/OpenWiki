@@ -4,7 +4,6 @@
   "installCommand": "true",
   "buildCommand": "rm -rf dist && mkdir -p dist/openwiki && cp -R site/. dist/openwiki/ && cp site/404.html site/robots.txt dist/",
   "outputDirectory": "dist",
-  "trailingSlash": true,
   "redirects": [
     {
       "source": "/",

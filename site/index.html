@@ -21,11 +21,11 @@
 <meta name="twitter:title" content="OpenWiki | Turn YouTube &amp; Blogs into a Markdown Knowledge Base">
 <meta name="twitter:description" content="Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.">
 <meta name="twitter:image" content="https://openwiki-delta.vercel.app/openwiki/img/og.jpg">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/openwiki/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=Inter:wght@400..600&family=Playwrite+US+Trad&display=swap">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="/openwiki/assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "OpenWiki", "description": "Open-source Python CLI that turns YouTube videos, playlists, channels, blogs and notes into a linked, Obsidian-compatible Markdown wiki. Works with Gemini, OpenAI or offline with Ollama.", "codeRepository": "https://github.com/ckryptickunal/OpenWiki", "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://opensource.org/licenses/MIT", "url": "https://openwiki-delta.vercel.app/openwiki/", "author": {"@type": "Person", "name": "Kunal", "url": "https://github.com/ckryptickunal"}, "keywords": "YouTube transcript, knowledge base, LLM wiki, Obsidian, Markdown, second brain, RAG"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I download the transcript of a YouTube video as text?", "acceptedAnswer": {"@type": "Answer", "text": "Run openwiki youtube <url> --folder Talks. It writes a .txt file with the title, channel, language and full transcript. No API key is needed."}}, {"@type": "Question", "name": "How do I turn a whole YouTube channel or playlist into notes?", "acceptedAnswer": {"@type": "Answer", "text": "Set a free YOUTUBE_API_KEY, run openwiki youtube --channel @handle or --playlist <url>, then openwiki ingest --all to build the wiki pages."}}, {"@type": "Question", "name": "Does it work with non-English videos?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Use --lang to prefer languages; if none match, OpenWiki uses whatever caption track exists. Page names keep non-Latin scripts."}}, {"@type": "Question", "name": "Can I use it with Obsidian?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Open the wiki folder as a vault. Pages use YAML frontmatter and [[wikilinks]], so backlinks and the graph view work."}}, {"@type": "Question", "name": "Can I run it without sending data to the cloud?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Point it at Ollama or LM Studio. Only the caption and article downloads touch the internet."}}, {"@type": "Question", "name": "What does it cost?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWiki is free and MIT-licensed. You only pay for LLM calls if your provider charges; a local model costs nothing."}}]}</script>
@@ -35,38 +35,38 @@
 <main class="ow" id="main">
 <div class="page">
 <header class="head">
-<h1 class="stagger" style="--s:0;margin:0"><a href="./" class="wordmark" aria-label="OpenWiki home">openwiki<span class="wordmark-veil"></span></a><span class="sr-only">: turn YouTube videos, blogs and notes into a Markdown knowledge base</span></h1>
-<p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="obsidian/">Obsidian</a>.</p>
+<h1 class="stagger" style="--s:0;margin:0"><a href="/openwiki/" class="wordmark" aria-label="OpenWiki home">openwiki<span class="wordmark-veil"></span></a><span class="sr-only">: turn YouTube videos, blogs and notes into a Markdown knowledge base</span></h1>
+<p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="/openwiki/obsidian/">Obsidian</a>.</p>
 <p class="body3 secondary stagger" style="--s:1"><a class="link" href="https://github.com/ckryptickunal/OpenWiki">source on github</a>, <a class="link" href="#start">get started</a>, or <a class="link" href="https://github.com/sponsors/ckryptickunal">sponsor the project</a>.</p>
 </header>
 <section class="section" aria-labelledby="h-sources">
 <h2 class="h2 stagger" id="h-sources" style="--s:1">sources</h2>
-<a class="row divider stagger" style="--s:2" href="youtube/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:2" href="/openwiki/youtube/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:-7deg;--tx:-2px;--ty:-2px;--fan-tilt:-12deg;--fan-tx:-7px;--fan-ty:-3px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="img/thumbs/youtube.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="/openwiki/img/thumbs/youtube.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">YouTube</span><span class="row-meta">videos · playlists · channels</span></a>
-<a class="row divider stagger" style="--s:3" href="blogs/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:3" href="/openwiki/blogs/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:5deg;--tx:1px;--ty:-1px;--fan-tilt:9deg;--fan-tx:6px;--fan-ty:-4px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="img/thumbs/essays.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="/openwiki/img/thumbs/essays.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">Blogs &amp; essays</span><span class="row-meta">any site</span></a>
-<a class="row divider stagger" style="--s:4" href="notes/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:4" href="/openwiki/notes/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:-4deg;--tx:-1px;--ty:1px;--fan-tilt:-10deg;--fan-tx:-6px;--fan-ty:2px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="img/thumbs/notes.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="/openwiki/img/thumbs/notes.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">Your notes</span><span class="row-meta">.md · .txt · .html</span></a>
 </section>
 <section class="section" aria-labelledby="h-the-wiki">
 <h2 class="h2 stagger" id="h-the-wiki" style="--s:5">the wiki</h2>
-<a class="row divider stagger" style="--s:6" href="wiki/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:6" href="/openwiki/wiki/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:-7deg;--tx:-2px;--ty:-2px;--fan-tilt:-12deg;--fan-tx:-7px;--fan-ty:-3px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="img/thumbs/wiki.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg"><img src="/openwiki/img/thumbs/wiki.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">Linked pages</span><span class="row-meta">sources · people · topics</span></a>
-<a class="row divider stagger" style="--s:7" href="obsidian/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:7" href="/openwiki/obsidian/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:5deg;--tx:1px;--ty:-1px;--fan-tilt:9deg;--fan-tx:6px;--fan-ty:-4px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="img/thumbs/obsidian.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg"><img src="/openwiki/img/thumbs/obsidian.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">Obsidian vault</span><span class="row-meta">[[wikilinks]]</span></a>
-<a class="row divider stagger" style="--s:8" href="providers/"><div class="pile" aria-hidden="true">
+<a class="row divider stagger" style="--s:8" href="/openwiki/providers/"><div class="pile" aria-hidden="true">
 <div class="pile-card" style="--tilt:-4deg;--tx:-1px;--ty:1px;--fan-tilt:-10deg;--fan-tx:-6px;--fan-ty:2px"><div class="polaroid polaroid--blank"></div></div>
-<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="img/thumbs/providers.jpg" alt="" width="57" height="34" decoding="async"></div></div>
+<div class="pile-card pile-card--top"><div class="polaroid" style="--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"><img src="/openwiki/img/thumbs/providers.jpg" alt="" width="57" height="34" decoding="async"></div></div>
 </div><span class="row-title">Any LLM</span><span class="row-meta">gemini · openai · ollama</span></a>
 </section>
 <section class="section" id="start" aria-labelledby="h-start">
@@ -97,11 +97,11 @@
 <a class="link" href="https://github.com/ckryptickunal/OpenWiki/issues">issues</a>
 <a class="link" href="https://github.com/ckryptickunal/OpenWiki/discussions">discussions</a>
 <a class="link" href="https://github.com/ckryptickunal/Founder-Book">founder book</a>
-<a class="link" href="sitemap.xml">sitemap</a>
+<a class="link" href="/openwiki/sitemap.xml">sitemap</a>
 <p class="foot-note">MIT licensed. Built by <a class="link" href="https://github.com/ckryptickunal">Kunal</a>.</p>
 </footer>
 </div>
 </main>
-<script src="assets/site.js" defer></script>
+<script src="/openwiki/assets/site.js" defer></script>
 </body>
 </html>
