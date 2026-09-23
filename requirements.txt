@@ -1,5 +1,7 @@
+# Runtime dependencies (same as pyproject.toml). Prefer: pip install -e ".[dev]"
 youtube-transcript-api>=1.2.4
 google-api-python-client>=2.86.0
 python-dotenv>=1.0.0
 google-genai>=1.70.0
+# Optional: SOCKS proxy support for YOUTUBE_PROXY (e.g. Tor)
 pysocks>=1.7.1

@@ -1,6 +1,6 @@
 """Wiki health check: missing links, missing frontmatter, orphans, index rebuild.
 
-Maps to Founder Book `lint_wiki.py`. `--gemini` is optional and needs GEMINI_API_KEY.
+`--review` optionally asks the configured LLM for maintenance suggestions.
 """
 
 from __future__ import annotations
@@ -8,9 +8,9 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from wikiblocks.links import extract_links, wiki_pages
-from wikiblocks.wiki import append_log, rebuild_index, today
-from wikiblocks.workspace import Workspace
+from openwiki.links import extract_links, wiki_pages
+from openwiki.wiki import append_log, rebuild_index, today
+from openwiki.workspace import Workspace
 
 
 def timestamp() -> str:
@@ -96,7 +96,7 @@ def render_report(report: dict) -> str:
     return "\n".join(lines)
 
 
-def save_report(workspace: Workspace, report_text: str, gemini_text: str | None = None) -> Path:
+def save_report(workspace: Workspace, report_text: str, review_text: str | None = None) -> Path:
     workspace.synthesis_dir.mkdir(parents=True, exist_ok=True)
     path = workspace.synthesis_dir / f"{today()}-wiki-lint-report.md"
     content = "\n".join(
@@ -115,20 +115,18 @@ def save_report(workspace: Workspace, report_text: str, gemini_text: str | None 
             "",
         ]
     )
-    if gemini_text:
-        content += "\n## Gemini Maintenance Suggestions\n\n" + gemini_text + "\n"
+    if review_text:
+        content += "\n## LLM Maintenance Suggestions\n\n" + review_text + "\n"
     path.write_text(content, encoding="utf-8")
     rebuild_index(workspace)
     append_log(workspace, "lint", "Wiki Lint Report", f"- Saved: `{workspace.rel(path)}`")
     return path
 
 
-def gemini_review(workspace: Workspace, report_text: str) -> str:
-    from google.genai import types
+def llm_review(workspace: Workspace, report_text: str, provider: str | None = None) -> str:
+    from openwiki.llm import make_client
 
-    from wikiblocks.gemini import configure_gemini
-
-    gemini = configure_gemini(lint=True)
+    client = make_client(provider=provider, lint=True)
     index_text = (
         workspace.index_path.read_text(encoding="utf-8", errors="replace")
         if workspace.index_path.exists()
@@ -151,12 +149,7 @@ Lint report:
 Index:
 {index_text[:60_000]}
 """
-    response = gemini["client"].models.generate_content(
-        model=gemini["model_name"],
-        contents=prompt,
-        config=types.GenerateContentConfig(temperature=0.2),
-    )
-    return (response.text or "").strip()
+    return client.generate(prompt, temperature=0.2).strip()
 
 
 def run_lint(
@@ -164,16 +157,17 @@ def run_lint(
     *,
     fix_index: bool = False,
     save: bool = False,
-    use_gemini: bool = False,
+    review: bool = False,
+    provider: str | None = None,
 ) -> tuple[dict, str]:
     if fix_index:
         workspace.ensure_dirs()
         rebuild_index(workspace)
     report = build_report(workspace)
     report_text = render_report(report)
-    gemini_text = gemini_review(workspace, report_text) if use_gemini else None
+    review_text = llm_review(workspace, report_text, provider) if review else None
     if save:
-        save_report(workspace, report_text, gemini_text)
-    if gemini_text:
-        report_text = report_text + "\n\n## Gemini Maintenance Suggestions\n\n" + gemini_text
+        save_report(workspace, report_text, review_text)
+    if review_text:
+        report_text = report_text + "\n\n## LLM Maintenance Suggestions\n\n" + review_text
     return report, report_text

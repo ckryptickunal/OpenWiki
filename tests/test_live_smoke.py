@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from wikiblocks.env import env_value
+from openwiki.env import env_value
 
 # First YouTube video (19s). If captions are missing, extract_one_video returns skip.
 PUBLIC_VIDEO_ID = "jNQXAC9IVRw"
@@ -19,7 +19,7 @@ PUBLIC_VIDEO_ID = "jNQXAC9IVRw"
 @pytest.mark.live
 @pytest.mark.skipif(not env_value("YOUTUBE_API_KEY") and not os.getenv("YOUTUBE_API_KEY"), reason="YOUTUBE_API_KEY not set")
 def test_live_youtube_one_public_video(tmp_path):
-    from wikiblocks.youtube import extract_one_video, maybe_youtube_client
+    from openwiki.youtube import extract_one_video, maybe_youtube_client
 
     youtube = maybe_youtube_client()
     result = extract_one_video(PUBLIC_VIDEO_ID, tmp_path / "single_videos", youtube=youtube)
@@ -33,8 +33,8 @@ def test_live_youtube_one_public_video(tmp_path):
 @pytest.mark.live
 @pytest.mark.skipif(not env_value("GEMINI_API_KEY") and not os.getenv("GEMINI_API_KEY"), reason="GEMINI_API_KEY not set")
 def test_live_gemini_ingest_fixture_only(tmp_path, fixtures):
-    from wikiblocks.wiki import ingest_path
-    from wikiblocks.workspace import Workspace
+    from openwiki.wiki import ingest_path
+    from openwiki.workspace import Workspace
 
     ws = Workspace(tmp_path)
     ws.ensure_dirs()

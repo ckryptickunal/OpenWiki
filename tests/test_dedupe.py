@@ -1,8 +1,8 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 
-from wikiblocks.wiki import ingest_path, load_manifest
-from wikiblocks.workspace import Workspace
+from openwiki.wiki import ingest_path, load_manifest
+from openwiki.workspace import Workspace
 
 
 def _copy_demo(workspace: Workspace, fixtures: Path) -> Path:

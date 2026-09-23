@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from wikiblocks.essays import (
+from openwiki.essays import (
     discover_new_from_html,
     html_to_text,
     parse_generic_index,

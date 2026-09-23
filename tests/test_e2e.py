@@ -5,11 +5,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from wikiblocks.cli import main
-from wikiblocks.essays import write_article_from_html
-from wikiblocks.lint import build_report
-from wikiblocks.wiki import ingest_path, rebuild_index
-from wikiblocks.workspace import Workspace
+from openwiki.cli import main
+from openwiki.essays import write_article_from_html
+from openwiki.lint import build_report
+from openwiki.wiki import ingest_path, rebuild_index
+from openwiki.workspace import Workspace
 
 
 def test_fixture_extract_ingest_lint(workspace: Workspace, fixtures: Path):

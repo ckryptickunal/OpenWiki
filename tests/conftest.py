@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from wikiblocks.workspace import Workspace
+from openwiki.workspace import Workspace  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 

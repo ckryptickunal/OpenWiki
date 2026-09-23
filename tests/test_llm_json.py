@@ -1,4 +1,4 @@
-from wikiblocks.gemini import extract_json
+from openwiki.llm import extract_json
 
 
 def test_extract_json_from_fenced_block():

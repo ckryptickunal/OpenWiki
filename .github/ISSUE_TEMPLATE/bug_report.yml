@@ -1,0 +1,36 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you ran, what you expected, and what you got instead.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: Paste the exact command and its output. Remove API keys and private URLs.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: OpenWiki version
+      description: Output of `openwiki --version`.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Python version and OS
+      placeholder: Python 3.12, macOS 15
+  - type: dropdown
+    id: provider
+    attributes:
+      label: LLM provider (if the bug is in ingest)
+      options: [Not related to ingest, Gemini, OpenAI, OpenRouter, Ollama, LM Studio, Other OpenAI-compatible]

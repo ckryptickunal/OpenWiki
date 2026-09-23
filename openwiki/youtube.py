@@ -1,42 +1,44 @@
 """YouTube discovery and caption extraction.
 
-Maps to Founder Book:
-  transcriptor.py       — channel resolve, uploads list, header writer
-  fetch_transcript.py   — single-video caption fetch
-  extract_channel.py    — skip no-captions, extract-state, optional proxy
-  auto_sync.py          — newest-first discovery that stops at known IDs
+- Single videos need no API key (title/channel come from YouTube's public oEmbed endpoint).
+- Channel and playlist listing use the YouTube Data API v3 (`YOUTUBE_API_KEY`).
+- Captions come from `youtube-transcript-api`, optionally through `YOUTUBE_PROXY`.
+- `<folder>/_extract_state.json` remembers finished and permanently skipped videos.
 """
 
 from __future__ import annotations
 
 import json
-import os
 import re
+import sys
 import time
+import urllib.parse
+import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 from urllib.parse import parse_qs, urlparse
 
-from wikiblocks.env import env_value, require_env
-from wikiblocks.textfmt import write_youtube_file
-from wikiblocks.workspace import Workspace
+from openwiki.env import env_value, require_env
+from openwiki.textfmt import write_youtube_file
+from openwiki.workspace import Workspace
 
 DISCOVERY_MAX_PAGES = 40
 DISCOVERY_STOP_AFTER_KNOWN = 2
+DEFAULT_LANGUAGES = ["en"]
 
-PERMANENT_NO_CAPTIONS = (
-    "no transcripts",
-    "transcriptsdisabled",
-    "disabled",
-    "no transcript",
-)
-PERMANENT_UNPLAYABLE = (
-    "unplayable",
-    "live event",
-    "private video",
-    "video unavailable",
-)
+# youtube-transcript-api exception class names, lower-cased.
+NO_CAPTION_ERRORS = {"transcriptsdisabled", "nocaptionsavailable"}
+UNPLAYABLE_ERRORS = {"videounavailable", "videounplayable", "agerestricted", "invalidvideoid"}
+BLOCKED_ERRORS = {"requestblocked", "ipblocked"}
+
+# Message fallbacks for exceptions raised by other layers.
+PERMANENT_NO_CAPTIONS = ("subtitles are disabled", "transcripts disabled", "no captions")
+PERMANENT_UNPLAYABLE = ("unplayable", "live event", "private video", "video unavailable")
+
+
+class NoCaptionsAvailable(Exception):
+    """The video lists no caption tracks at all."""
 
 
 @dataclass
@@ -49,16 +51,26 @@ class FetchedTranscript:
 
 
 def extract_video_id(url_or_id: str) -> str:
-    """Extract a video ID from a watch URL, youtu.be link, or bare ID."""
+    """Extract a video ID from a watch URL, youtu.be link, shorts/live/embed URL, or bare ID."""
     value = (url_or_id or "").strip()
-    if "youtube.com/watch" in value:
-        query = parse_qs(urlparse(value).query)
-        return query["v"][0]
-    if "youtube.com/shorts/" in value:
-        return value.split("youtube.com/shorts/")[1].split("?")[0].split("/")[0]
-    if "youtu.be/" in value:
-        return value.split("youtu.be/")[1].split("?")[0]
+    parsed = urlparse(value)
+    if parsed.netloc.endswith("youtu.be"):
+        return parsed.path.lstrip("/").split("/")[0]
+    if "youtube.com" in parsed.netloc:
+        query = parse_qs(parsed.query)
+        if "v" in query:
+            return query["v"][0]
+        for prefix in ("/shorts/", "/live/", "/embed/"):
+            if parsed.path.startswith(prefix):
+                return parsed.path[len(prefix):].split("/")[0]
     return value
+
+
+def extract_playlist_id(url_or_id: str) -> str:
+    """Return the `list=` parameter of a playlist URL, or the input unchanged."""
+    value = (url_or_id or "").strip()
+    query = parse_qs(urlparse(value).query)
+    return query["list"][0] if "list" in query else value
 
 
 def parse_url_file(filepath: Path | str) -> list[str]:
@@ -73,16 +85,25 @@ def parse_url_file(filepath: Path | str) -> list[str]:
 
 
 def classify_fetch_error(exc: BaseException) -> str:
-    """Return no_captions | unplayable | ip_blocked | error."""
-    message = str(exc).lower()
+    """Return no_captions | unplayable | ip_blocked | error.
+
+    no_captions and unplayable are permanent: the video is never retried.
+    Anything else (blocks, network errors) stays retryable on the next run.
+    """
     name = type(exc).__name__.lower()
-    blob = f"{name} {message}"
-    if any(marker in blob for marker in PERMANENT_NO_CAPTIONS):
-        return "no_captions"
-    if any(marker in blob for marker in PERMANENT_UNPLAYABLE):
-        return "unplayable"
-    if "429" in blob or "blocked" in blob or "ipblocked" in blob:
+    if name in BLOCKED_ERRORS:
         return "ip_blocked"
+    if name in NO_CAPTION_ERRORS:
+        return "no_captions"
+    if name in UNPLAYABLE_ERRORS:
+        return "unplayable"
+    message = str(exc).lower()
+    if "429" in message or "blocking requests" in message or "ip blocked" in message:
+        return "ip_blocked"
+    if any(marker in message for marker in PERMANENT_NO_CAPTIONS):
+        return "no_captions"
+    if any(marker in message for marker in PERMANENT_UNPLAYABLE):
+        return "unplayable"
     return "error"
 
 
@@ -112,51 +133,66 @@ def select_new_ids(
 
 
 def get_youtube_service():
-    api_key = require_env("YOUTUBE_API_KEY", "channel discovery and video metadata")
+    api_key = require_env("YOUTUBE_API_KEY", "channel/playlist discovery and video metadata")
     from googleapiclient.discovery import build
 
-    return build("youtube", "v3", developerKey=api_key)
+    return build("youtube", "v3", developerKey=api_key, cache_discovery=False)
 
 
-def resolve_channel_id(youtube, channel_input: str) -> tuple[str, str]:
-    """Resolve a channel ID, URL, @handle, or name to (channel_id, title)."""
-    if re.match(r"^UC[\w-]{22}$", channel_input):
-        resp = youtube.channels().list(part="snippet", id=channel_input).execute()
-        if resp.get("items"):
-            return channel_input, resp["items"][0]["snippet"]["title"]
+def _channel_by(youtube, **kwargs) -> tuple[str, str] | None:
+    resp = youtube.channels().list(part="snippet", **kwargs).execute()
+    if resp.get("items"):
+        item = resp["items"][0]
+        return item["id"], item["snippet"]["title"]
+    return None
 
-    if "youtube.com" in channel_input:
-        parsed = urlparse(channel_input)
-        path = parsed.path
-        if "/channel/" in path:
-            channel_id = path.split("/channel/")[1].split("/")[0]
-            resp = youtube.channels().list(part="snippet", id=channel_id).execute()
-            if resp.get("items"):
-                return channel_id, resp["items"][0]["snippet"]["title"]
-        if "/@" in path:
-            handle = path.split("/@")[1].split("/")[0]
-            resp = youtube.search().list(
-                part="snippet", q=handle, type="channel", maxResults=1
-            ).execute()
-            if resp.get("items"):
-                snippet = resp["items"][0]["snippet"]
-                return snippet["channelId"], snippet["channelTitle"]
-        if "/c/" in path or "/user/" in path:
-            name = path.split("/")[-1]
-            resp = youtube.search().list(
-                part="snippet", q=name, type="channel", maxResults=1
-            ).execute()
-            if resp.get("items"):
-                snippet = resp["items"][0]["snippet"]
-                return snippet["channelId"], snippet["channelTitle"]
 
-    query = channel_input[1:] if channel_input.startswith("@") else channel_input
-    resp = youtube.search().list(
-        part="snippet", q=query, type="channel", maxResults=1
-    ).execute()
+def _search_channel(youtube, query: str) -> tuple[str, str] | None:
+    resp = youtube.search().list(part="snippet", q=query, type="channel", maxResults=1).execute()
     if resp.get("items"):
         snippet = resp["items"][0]["snippet"]
         return snippet["channelId"], snippet["channelTitle"]
+    return None
+
+
+def resolve_channel_id(youtube, channel_input: str) -> tuple[str, str]:
+    """Resolve a channel ID, URL, @handle, or name to (channel_id, title).
+
+    IDs and handles use channels.list (1 quota unit). Only free-text names fall
+    back to search (100 units).
+    """
+    value = channel_input.strip()
+    path = urlparse(value).path if "youtube.com" in value else ""
+
+    channel_id = None
+    if re.match(r"^UC[\w-]{22}$", value):
+        channel_id = value
+    elif "/channel/" in path:
+        channel_id = path.split("/channel/")[1].split("/")[0]
+    if channel_id:
+        found = _channel_by(youtube, id=channel_id)
+        if found:
+            return found
+
+    handle = None
+    if "/@" in path:
+        handle = path.split("/@")[1].split("/")[0]
+    elif value.startswith("@"):
+        handle = value[1:]
+    if handle:
+        found = _channel_by(youtube, forHandle=handle)
+        if found:
+            return found
+
+    if "/user/" in path:
+        found = _channel_by(youtube, forUsername=path.split("/user/")[1].split("/")[0])
+        if found:
+            return found
+
+    query = handle or (path.rstrip("/").split("/")[-1] if path else value)
+    found = _search_channel(youtube, query)
+    if found:
+        return found
     raise RuntimeError(f"Could not find channel for {channel_input!r}")
 
 
@@ -179,17 +215,25 @@ def get_video_metadata(youtube, video_id: str) -> dict:
     }
 
 
-def iter_upload_pages(youtube, channel_id: str, *, max_pages: int = DISCOVERY_MAX_PAGES):
-    resp = youtube.channels().list(part="contentDetails", id=channel_id).execute()
-    items = resp.get("items", [])
-    if not items:
-        return
-    uploads = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+def get_oembed_metadata(video_id: str, timeout: int = 15) -> dict:
+    """Title and channel name from YouTube's public oEmbed endpoint. No API key."""
+    watch = f"https://www.youtube.com/watch?v={video_id}"
+    url = "https://www.youtube.com/oembed?" + urllib.parse.urlencode({"url": watch, "format": "json"})
+    with urllib.request.urlopen(url, timeout=timeout) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    return {
+        "title": data.get("title") or "Unknown",
+        "channel_title": data.get("author_name") or "",
+    }
+
+
+def iter_playlist_pages(youtube, playlist_id: str, *, max_pages: int = DISCOVERY_MAX_PAGES):
+    """Yield pages (lists of dicts) of a playlist, in playlist order."""
     page_token = None
     for _ in range(max_pages):
         playlist = youtube.playlistItems().list(
             part="snippet,contentDetails",
-            playlistId=uploads,
+            playlistId=playlist_id,
             maxResults=50,
             pageToken=page_token,
         ).execute()
@@ -206,13 +250,27 @@ def iter_upload_pages(youtube, channel_id: str, *, max_pages: int = DISCOVERY_MA
                 "id": video_id,
                 "title": snippet.get("title", "Unknown"),
                 "published_at": snippet.get("publishedAt", "Unknown"),
-                "description": snippet.get("description", ""),
                 "channel_title": snippet.get("channelTitle", ""),
             })
         yield page
         page_token = playlist.get("nextPageToken")
         if not page_token:
             break
+
+
+def uploads_playlist_id(youtube, channel_id: str) -> str | None:
+    resp = youtube.channels().list(part="contentDetails", id=channel_id).execute()
+    items = resp.get("items", [])
+    if not items:
+        return None
+    return items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+
+def iter_upload_pages(youtube, channel_id: str, *, max_pages: int = DISCOVERY_MAX_PAGES):
+    """Yield pages of a channel's uploads, newest first."""
+    uploads = uploads_playlist_id(youtube, channel_id)
+    if uploads:
+        yield from iter_playlist_pages(youtube, uploads, max_pages=max_pages)
 
 
 def get_all_videos(youtube, channel_id: str) -> list[dict]:
@@ -235,7 +293,19 @@ def _transcript_api(proxy: str | None = None):
         return YouTubeTranscriptApi()
     from youtube_transcript_api.proxies import GenericProxyConfig
 
-    return YouTubeTranscriptApi(proxy_config=GenericProxyConfig(https_url=proxy))
+    return YouTubeTranscriptApi(proxy_config=GenericProxyConfig(http_url=proxy, https_url=proxy))
+
+
+def pick_transcript(transcript_list, languages: list[str]):
+    """Preferred language first; otherwise the first manual track, then the first generated one."""
+    try:
+        return transcript_list.find_transcript(languages)
+    except Exception as exc:
+        if type(exc).__name__ != "NoTranscriptFound":
+            raise
+    for transcript in transcript_list:
+        return transcript
+    raise NoCaptionsAvailable("no captions")
 
 
 def fetch_transcript(
@@ -247,10 +317,10 @@ def fetch_transcript(
     from youtube_transcript_api.formatters import TextFormatter
 
     api = _transcript_api(proxy)
-    transcript = api.fetch(video_id, languages=languages or ["en"])
-    text = TextFormatter().format_transcript(transcript)
+    chosen = pick_transcript(api.list(video_id), languages or DEFAULT_LANGUAGES)
+    transcript = chosen.fetch()
     return FetchedTranscript(
-        text=text,
+        text=TextFormatter().format_transcript(transcript),
         language=getattr(transcript, "language", "English"),
         language_code=getattr(transcript, "language_code", "en"),
         is_generated=bool(getattr(transcript, "is_generated", False)),
@@ -300,17 +370,15 @@ def extract_one_video(
         return "exists"
 
     meta = dict(metadata or {})
-    if youtube:
-        try:
-            fetched = get_video_metadata(youtube, video_id)
-            if fetched:
-                meta.update(fetched)
-        except Exception:
-            pass
+    try:
+        fetched = get_video_metadata(youtube, video_id) if youtube else get_oembed_metadata(video_id)
+        meta.update({k: v for k, v in fetched.items() if v})
+    except Exception:
+        pass
     meta.setdefault("title", "Unknown")
     meta.setdefault("channel_title", folder.name)
 
-    last_kind = "error"
+    last_error: BaseException | None = None
     for attempt in range(retries):
         try:
             transcript = fetch_transcript(video_id, languages=languages, proxy=proxy)
@@ -326,12 +394,17 @@ def extract_one_video(
             )
             return "ok"
         except Exception as exc:
-            last_kind = classify_fetch_error(exc)
-            if last_kind in {"no_captions", "unplayable"}:
+            last_error = exc
+            if classify_fetch_error(exc) in {"no_captions", "unplayable"}:
                 return "skip"
             if attempt < retries - 1:
                 time.sleep((attempt + 1) * 2)
-    return "failed" if last_kind != "skip" else "skip"
+
+    kind = classify_fetch_error(last_error) if last_error else "error"
+    hint = " (set YOUTUBE_PROXY, see README)" if kind == "ip_blocked" else ""
+    reason = str(last_error).strip().splitlines()[0] if last_error else "unknown error"
+    print(f"  [failed] {video_id}: {kind}{hint}: {reason[:200]}", file=sys.stderr)
+    return "failed"
 
 
 def extract_videos(
@@ -340,13 +413,13 @@ def extract_videos(
     *,
     channel_name: str | None = None,
     youtube=None,
+    languages: list[str] | None = None,
     proxy: str | None = None,
 ) -> dict[str, int]:
     """Extract many videos. Skips existing files and videos with no captions."""
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
     state = load_extract_state(folder)
-    done = set(state.get("done", []))
     skipped = set(state.get("permanent_skip", []))
     counts = {"ok": 0, "skip": 0, "exists": 0, "failed": 0}
 
@@ -359,6 +432,7 @@ def extract_videos(
             folder,
             metadata={"channel_title": channel_name or folder.name},
             youtube=youtube,
+            languages=languages,
             proxy=proxy,
         )
         counts[result] = counts.get(result, 0) + 1
@@ -370,6 +444,7 @@ def extract_videos(
                 state["permanent_skip"].append(video_id)
         state["stats"]["success"] = len(state["done"])
         state["stats"]["skipped"] = len(state["permanent_skip"])
+        state["stats"]["failed"] = counts["failed"]
         save_extract_state(folder, state)
 
     return counts
@@ -395,38 +470,46 @@ def extract_channel(
     folder: str | None = None,
     dry_run: bool = False,
     limit: int | None = None,
+    languages: list[str] | None = None,
 ) -> dict:
-    """Resolve a channel, discover new videos, extract captions for the missing ones."""
+    """Resolve a channel, find uploads not on disk yet (newest first), extract their captions."""
     youtube = get_youtube_service()
     channel_id, title = resolve_channel_id(youtube, channel_input)
-    folder_name = folder or safe_folder_name(title)
+    folder_name = safe_folder_name(folder or title)
     out = workspace.root / folder_name
-    known = workspace.known_ids_for_folder(out)
-    videos = get_all_videos(youtube, channel_id)
-    remaining = [v for v in videos if v["id"] not in known]
+    new_ids = discover_new_video_ids(youtube, channel_id, workspace.known_ids_for_folder(out))
     if limit is not None:
-        remaining = remaining[:limit]
-    if dry_run:
-        return {
-            "channel_id": channel_id,
-            "title": title,
-            "folder": folder_name,
-            "total": len(videos),
-            "new": [v["id"] for v in remaining],
-            "extracted": 0,
-        }
-    counts = extract_videos(
-        [v["id"] for v in remaining],
-        out,
-        channel_name=title,
-        youtube=youtube,
-        proxy=os.getenv("YOUTUBE_PROXY") or None,
-    )
-    return {
-        "channel_id": channel_id,
-        "title": title,
-        "folder": folder_name,
-        "total": len(videos),
-        "new": [v["id"] for v in remaining],
-        "counts": counts,
-    }
+        new_ids = new_ids[:limit]
+    result = {"channel_id": channel_id, "title": title, "folder": folder_name, "new": new_ids}
+    if not dry_run:
+        result["counts"] = extract_videos(
+            new_ids, out, channel_name=title, youtube=youtube, languages=languages
+        )
+    return result
+
+
+def extract_playlist(
+    workspace: Workspace,
+    playlist_input: str,
+    *,
+    folder: str,
+    dry_run: bool = False,
+    limit: int | None = None,
+    languages: list[str] | None = None,
+) -> dict:
+    """Extract every video of a playlist that is not on disk yet, in playlist order."""
+    youtube = get_youtube_service()
+    playlist_id = extract_playlist_id(playlist_input)
+    out = workspace.root / safe_folder_name(folder)
+    known = workspace.known_ids_for_folder(out)
+    new_ids: list[str] = []
+    for page in iter_playlist_pages(youtube, playlist_id, max_pages=200):
+        new_ids.extend(v["id"] for v in page if v["id"] not in known and v["id"] not in new_ids)
+    if limit is not None:
+        new_ids = new_ids[:limit]
+    result = {"playlist_id": playlist_id, "folder": out.name, "new": new_ids}
+    if not dry_run:
+        result["counts"] = extract_videos(
+            new_ids, out, channel_name=folder, youtube=youtube, languages=languages
+        )
+    return result

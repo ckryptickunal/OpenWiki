@@ -7,7 +7,10 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-SKIP_DIRS = {".cursor", "__pycache__", "wiki", ".git", "tests", "wikiblocks", ".venv", "venv"}
+SKIP_DIRS = {
+    "__pycache__", "wiki", "tests", "openwiki", "venv", "node_modules",
+    "docs", "examples", "site", "build", "dist",
+}
 SKIP_TXT_NAMES = {"_new_urls.txt"}
 
 
@@ -19,7 +22,7 @@ class Workspace:
     def resolve(cls, root: str | Path | None = None) -> Workspace:
         if root:
             return cls(Path(root).expanduser().resolve())
-        env = os.getenv("WIKI_BLOCKS_ROOT")
+        env = os.getenv("OPENWIKI_ROOT")
         if env:
             return cls(Path(env).expanduser().resolve())
         return cls(Path.cwd().resolve())
@@ -89,7 +92,7 @@ class Workspace:
             return str(path)
 
     def discover_source_files(self, folder: str | None = None) -> list[Path]:
-        """Find pipeline .txt files the same way Founder Book ingest.py does."""
+        """Find raw source .txt files in each top-level folder of the workspace."""
         if folder:
             directory = (self.root / folder).resolve()
             if not directory.is_dir():

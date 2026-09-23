@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from wikiblocks.wiki import ingest_path
+from openwiki.wiki import ingest_path
 
 
 def test_ingest_without_key_or_analysis_raises(workspace, fixtures, monkeypatch):
