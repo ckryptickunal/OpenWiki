@@ -30,6 +30,8 @@ Hours of talks, lectures, podcasts, and essays are hard to search and easy to fo
 - **Works offline:** point it at Ollama or LM Studio and nothing leaves your machine.
 - **Good RAG input:** clean, chunked-by-topic Markdown to feed a retrieval pipeline or a long-context model.
 
+OpenWiki implements the [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) pattern described by Andrej Karpathy: instead of retrieving from raw documents at query time, an LLM compiles your sources into a persistent, cross-linked wiki that keeps getting richer with everything you add.
+
 It is the engine behind [Founder Book](https://github.com/ckryptickunal/Founder-Book), a wiki built from Y Combinator videos and Paul Graham and Sam Altman essays.
 
 ## Contents
