@@ -6,7 +6,6 @@
 
 An open-source Python CLI that downloads YouTube transcripts and web articles, then uses an LLM (Gemini, OpenAI, OpenRouter, or a local model through Ollama / LM Studio) to build an Obsidian-compatible wiki of sources, people, companies, and topics, all cross-linked with `[[wikilinks]]`.
 
-[![CI](https://github.com/ckryptickunal/OpenWiki/actions/workflows/ci.yml/badge.svg)](https://github.com/ckryptickunal/OpenWiki/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/ckryptickunal)
