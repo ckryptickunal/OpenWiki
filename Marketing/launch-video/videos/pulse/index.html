@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>OpenWiki Pulse</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: "Inter Display", sans-serif; -webkit-font-smoothing: antialiased; color: #fff; }
+      #stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+      .shot { position: absolute; left: -48px; top: -27px; width: 2016px; height: 1134px; object-fit: cover; }
+      .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 460px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.7)); z-index: 3; pointer-events: none; }
+      .line { position: absolute; z-index: 5; opacity: 0; font-weight: 700; letter-spacing: -0.025em; }
+      .line.low { left: 128px; bottom: 116px; font-size: 76px; line-height: 1.05; }
+      .line.slam { left: 0; right: 0; top: 50%; margin-top: -120px; text-align: center; font-size: 220px; letter-spacing: -0.045em; line-height: 1; }
+      /* the real page OpenWiki wrote for a YC talk */
+      #pageScene { position: absolute; inset: 0; background: #000; perspective: 1600px; }
+      #card { position: absolute; left: 230px; top: 70px; width: 1460px; padding: 60px 72px; border-radius: 26px; background: #0d0d0d; border: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 60px 140px -40px rgba(255,255,255,.12); transform-origin: 50% 100%; }
+      #card .path { font: 600 26px/1 "Inter Display"; color: rgba(255,255,255,.45); letter-spacing: .02em; }
+      #card h2 { margin: 24px 0 20px; font: 700 68px/1.05 "Inter Display"; letter-spacing: -0.03em; }
+      #card p { font: 600 32px/1.4 "Inter Display"; color: rgba(255,255,255,.72); }
+      #card .links { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; }
+      #card .lk { padding: 12px 22px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); font: 700 30px/1 "Inter Display"; color: rgba(255,255,255,.55); }
+      #card blockquote { margin-top: 32px; padding-left: 28px; border-left: 4px solid #fff; font: 600 40px/1.25 "Inter Display"; letter-spacing: -0.01em; }
+      #card blockquote span { display: block; margin-top: 12px; font-size: 28px; color: rgba(255,255,255,.5); }
+      #graphScene { position: absolute; inset: 0; background: #000; }
+      #gwords { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; z-index: 5; font-weight: 700; font-size: 96px; letter-spacing: -0.035em; }
+      .gw { display: inline-block; opacity: 0; margin: 0 .16em; }
+      #end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; }
+      .tile { width: 168px; height: 168px; border-radius: 38px; background: linear-gradient(180deg, #2c2c2c, #0c0c0c); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 1px rgba(255,255,255,.08), 0 40px 120px -20px rgba(255,255,255,.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+      .tile b { font-weight: 700; line-height: 1; background: linear-gradient(180deg, #f6f6f6, #b4b4b4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .tile .a1 { font-size: 42px; } .tile .a2 { font-size: 64px; letter-spacing: -0.02em; }
+      .word { margin-top: 40px; font: 700 96px/1 "Inter Display"; letter-spacing: -0.04em; }
+      .tag { margin-top: 26px; font: 600 36px/1.2 "Inter Display"; color: rgba(255,255,255,.75); letter-spacing: -0.01em; }
+      .url { position: absolute; bottom: 92px; left: 0; right: 0; text-align: center; font: 600 26px/1 "Inter Display"; color: rgba(255,255,255,.5); }
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 20; pointer-events: none; }
+      #fade { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 21; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30.0" data-width="1920" data-height="1080">
+      <div id="stage">
+        <video class="clip shot" id="v0" src="assets/shots/00-eyes4.mp4" muted playsinline data-start="0.0" data-duration="1.0" data-track-index="0"></video>
+        <video class="clip shot" id="v1" src="assets/shots/01-eyes3.mp4" muted playsinline data-start="1.0" data-duration="1.0" data-track-index="1"></video>
+        <video class="clip shot" id="v2" src="assets/shots/02-click3.mp4" muted playsinline data-start="2.0" data-duration="1.34" data-track-index="0"></video>
+        <video class="clip shot" id="v3" src="assets/shots/03-scroll3.mp4" muted playsinline data-start="3.34" data-duration="0.83" data-track-index="1"></video>
+        <video class="clip shot" id="v4" src="assets/shots/04-sticky4.mp4" muted playsinline data-start="4.17" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v5" src="assets/shots/05-papers3.mp4" muted playsinline data-start="4.67" data-duration="0.67" data-track-index="1"></video>
+        <video class="clip shot" id="v6" src="assets/shots/06-think0.mp4" muted playsinline data-start="5.34" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v7" src="assets/shots/07-scroll5.mp4" muted playsinline data-start="5.84" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v8" src="assets/shots/08-papers4.mp4" muted playsinline data-start="6.34" data-duration="0.33" data-track-index="0"></video>
+        <video class="clip shot" id="v9" src="assets/shots/09-eyes4.mp4" muted playsinline data-start="6.67" data-duration="0.08" data-track-index="1"></video>
+        <video class="clip shot" id="v10" src="assets/shots/10-click3.mp4" muted playsinline data-start="6.75" data-duration="0.08" data-track-index="0"></video>
+        <video class="clip shot" id="v11" src="assets/shots/11-papers3.mp4" muted playsinline data-start="6.83" data-duration="0.09" data-track-index="1"></video>
+        <video class="clip shot" id="v12" src="assets/shots/12-think0.mp4" muted playsinline data-start="6.92" data-duration="0.08" data-track-index="0"></video>
+        <video class="clip shot" id="v13" src="assets/shots/13-stage2.mp4" muted playsinline data-start="8.33" data-duration="0.67" data-track-index="1"></video>
+        <video class="clip shot" id="v14" src="assets/shots/14-podcast0.mp4" muted playsinline data-start="9.0" data-duration="0.67" data-track-index="0"></video>
+        <video class="clip shot" id="v15" src="assets/shots/15-flip3.mp4" muted playsinline data-start="9.67" data-duration="0.66" data-track-index="1"></video>
+        <video class="clip shot" id="v16" src="assets/shots/16-flip1.mp4" muted playsinline data-start="10.33" data-duration="0.67" data-track-index="0"></video>
+        <video class="clip shot" id="v17" src="assets/shots/17-write3.mp4" muted playsinline data-start="11.0" data-duration="1.33" data-track-index="1"></video>
+        <video class="clip shot" id="v18" src="assets/shots/18-code5.mp4" muted playsinline data-start="17.0" data-duration="1.0" data-track-index="0"></video>
+        <video class="clip shot" id="v19" src="assets/shots/19-type4.mp4" muted playsinline data-start="18.0" data-duration="0.67" data-track-index="1"></video>
+        <video class="clip shot" id="v20" src="assets/shots/20-think4.mp4" muted playsinline data-start="18.67" data-duration="1.66" data-track-index="0"></video>
+        <video class="clip shot" id="v21" src="assets/shots/21-city5.mp4" muted playsinline data-start="20.33" data-duration="0.34" data-track-index="1"></video>
+        <video class="clip shot" id="v22" src="assets/shots/22-stage0.mp4" muted playsinline data-start="20.67" data-duration="0.33" data-track-index="0"></video>
+        <video class="clip shot" id="v23" src="assets/shots/23-flip4.mp4" muted playsinline data-start="21.0" data-duration="0.33" data-track-index="1"></video>
+        <video class="clip shot" id="v24" src="assets/shots/24-write4.mp4" muted playsinline data-start="21.33" data-duration="0.34" data-track-index="0"></video>
+        <video class="clip shot" id="v25" src="assets/shots/25-eyes5.mp4" muted playsinline data-start="21.67" data-duration="0.33" data-track-index="1"></video>
+        <video class="clip shot" id="v26" src="assets/shots/26-code2.mp4" muted playsinline data-start="22.0" data-duration="0.33" data-track-index="0"></video>
+        <video class="clip shot" id="v27" src="assets/shots/27-podcast5.mp4" muted playsinline data-start="22.33" data-duration="0.34" data-track-index="1"></video>
+        <video class="clip shot" id="v28" src="assets/shots/28-city4.mp4" muted playsinline data-start="22.67" data-duration="0.33" data-track-index="0"></video>
+        <video class="clip shot" id="v29" src="assets/shots/29-eyes4.mp4" muted playsinline data-start="23.0" data-duration="0.083" data-track-index="1"></video>
+        <video class="clip shot" id="v30" src="assets/shots/30-flip0.mp4" muted playsinline data-start="23.083" data-duration="0.084" data-track-index="0"></video>
+        <video class="clip shot" id="v31" src="assets/shots/31-type5.mp4" muted playsinline data-start="23.167" data-duration="0.083" data-track-index="1"></video>
+        <video class="clip shot" id="v32" src="assets/shots/32-think3.mp4" muted playsinline data-start="23.25" data-duration="0.08" data-track-index="0"></video>
+      </div>
+      <section id="pageScene" class="clip" data-start="12.33" data-duration="1.67" data-track-index="3">
+        <div id="card">
+          <div class="path">wiki/sources/-7Qz7tSTfUU-dylan-field-scaling-figma-and-the-future-of-design.md</div>
+          <h2>Dylan Field: Scaling Figma and the Future of Design</h2>
+          <p>Dylan Field, co-founder and CEO of Figma, discusses the company’s evolution, the importance of design in the age of AI, and his philosophy on building products and startups.</p>
+          <div class="links"><span class="lk" id="lk0">[[Dylan Field]]</span><span class="lk" id="lk1">[[Figma]]</span><span class="lk" id="lk2">[[Product Design]]</span><span class="lk" id="lk3">[[Startup Strategy]]</span></div>
+          <blockquote>“Keep the simple things simple and make the complex things possible.”<span>— 34:39</span></blockquote>
+        </div>
+      </section>
+      <section id="graphScene" class="clip" data-start="14" data-duration="3" data-track-index="3">
+        <canvas id="g" width="1920" height="1080"></canvas>
+        <div id="gwords"><span class="gw" id="gw0">linked.</span> <span class="gw" id="gw1">searchable.</span> <span class="gw" id="gw2">yours.</span></div>
+      </section>
+      <section id="endScene" class="clip" data-start="24.0" data-duration="6" data-track-index="3" style="position:absolute;inset:0">
+        <div id="end">
+          <div class="tile" id="tile"><b class="a1">&gt;</b><b class="a2">OW</b></div>
+          <div class="word" id="word">OpenWiki</div>
+          <div class="tag" id="tag">turn what you watch into what you know.</div>
+        </div>
+        <div class="url" id="url">free and open source · github.com/ckryptickunal/OpenWiki</div>
+      </section>
+      <div class="shade"></div>
+      <div class="line low" id="t0">you watched it.</div>
+      <div class="line low" id="t1">you saved it.</div>
+      <div class="line low" id="t2">you lost it.</div>
+      <div class="line slam" id="t3">OpenWiki.</div>
+      <div class="line low" id="t4">every talk.</div>
+      <div class="line low" id="t5">every essay.</div>
+      <div class="line low" id="t6">every note.</div>
+      <div class="line low" id="t7">becomes a page.</div>
+      <div class="line low" id="t8">your AI reads it too.</div>
+      <div id="flash"></div>
+      <div id="fade"></div>
+    </div>
+
+    <script src="assets/js/graph-data.js"></script>
+    <script>
+      const OUT = "power3.out", EXPO = "expo.out";
+      function drift(tl, sel, t0, dur, dir) {
+        tl.fromTo(sel, { scale: 1.0, x: -14 * dir }, { scale: 1.06, x: 14 * dir, duration: dur, ease: "none" }, t0);
+      }
+      function lineIn(tl, sel, a, b) {
+        tl.fromTo(sel, { opacity: 0, y: 26, scale: 1.04, filter: "blur(10px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.42, ease: EXPO }, a);
+        tl.to(sel, { opacity: 0, duration: 0.12, ease: "none" }, b - 0.12);
+      }
+      function slam(tl, sel, a, b) {
+        tl.fromTo(sel, { opacity: 0, scale: 1.35, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.34, ease: EXPO }, a);
+        tl.to(sel, { scale: 0.97, duration: b - a - 0.1, ease: "none" }, a + 0.34);
+        tl.to(sel, { opacity: 0, duration: 0.08, ease: "none" }, b - 0.08);
+      }
+      function wordIn(tl, sel, a) {
+        tl.fromTo(sel, { opacity: 0, y: 30, scale: 1.1, filter: "blur(10px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.36, ease: EXPO }, a);
+      }
+      function kick(tl, t) {  // a punch on the beat: the frame jumps in and settles back
+        tl.fromTo("#stage", { scale: 1.06 }, { scale: 1, duration: 0.32, ease: "power2.out", immediateRender: false }, t);
+      }
+      function flash(tl, t) {
+        tl.fromTo("#flash", { opacity: 0.85 }, { opacity: 0, duration: 0.22, ease: "power2.out", immediateRender: false }, t);
+      }
+      function page(tl) {
+        tl.fromTo("#card", { opacity: 0, rotateX: 22, y: 160, scale: 0.9 }, { opacity: 1, rotateX: 0, y: 0, scale: 1, duration: 0.6, ease: EXPO }, 12.33);
+        tl.fromTo("#card", { scale: 1 }, { scale: 1.035, duration: 1.1, ease: "none", immediateRender: false }, 12.9);
+        [12.65, 13.0, 13.33, 13.66].forEach((t, i) => tl.to("#lk" + i, { color: "#000", backgroundColor: "#fff", borderColor: "#fff", duration: 0.12, ease: "none" }, t));
+      }
+      function graph(tl) {
+        const G = window.GRAPH, cv = document.getElementById("g"), ctx = cv.getContext("2d");
+        const n = G.n, E = G.edges, rr = new Float32Array(n);
+        for (let i = 0; i < n; i++) rr[i] = Math.hypot(G.x[i], G.y[i]);
+        const size = G.d.map((d) => 0.8 + Math.sqrt(Math.min(d, 400)) * 0.22);
+        const S = { reveal: 0, rot: 0, zoom: 0.5 }, P = new Float32Array(n * 2);
+        const draw = () => {
+          ctx.clearRect(0, 0, 1920, 1080);
+          const c = Math.cos(S.rot), s = Math.sin(S.rot), R = S.reveal * 1.05, RAD = 470 * S.zoom, grow = Math.sqrt(S.zoom);
+          for (let i = 0; i < n; i++) { P[2*i] = 960 + (G.x[i]*c - G.y[i]*s) * RAD; P[2*i+1] = 470 + (G.x[i]*s + G.y[i]*c) * RAD; }
+          ctx.lineWidth = 0.6; ctx.strokeStyle = `rgba(255,255,255,${0.08 * S.reveal})`; ctx.beginPath();
+          for (let k = 0; k < E.length; k += 2) { const a = E[k], b = E[k+1]; if (rr[a] > R || rr[b] > R) continue; ctx.moveTo(P[2*a], P[2*a+1]); ctx.lineTo(P[2*b], P[2*b+1]); }
+          ctx.stroke();
+          ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.beginPath();
+          for (let i = 0; i < n; i++) { const k = (R - rr[i]) / 0.06; if (k <= 0) continue; const r = size[i] * grow * Math.min(1, k);
+            const x = P[2*i], y = P[2*i+1]; if (x < -20 || x > 1940 || y < -20 || y > 1100) continue;
+            ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2); }
+          ctx.fill();
+        };
+        tl.fromTo(S, { reveal: 0 }, { reveal: 1, duration: 0.9, ease: "power3.out", onUpdate: draw }, 14.0);
+        tl.fromTo(S, { rot: 0, zoom: 0.5 }, { rot: 0.45, zoom: 2.4, duration: 3.0, ease: "power2.in", onUpdate: draw }, 14.0);
+      }
+      document.fonts.load('700 76px "Inter Display"').then(() => document.fonts.load('600 25px "Inter Display"')).then(() => {
+        const tl = gsap.timeline({ paused: true });
+  drift(tl, "#v0", 0.0, 1.0, -1);
+  drift(tl, "#v1", 1.0, 1.0, 1);
+  drift(tl, "#v2", 2.0, 1.34, -1);
+  drift(tl, "#v3", 3.34, 0.83, 1);
+  drift(tl, "#v4", 4.17, 0.5, -1);
+  drift(tl, "#v5", 4.67, 0.67, 1);
+  drift(tl, "#v6", 5.34, 0.5, -1);
+  drift(tl, "#v7", 5.84, 0.5, 1);
+  drift(tl, "#v8", 6.34, 0.33, -1);
+  drift(tl, "#v9", 6.67, 0.08, 1);
+  drift(tl, "#v10", 6.75, 0.08, -1);
+  drift(tl, "#v11", 6.83, 0.09, 1);
+  drift(tl, "#v12", 6.92, 0.08, -1);
+  drift(tl, "#v13", 8.33, 0.67, 1);
+  drift(tl, "#v14", 9.0, 0.67, -1);
+  drift(tl, "#v15", 9.67, 0.66, 1);
+  drift(tl, "#v16", 10.33, 0.67, -1);
+  drift(tl, "#v17", 11.0, 1.33, 1);
+  drift(tl, "#v18", 17.0, 1.0, -1);
+  drift(tl, "#v19", 18.0, 0.67, 1);
+  drift(tl, "#v20", 18.67, 1.66, -1);
+  drift(tl, "#v21", 20.33, 0.34, 1);
+  drift(tl, "#v22", 20.67, 0.33, -1);
+  drift(tl, "#v23", 21.0, 0.33, 1);
+  drift(tl, "#v24", 21.33, 0.34, -1);
+  drift(tl, "#v25", 21.67, 0.33, 1);
+  drift(tl, "#v26", 22.0, 0.33, -1);
+  drift(tl, "#v27", 22.33, 0.34, 1);
+  drift(tl, "#v28", 22.67, 0.33, -1);
+  drift(tl, "#v29", 23.0, 0.083, 1);
+  drift(tl, "#v30", 23.083, 0.084, -1);
+  drift(tl, "#v31", 23.167, 0.083, 1);
+  drift(tl, "#v32", 23.25, 0.08, -1);
+  lineIn(tl, "#t0", 0.25, 1.95);
+  lineIn(tl, "#t1", 2.05, 3.3);
+  lineIn(tl, "#t2", 4.7, 7.0);
+  slam(tl, "#t3", 7.67, 8.33);
+  lineIn(tl, "#t4", 8.4, 9.62);
+  lineIn(tl, "#t5", 10.0, 11.0);
+  lineIn(tl, "#t6", 11.33, 12.3);
+  lineIn(tl, "#t7", 12.4, 13.95);
+  lineIn(tl, "#t8", 17.0, 18.62);
+  wordIn(tl, "#gw0", 15.0);
+  wordIn(tl, "#gw1", 16.0);
+  wordIn(tl, "#gw2", 16.66);
+  kick(tl, 2.0);
+  kick(tl, 3.34);
+  kick(tl, 4.17);
+  kick(tl, 4.67);
+  kick(tl, 5.34);
+  kick(tl, 5.84);
+  kick(tl, 7.67);
+  kick(tl, 10.0);
+  kick(tl, 11.33);
+  kick(tl, 12.33);
+  kick(tl, 15.0);
+  kick(tl, 16.0);
+  kick(tl, 17.0);
+  kick(tl, 18.0);
+  kick(tl, 20.33);
+  kick(tl, 21.0);
+  kick(tl, 23.0);
+  flash(tl, 7.67);
+  flash(tl, 24.0);
+        page(tl);
+        graph(tl);
+        tl.to("#gwords", { opacity: 0, duration: 0.1, ease: "none" }, 16.9);
+        // the final hit
+        tl.fromTo("#tile", { opacity: 0, scale: 1.25, filter: "blur(14px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: EXPO }, 24.0);
+        tl.fromTo("#word", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: OUT }, 24.0 + 0.5);
+        tl.fromTo("#tag", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9, ease: OUT }, 24.0 + 1.3);
+        tl.fromTo("#url", { opacity: 0 }, { opacity: 1, duration: 0.9, ease: "power1.out" }, 24.0 + 2.2);
+        tl.fromTo("#end", { scale: 1 }, { scale: 1.03, duration: 6, ease: "none" }, 24.0);
+        tl.to("#fade", { opacity: 1, duration: 0.8, ease: "power1.in" }, 30.0 - 0.85);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      });
+    </script>
+  </body>
+</html>
