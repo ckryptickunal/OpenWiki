@@ -9,214 +9,221 @@
     <link rel="stylesheet" href="assets/film.css" />
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="56" data-width="1920" data-height="1080">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="57" data-width="1920" data-height="1080">
 
-      <!-- S1 · 0–6.2 · you watched / saved / forgot it -->
-      <section id="s1" class="clip scene" data-start="0" data-duration="8.6" data-track-index="0">
-        <div id="s1-glow"></div>
-        <div id="s1-rows"></div>
-        <div id="s1-hook">
-          <div class="slotm" id="m-you"><span class="h" id="w-you">You</span></div>
-          <div class="slotm" id="m-slot" style="width: 1100px">
-            <span class="h sw" id="w-watched">watched</span>
-            <span class="h sw" id="w-saved">saved</span>
-            <span class="h sw" id="w-forgot">forgot</span>
-          </div>
-          <div class="slotm" id="m-it"><span class="h" id="w-it">it.</span></div>
+      <!-- A · 0–3.2 · watched -->
+      <section id="sA" class="clip scene" data-start="0" data-duration="3.2" data-track-index="0">
+        <img class="photo" id="pA" src="assets/photos/watched.jpg" alt="" />
+        <div class="scrim-b"></div>
+        <div class="chip" id="cA" style="left: 1030px; top: 300px; width: 760px">
+          <div class="av yt"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg></div>
+          <div style="flex: 1"><div class="meta">Y Combinator · 43:49</div><div class="txt">How To Get AI Startup Ideas</div><div class="bar"><i id="barA"></i></div></div>
         </div>
+        <div class="cap" id="capA">You watched it.</div>
       </section>
 
-      <!-- S2 · 5.8–10.4 · the prompt, compile it -->
-      <section id="s2" class="clip scene" data-start="5.8" data-duration="4.6" data-track-index="1" style="background: transparent">
-        <div id="s2-hero"></div>
-        <div id="s2-search"><span class="gt">&gt;</span><span class="q" id="s2-q">openwiki</span><span class="cur" id="s2-cur"></span></div>
-        <div class="h center-x" id="s2-h">Compile it.</div>
+      <!-- B · 3.2–6.4 · saved -->
+      <section id="sB" class="clip scene" data-start="3.2" data-duration="3.2" data-track-index="0">
+        <img class="photo" id="pB" src="assets/photos/saved.jpg" alt="" />
+        <div class="scrim-b"></div>
+        <div class="chip" id="cB" style="left: 120px; top: 150px">
+          <div class="av pg">PG</div>
+          <div><div class="meta">paulgraham.com · saved for later</div><div class="txt">Do Things that Don't Scale</div></div>
+        </div>
+        <div class="cap" id="capB">You saved it.</div>
       </section>
 
-      <!-- S3 · 10.2–16.5 · the agent starts from zero -->
-      <section id="s3" class="clip scene" data-start="10.2" data-duration="6.3" data-track-index="2">
-        <div class="h center-x" id="s3-h">Your AI starts from zero.</div>
-        <div class="h center-x" id="s3-h2">That's one question.</div>
-        <div class="glass" id="s3-card">
-          <div class="qlbl">Without a wiki, the agent reads the raw files for</div>
-          <div class="qtx">“What does Paul Graham say about doing things that don't scale?”</div>
-          <div class="bal"><span id="s3-tok">0</span><span class="unit">tokens</span></div>
-          <div class="pill" id="s3-files-pill"><span id="s3-files">0</span>&nbsp;files read</div>
-          <div id="s3-list"><div id="s3-reads"></div></div>
+      <!-- C · 6.4–10.2 · now find it -->
+      <section id="sC" class="clip scene" data-start="6.4" data-duration="3.8" data-track-index="0">
+        <img class="photo" id="pC" src="assets/photos/notes.jpg" alt="" style="object-position: 50% 40%" />
+        <div class="scrim-b" style="height: 700px"></div>
+        <div class="chip" id="cC" style="left: 470px; top: 300px">
+          <div class="av me"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z" fill="#fff"/></svg></div>
+          <div><div class="meta">Notes · just now</div><div class="txt"><span id="tC">which video had the warm network advice?</span><span class="caret" id="caretC"></span></div></div>
         </div>
+        <div class="cap" id="capC">Now find the part that mattered.</div>
       </section>
 
-      <!-- S4 · 16.3–23.0 · ingest (light) -->
-      <section id="s4" class="clip scene light" data-start="16.3" data-duration="6.9" data-track-index="3">
-        <div id="s4-head">
-          <span class="h" id="s4-lead">Point it at</span>
-          <span id="s4-slot"><span class="h sw">a video.</span><span class="h sw">a playlist.</span><span class="h sw">a channel.</span><span class="h sw">a blog.</span><span class="h sw">your notes.</span><span class="h sw">all of it.</span></span>
+      <!-- D · 10.2–13.2 · agents too -->
+      <section id="sD" class="clip scene" data-start="10.2" data-duration="3.0" data-track-index="0">
+        <div class="big" id="bD" style="top: 330px; padding: 0 200px">Your AI agent has the <span class="ser">same</span> problem.</div>
+      </section>
+
+      <!-- E · 13.2–17.0 · one idea, 68 files -->
+      <section id="sE" class="clip scene" data-start="13.2" data-duration="3.8" data-track-index="0">
+        <img class="photo" id="pE" src="assets/photos/agent-night.jpg" alt="" style="object-position: 50% 45%" />
+        <div class="scrim-l"></div>
+        <div class="chip" id="cE" style="left: 120px; top: 250px">
+          <div class="av tm">&gt;</div>
+          <div><div class="meta">Search the raw transcripts and essays for “don't scale”</div>
+            <div class="txt"><span id="nE1">0</span> files matched</div>
+            <div class="txt"><span id="nE2">0</span> tokens of raw text</div></div>
         </div>
-        <div class="side" id="s4-l"><b id="s4-n1">0</b><span class="pill">Y Combinator videos</span></div>
-        <div id="s4-term">
-          <div class="tbar"><b></b><b></b><b></b><span>~/founder-book</span></div>
+        <div class="cap" id="capE">One idea, spread across 68 files.</div>
+      </section>
+
+      <!-- F · 17.0–20.6 · long inputs -->
+      <section id="sF" class="clip scene" data-start="17" data-duration="3.6" data-track-index="0">
+        <div class="big" id="bF" style="top: 360px">Longer inputs make models <span class="hl" id="hlF">less reliable.</span></div>
+        <div class="foot" id="fF">Chroma, “Context Rot” (2025): performance tested across 18 models as input length grows.</div>
+      </section>
+
+      <!-- G · 20.6–23.6 · compile once -->
+      <section id="sG" class="clip scene" data-start="20.6" data-duration="3.0" data-track-index="0">
+        <div class="big" id="bG" style="top: 330px">OpenWiki compiles it <span class="ser">once.</span></div>
+        <div class="sub" id="subG" style="top: 520px">Videos, essays and notes become linked Markdown pages you keep.</div>
+      </section>
+
+      <!-- H · 23.6–28.4 · the real commands -->
+      <section id="sH" class="clip scene" data-start="23.6" data-duration="5.4" data-track-index="0">
+        <div class="term" id="tH" style="left: 230px; top: 290px; width: 1460px; height: 500px">
+          <div class="tbar"><b></b><b></b><b></b><span>~/my-wiki</span></div>
           <div class="tbody">
-            <div class="ln" id="s4-l1"><span class="pr">$ </span><span id="s4-c1">openwiki youtube --channel @ycombinator --folder "Y Combinator"</span></div>
-            <div class="out" id="s4-o1"><span class="ok">✓</span><b>887</b> transcripts · listed without an API key</div>
-            <div class="ln" id="s4-l2"><span class="pr">$ </span><span id="s4-c2">openwiki essay --source paulgraham</span></div>
-            <div class="out" id="s4-o2"><span class="ok">✓</span><b>233</b> essays</div>
-            <div class="ln" id="s4-l3"><span class="pr">$ </span><span id="s4-c3">openwiki ingest --all</span></div>
-            <div class="out" id="s4-o3"><div class="pbar"><i id="s4-pb"></i></div><b id="s4-pages">0</b> pages</div>
+            <div class="ln" id="lH1"><span class="pr">$ </span><span id="cH1">openwiki youtube https://www.youtube.com/watch?v=-7Qz7tSTfUU --folder "Y Combinator"</span></div>
+            <div class="out" id="oH1"><span class="ok">WROTE</span> ~/my-wiki/Y Combinator/-7Qz7tSTfUU.txt</div>
+            <div class="ln" id="lH2"><span class="pr">$ </span><span id="cH2">openwiki youtube https://www.youtube.com/watch?v=wr6PMD06hP0 --folder "Y Combinator"</span></div>
+            <div class="out" id="oH2"><span class="ok">WROTE</span> ~/my-wiki/Y Combinator/wr6PMD06hP0.txt</div>
+            <div class="ln" id="lH3"><span class="pr">$ </span><span id="cH3">openwiki ingest --all</span></div>
+            <div class="out" id="oH3"><b>processed=2 skipped=0 failed=0</b></div>
+            <div class="ln" id="lH4" style="color: #faf6f266"># a whole channel works too, no API key: openwiki youtube --channel @ycombinator</div>
           </div>
         </div>
-        <div class="side" id="s4-r"><b id="s4-n2">0</b><span class="pill">Paul Graham essays</span></div>
       </section>
 
-      <!-- S5 · 23.0–30.2 · one transcript becomes linked pages -->
-      <section id="s5" class="clip scene" data-start="23" data-duration="7.2" data-track-index="4">
-        <div id="s5-stage">
-          <svg id="s5-links" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
-          <div class="glass" id="s5-doc">
-            <div class="dfile">Y Combinator/-7Qz7tSTfUU.txt</div>
-            <div class="dtitle"><span class="hl" id="hl-dylan">Dylan Field</span>: Scaling <span class="hl" id="hl-figma">Figma</span> and the Future of Design</div>
-            <div class="dl"><em>[0:01]</em>to have folks that are designers step</div>
-            <div class="dl"><em>[0:04]</em>into the founder role and <span class="hl" id="hl-found">start companies.</span></div>
-            <div class="dl"><em>[0:05]</em>It feels intuitively like</div>
-            <div class="dl"><em>[0:08]</em><span class="hl" id="hl-quote">we're in the MS DOS era of AI right now.</span></div>
-            <div class="pill" id="s5-stamp">✓&nbsp; Quote found in the transcript at [0:05]</div>
-          </div>
-          <div class="glass ent" id="s5-p1"><div class="top"><div class="av" style="background:#7c6cf2">DF</div><div><div class="k">Person</div><div class="n">Dylan Field</div></div></div><div class="f">entities/dylan-field.md</div><div class="m"><b>4</b> sources link here</div></div>
-          <div class="glass ent" id="s5-p2"><div class="top"><div class="av" style="background:#ff6b3d">F</div><div><div class="k">Company</div><div class="n">Figma</div></div></div><div class="f">entities/figma.md</div><div class="m"><b>19</b> sources link here</div></div>
-          <div class="glass ent" id="s5-p3"><div class="top"><div class="av" style="background:#2ec4a0">#</div><div><div class="k">Topic</div><div class="n">Entrepreneurship</div></div></div><div class="f">topics/entrepreneurship.md</div><div class="m"><b>41</b> sources link here</div></div>
-          <div class="glass ent" id="s5-p4"><div class="k">Verified quote · [0:05]</div><div class="q">“It feels intuitively like we're in the MS DOS era of AI right now.”</div><div class="f">youtube.com/watch?v=-7Qz7tSTfUU&amp;t=5s</div></div>
-        </div>
-        <div class="h center-x" id="s5-h">Every person, company and idea gets a page.</div>
-      </section>
-
-      <!-- S6 · 30.0–35.6 · the real Founder Book graph -->
-      <section id="s6" class="clip scene" data-start="30" data-duration="5.6" data-track-index="5">
-        <div id="s6-arc"></div>
-        <canvas id="g-canvas" width="1920" height="1080"></canvas>
-        <div id="g-labels"></div>
-        <div id="s6-shade"></div>
-        <div class="kick center-x" id="s6-lbl">Founder Book · built with OpenWiki</div>
-        <div class="center-x" id="s6-num">0</div>
-        <div id="s6-pill"><span class="pill">Linked Markdown pages</span></div>
-        <div class="center-x" id="s6-sub">from 1,219 YC and founder videos and 354 essays</div>
-      </section>
-
-      <!-- S7 · 35.5–45.0 · tokens, then a cited answer -->
-      <section id="s7" class="clip scene" data-start="35.5" data-duration="9.5" data-track-index="6">
-        <div class="kick center-x" id="s7-kick">The same 3 questions, measured on Founder Book</div>
-        <div class="h center-x" id="s7-h">8× fewer tokens.</div>
-        <div id="s7-cards">
-          <div class="glass tcard" id="s7-c1"><div class="lbl">Reading the raw transcripts</div><div class="num"><b id="s7-n1">0</b><span>tokens</span></div><div class="bar"><i id="s7-b1"></i></div></div>
-          <div class="glass tcard" id="s7-c2"><div class="lbl">Reading the OpenWiki pages</div><div class="num"><b id="s7-n2">0</b><span>tokens</span></div><div class="bar"><i id="s7-b2"></i></div></div>
-        </div>
-        <div class="h center-x" id="s7-h2">Your agent reads the page, not the pile.</div>
-        <div id="s7-term">
-          <div class="tbar"><b></b><b></b><b></b><span>~/founder-book</span></div>
-          <div class="tbody">
-            <div class="cmd"><span class="pr">$ </span><span id="s7-cmd">openwiki ask "What does default alive mean?"</span></div>
-            <div id="s7-ans">"Default alive" is a concept created by Paul Graham that describes a startup's financial trajectory <i>[1, 3]</i>. A startup is "default alive" if its current revenue growth rate is high enough to reach profitability before its cash reserves are exhausted, even if the company is currently burning money <i>[1, 2, 6]</i>.</div>
-            <div id="s7-srcs">
-              <div><i>[1]</i> Is your startup default alive, or default dead?  <em>(Y Combinator/BYhxNYD6jNg.txt)</em></div>
-              <div><i>[2]</i> Save Your Startup During an Economic Downturn  <em>(Y Combinator/0OVSTWozvfY.txt)</em></div>
+      <!-- I · 28.4–34.6 · the real page -->
+      <section id="sI" class="clip scene" data-start="29" data-duration="6.2" data-track-index="0">
+        <div id="stI" style="position: absolute; inset: 0">
+          <svg id="links" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+          <div class="page" id="pgI" style="left: 540px; top: 90px; width: 840px">
+            <div class="pf">wiki/sources/-7Qz7tSTfUU-dylan-field-scaling-figma-and-the-future-of-design.md</div>
+            <div class="pb">
+              <h3>Dylan Field: Scaling Figma and the Future of Design</h3>
+              <h4>Summary</h4>
+              <p><span class="hl" id="hlI1">Dylan Field</span>, co-founder and CEO of <span class="hl" id="hlI2">Figma</span>, discusses the company's evolution, the importance of design in the age of AI, and his philosophy on building products and startups.</p>
+              <h4>Topics</h4>
+              <ul><li><span class="lk hl" id="hlI3">[[Product Design]]</span></li></ul>
+              <h4>Quotes</h4>
+              <p><span class="hl" id="hlI4">“Keep the simple things simple and make the complex things possible.”</span> <span class="lk">[34:39]</span></p>
             </div>
           </div>
+          <div class="page ent" id="eI1" style="left: 70px; top: 150px"><div class="k">Person</div><div class="n">Dylan Field</div><div class="f">entities/dylan-field.md</div><div class="m">Co-founder and CEO of Figma.</div></div>
+          <div class="page ent" id="eI2" style="left: 1450px; top: 150px"><div class="k">Company</div><div class="n">Figma</div><div class="f">entities/figma.md</div><div class="m">A collaborative web-based interface design tool.</div></div>
+          <div class="page ent" id="eI3" style="left: 70px; top: 560px"><div class="k">Topic</div><div class="n">Product Design</div><div class="f">topics/product-design.md</div></div>
+          <div class="page ent" id="eI4" style="left: 1450px; top: 520px"><div class="k">Quote · checked</div><div class="q">Found in the transcript at 34:39</div><div class="f">youtube.com/watch?v=-7Qz7tSTfUU&amp;t=2079s</div></div>
+        </div>
+        <div class="big" id="bI" style="top: 880px; font-size: 60px">People, companies and ideas get their own pages.</div>
+        <div class="big" id="bI2" style="top: 880px; font-size: 60px">Every quote is checked against the transcript.</div>
+      </section>
+
+      <!-- J · 34.6–38.6 · Founder Book graph -->
+      <section id="sJ" class="clip scene night" data-start="35.2" data-duration="4.0" data-track-index="0">
+        <canvas id="g-canvas" width="1920" height="1080"></canvas>
+        <div class="gshade"></div>
+        <div class="gk" id="gkJ">The pipeline behind Founder Book · github.com/ckryptickunal/Founder-Book</div>
+        <div class="gstats" id="gsJ">
+          <div class="st"><b id="gv">0</b><span>YC and founder videos</span></div>
+          <div class="st"><b id="ge">0</b><span>essays</span></div>
+          <div class="st arrow">→</div>
+          <div class="st big2"><b id="gp">0</b><span>linked Markdown pages</span></div>
         </div>
       </section>
 
-      <!-- S8 · 45.0–49.2 · works with -->
-      <section id="s8" class="clip scene" data-start="45" data-duration="4.2" data-track-index="7">
-        <div class="kick center-x" id="s8-lbl">Works with</div>
-        <div id="s8-btns">
-          <div class="act"><div class="c"><img src="assets/logos/gemini.svg" alt="" /></div><span>Gemini</span></div>
-          <div class="act"><div class="c"><img class="mono-w" src="assets/logos/openai.svg" alt="" /></div><span>OpenAI</span></div>
-          <div class="act"><div class="c"><img class="mono-w" src="assets/logos/openrouter.svg" alt="" /></div><span>OpenRouter</span></div>
-          <div class="act"><div class="c"><img class="mono-w" src="assets/logos/ollama.svg" alt="" /></div><span>Ollama</span></div>
+      <!-- K · 38.6–42.8 · for you -->
+      <section id="sK" class="clip scene" data-start="39.2" data-duration="4.2" data-track-index="0">
+        <img class="photo" id="pK" src="assets/photos/you.jpg" alt="" style="object-position: 30% 50%" />
+        <div class="scrim-b"></div>
+        <div class="chip" id="cK" style="left: 900px; top: 110px">
+          <div class="av tm">&gt;</div>
+          <div><div class="meta mono" style="font-size: 21px">openwiki search warm network</div>
+            <div class="txt">Why You're Getting Zero Replies To Your Cold Emails <span style="color: #1f5fd1">[3:46]</span></div>
+            <div class="res">…It's also far easier to start with <b>your warm network</b>.</div></div>
         </div>
-        <div id="s8-pills">
-          <span class="pill"><i class="dot"></i>The LLM can run on your machine</span>
-          <span class="pill"><i class="dot"></i>Re-runs read only new or changed sources</span>
-          <span class="pill"><i class="dot"></i>Free and MIT licensed</span>
+        <div class="cap" id="capK" style="max-width: 1180px">For you: the exact moment, one search away.</div>
+      </section>
+
+      <!-- L · 42.8–47.4 · for your agents -->
+      <section id="sL" class="clip scene" data-start="43.4" data-duration="4.6" data-track-index="0">
+        <img class="photo" id="pL" src="assets/photos/typing.jpg" alt="" />
+        <div class="scrim-b"></div>
+        <div class="chip" id="cL" style="left: 880px; top: 80px">
+          <div class="av tm">&gt;</div>
+          <div><div class="meta mono" style="font-size: 21px">openwiki ask "Who should I email first when I start selling?"</div>
+            <div class="res"><b>Leverage your network:</b> Reach out to people you have previously worked or interned with… <em>[6]</em></div>
+            <div class="res" style="color: #73574a; font-size: 21px">[1] Why You're Getting Zero Replies To Your Cold Emails [1:39]<br />[6] Dylan Field: Scaling Figma and the Future of Design [6:08]</div></div>
+        </div>
+        <div class="stat" id="stL" style="left: 880px; top: 520px">
+          <div class="s"><b>786</b><span>tokens: a typical page</span></div>
+          <div class="s"><b>3,397</b><span>tokens: the source it summarizes</span></div>
+        </div>
+        <div class="cap" id="capL" style="max-width: 1120px">For your agents: short pages, with sources.</div>
+        <div id="fnL" style="position: absolute; right: 120px; bottom: 60px; font: 500 17px/1 Inter; color: rgba(255,255,255,0.7)">Medians across Founder Book's 1,573 sources.</div>
+      </section>
+
+      <!-- M · 47.4–50.8 · works with -->
+      <section id="sM" class="clip scene" data-start="48" data-duration="3.4" data-track-index="0">
+        <div class="big" id="bM" style="top: 300px; font-size: 92px; padding: 0 180px">Works with Gemini, OpenAI, OpenRouter, or a model on your own machine.</div>
+        <div class="sub" id="subM" style="top: 620px">Free and open source (MIT). Bring your own LLM, or run one locally with Ollama.</div>
+      </section>
+
+      <!-- N · 50.8–56.0 · lockup -->
+      <section id="sN" class="clip scene" data-start="51.4" data-duration="5.6" data-track-index="0">
+        <div id="lockN" style="position: absolute; left: 0; right: 0; top: 300px; display: flex; justify-content: center; align-items: center; gap: 36px">
+          <div class="appicon" id="iconN"><span class="a1">&gt;</span><span class="a2">OW</span></div>
+          <div id="nameN" style="font: 700 150px/1 Inter; letter-spacing: -0.05em">OpenWiki</div>
+        </div>
+        <div class="sub" id="tagN" style="top: 520px; font-size: 46px; color: var(--ink); font-weight: 600">Turn what you watch into what you know.</div>
+        <div id="ghN" style="position: absolute; left: 0; right: 0; top: 650px; display: flex; justify-content: center">
+          <div style="display: inline-flex; align-items: center; gap: 14px; height: 76px; padding: 0 34px; border-radius: 999px; background: #1b140f; color: #faf6f2; font: 500 30px/1 'JetBrains Mono'">
+            <svg viewBox="0 0 16 16" width="28" height="28"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            github.com/ckryptickunal/OpenWiki
+          </div>
         </div>
       </section>
 
-      <!-- S9 · 48.8–56.0 · lockup -->
-      <section id="s9" class="clip scene" data-start="48.8" data-duration="7.2" data-track-index="8" style="background: transparent">
-        <div id="s9-hero"></div>
-        <div id="s9-lock">
-          <div class="appicon" id="s9-icon"><span class="a1">&gt;</span><span class="a2">OW</span></div>
-          <div id="s9-name">OpenWiki</div>
-        </div>
-        <div class="center-x" id="s9-tag">Turn what you watch into what you know.</div>
-        <div id="s9-cta">
-          <div id="s9-pip"><span class="pr">$</span><span>pip install openwiki-cli</span></div>
-          <div id="s9-gh"><svg viewBox="0 0 16 16" width="30" height="30"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.530 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.690-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>github.com/ckryptickunal/OpenWiki</div>
-        </div>
-        <div class="center-x" id="s9-foot">Open source · MIT · built on Karpathy's LLM Wiki pattern</div>
-      </section>
-
-      <!-- AUDIO -->
-      <audio id="a-music" src="assets/audio/music-film.wav" data-start="0" data-duration="56" data-track-index="10" data-volume="0.8"></audio>
-      <audio id="a-f0" src="assets/audio/key-003.wav" data-start="6.9" data-duration="0.25" data-track-index="40" data-volume="0.3"></audio>
-      <audio id="a-f1" src="assets/audio/key-007.wav" data-start="6.975" data-duration="0.25" data-track-index="41" data-volume="0.3"></audio>
-      <audio id="a-f2" src="assets/audio/key-011.wav" data-start="7.05" data-duration="0.25" data-track-index="42" data-volume="0.3"></audio>
-      <audio id="a-f3" src="assets/audio/key-015.wav" data-start="7.125" data-duration="0.25" data-track-index="43" data-volume="0.3"></audio>
-      <audio id="a-f4" src="assets/audio/key-019.wav" data-start="7.2" data-duration="0.25" data-track-index="44" data-volume="0.3"></audio>
-      <audio id="a-f5" src="assets/audio/key-023.wav" data-start="7.275" data-duration="0.25" data-track-index="45" data-volume="0.3"></audio>
-      <audio id="a-f6" src="assets/audio/key-027.wav" data-start="7.35" data-duration="0.25" data-track-index="46" data-volume="0.3"></audio>
-      <audio id="a-f7" src="assets/audio/key-003.wav" data-start="7.425" data-duration="0.25" data-track-index="47" data-volume="0.3"></audio>
-      <audio id="a-f8" src="assets/audio/click_003.ogg" data-start="7.55" data-duration="0.02" data-track-index="48" data-volume="0.5"></audio>
-      <audio id="a-f9" src="assets/audio/whoosh.wav" data-start="7.85" data-duration="0.9" data-track-index="49" data-volume="0.32"></audio>
-      <audio id="a-f10" src="assets/audio/impact-soft.ogg" data-start="8.45" data-duration="0.18" data-track-index="50" data-volume="0.5"></audio>
-      <audio id="a-f11" src="assets/audio/riser.wav" data-start="12.3" data-duration="2.4" data-track-index="51" data-volume="0.26"></audio>
-      <audio id="a-f12" src="assets/audio/impact-soft.ogg" data-start="15.25" data-duration="0.18" data-track-index="52" data-volume="0.45"></audio>
-      <audio id="a-f13" src="assets/audio/whoosh.wav" data-start="16.25" data-duration="0.9" data-track-index="53" data-volume="0.3"></audio>
-      <audio id="a-f14" src="assets/audio/key-007.wav" data-start="17.6" data-duration="0.25" data-track-index="54" data-volume="0.22"></audio>
-      <audio id="a-f15" src="assets/audio/key-011.wav" data-start="17.85" data-duration="0.25" data-track-index="55" data-volume="0.22"></audio>
-      <audio id="a-f16" src="assets/audio/key-015.wav" data-start="18.1" data-duration="0.25" data-track-index="56" data-volume="0.22"></audio>
-      <audio id="a-f17" src="assets/audio/key-019.wav" data-start="18.35" data-duration="0.25" data-track-index="57" data-volume="0.22"></audio>
-      <audio id="a-f18" src="assets/audio/key-023.wav" data-start="18.6" data-duration="0.25" data-track-index="58" data-volume="0.22"></audio>
-      <audio id="a-f19" src="assets/audio/key-027.wav" data-start="19.15" data-duration="0.25" data-track-index="59" data-volume="0.22"></audio>
-      <audio id="a-f20" src="assets/audio/key-003.wav" data-start="19.45" data-duration="0.25" data-track-index="60" data-volume="0.22"></audio>
-      <audio id="a-f21" src="assets/audio/key-007.wav" data-start="19.75" data-duration="0.25" data-track-index="61" data-volume="0.22"></audio>
-      <audio id="a-f22" src="assets/audio/key-011.wav" data-start="20.45" data-duration="0.25" data-track-index="62" data-volume="0.22"></audio>
-      <audio id="a-f23" src="assets/audio/key-015.wav" data-start="20.7" data-duration="0.25" data-track-index="63" data-volume="0.22"></audio>
-      <audio id="a-f24" src="assets/audio/swish.wav" data-start="23.05" data-duration="0.45" data-track-index="64" data-volume="0.25"></audio>
-      <audio id="a-f25" src="assets/audio/place1.ogg" data-start="26.3" data-duration="0.4" data-track-index="65" data-volume="0.28"></audio>
-      <audio id="a-f26" src="assets/audio/place1.ogg" data-start="26.7" data-duration="0.4" data-track-index="66" data-volume="0.28"></audio>
-      <audio id="a-f27" src="assets/audio/place1.ogg" data-start="27.1" data-duration="0.4" data-track-index="67" data-volume="0.28"></audio>
-      <audio id="a-f28" src="assets/audio/place1.ogg" data-start="27.5" data-duration="0.4" data-track-index="68" data-volume="0.28"></audio>
-      <audio id="a-f29" src="assets/audio/impact-heavy.ogg" data-start="30.0" data-duration="0.54" data-track-index="69" data-volume="0.45"></audio>
-      <audio id="a-f30" src="assets/audio/swish.wav" data-start="35.8" data-duration="0.45" data-track-index="70" data-volume="0.25"></audio>
-      <audio id="a-f31" src="assets/audio/impact-soft.ogg" data-start="38.5" data-duration="0.18" data-track-index="71" data-volume="0.55"></audio>
-      <audio id="a-f32" src="assets/audio/swish.wav" data-start="40.95" data-duration="0.45" data-track-index="72" data-volume="0.22"></audio>
-      <audio id="a-f33" src="assets/audio/key-019.wav" data-start="41.75" data-duration="0.25" data-track-index="73" data-volume="0.22"></audio>
-      <audio id="a-f34" src="assets/audio/key-023.wav" data-start="42.0" data-duration="0.25" data-track-index="74" data-volume="0.22"></audio>
-      <audio id="a-f35" src="assets/audio/key-027.wav" data-start="42.25" data-duration="0.25" data-track-index="75" data-volume="0.22"></audio>
-      <audio id="a-f36" src="assets/audio/key-003.wav" data-start="42.5" data-duration="0.25" data-track-index="76" data-volume="0.22"></audio>
-      <audio id="a-f37" src="assets/audio/swish.wav" data-start="45.1" data-duration="0.45" data-track-index="77" data-volume="0.22"></audio>
-      <audio id="a-f38" src="assets/audio/whoosh.wav" data-start="48.75" data-duration="0.9" data-track-index="78" data-volume="0.36"></audio>
-      <audio id="a-f39" src="assets/audio/bong.ogg" data-start="49.55" data-duration="0.12" data-track-index="79" data-volume="0.45"></audio>
+      <audio id="a-f0" src="assets/audio/click-soft.mp3" data-start="0.35" data-duration="0.37" data-track-index="40" data-volume="0.7"></audio>
+      <audio id="a-f1" src="assets/audio/slide1.ogg" data-start="3.18" data-duration="0.5" data-track-index="41" data-volume="0.45"></audio>
+      <audio id="a-f2" src="assets/audio/click-soft.mp3" data-start="3.55" data-duration="0.37" data-track-index="42" data-volume="0.7"></audio>
+      <audio id="a-f3" src="assets/audio/slide2.ogg" data-start="6.38" data-duration="0.5" data-track-index="43" data-volume="0.45"></audio>
+      <audio id="a-f4" src="assets/audio/click-soft.mp3" data-start="6.7" data-duration="0.37" data-track-index="44" data-volume="0.7"></audio>
+      <audio id="a-f5" src="assets/audio/typing.mp3" data-start="7.05" data-duration="1.5" data-track-index="45" data-volume="0.85"></audio>
+      <audio id="a-f6" src="assets/audio/key-press.mp3" data-start="8.4" data-duration="0.4" data-track-index="46" data-volume="0.7"></audio>
+      <audio id="a-f7" src="assets/audio/whoosh-short.mp3" data-start="10.15" data-duration="0.57" data-track-index="47" data-volume="0.3"></audio>
+      <audio id="a-f8" src="assets/audio/slide1.ogg" data-start="13.18" data-duration="0.5" data-track-index="48" data-volume="0.45"></audio>
+      <audio id="a-f9" src="assets/audio/click-soft.mp3" data-start="13.5" data-duration="0.37" data-track-index="49" data-volume="0.7"></audio>
+      <audio id="a-f10" src="assets/audio/whoosh-short.mp3" data-start="16.95" data-duration="0.57" data-track-index="50" data-volume="0.28"></audio>
+      <audio id="a-f11" src="assets/audio/pop.mp3" data-start="18.2" data-duration="0.72" data-track-index="51" data-volume="0.35"></audio>
+      <audio id="a-f12" src="assets/audio/whoosh-short.mp3" data-start="20.55" data-duration="0.57" data-track-index="52" data-volume="0.28"></audio>
+      <audio id="a-f13" src="assets/audio/click-soft.mp3" data-start="23.7" data-duration="0.37" data-track-index="53" data-volume="0.6"></audio>
+      <audio id="a-f14" src="assets/audio/typing.mp3" data-start="24.1" data-duration="1.4" data-track-index="54" data-volume="0.8"></audio>
+      <audio id="a-f15" src="assets/audio/typing.mp3" data-start="25.75" data-duration="1.0" data-track-index="55" data-volume="0.8"></audio>
+      <audio id="a-f16" src="assets/audio/typing.mp3" data-start="27.3" data-duration="0.7" data-track-index="56" data-volume="0.8"></audio>
+      <audio id="a-f17" src="assets/audio/slide2.ogg" data-start="29.05" data-duration="0.5" data-track-index="57" data-volume="0.4"></audio>
+      <audio id="a-f18" src="assets/audio/place1.ogg" data-start="32.0" data-duration="0.5" data-track-index="58" data-volume="0.45"></audio>
+      <audio id="a-f19" src="assets/audio/place1.ogg" data-start="32.25" data-duration="0.5" data-track-index="59" data-volume="0.45"></audio>
+      <audio id="a-f20" src="assets/audio/place1.ogg" data-start="32.5" data-duration="0.5" data-track-index="60" data-volume="0.45"></audio>
+      <audio id="a-f21" src="assets/audio/place1.ogg" data-start="32.75" data-duration="0.5" data-track-index="61" data-volume="0.45"></audio>
+      <audio id="a-f22" src="assets/audio/whoosh-cinematic.mp3" data-start="35.1" data-duration="2.6" data-track-index="62" data-volume="0.32"></audio>
+      <audio id="a-f23" src="assets/audio/slide1.ogg" data-start="39.18" data-duration="0.5" data-track-index="63" data-volume="0.45"></audio>
+      <audio id="a-f24" src="assets/audio/click-soft.mp3" data-start="39.55" data-duration="0.37" data-track-index="64" data-volume="0.7"></audio>
+      <audio id="a-f25" src="assets/audio/slide2.ogg" data-start="43.38" data-duration="0.5" data-track-index="65" data-volume="0.45"></audio>
+      <audio id="a-f26" src="assets/audio/click-soft.mp3" data-start="43.75" data-duration="0.37" data-track-index="66" data-volume="0.7"></audio>
+      <audio id="a-f27" src="assets/audio/pop.mp3" data-start="44.6" data-duration="0.72" data-track-index="67" data-volume="0.3"></audio>
+      <audio id="a-f28" src="assets/audio/pop.mp3" data-start="44.7" data-duration="0.72" data-track-index="68" data-volume="0.25"></audio>
+      <audio id="a-f29" src="assets/audio/whoosh-short.mp3" data-start="47.95" data-duration="0.57" data-track-index="69" data-volume="0.28"></audio>
+      <audio id="a-f30" src="assets/audio/chime.mp3" data-start="51.6" data-duration="2.5" data-track-index="70" data-volume="0.75"></audio>
 <!--SFX-->
     </div>
 
     <script src="assets/js/facts.js"></script>
     <script src="assets/js/graph-data.js"></script>
-    <script src="assets/js/naive-data.js"></script>
     <script src="assets/js/helpers.js"></script>
-    <script src="assets/js/s1-hook.js"></script>
-    <script src="assets/js/s2-turn.js"></script>
-    <script src="assets/js/s3-agent.js"></script>
-    <script src="assets/js/s4-ingest.js"></script>
-    <script src="assets/js/s5-compile.js"></script>
-    <script src="assets/js/s6-graph.js"></script>
-    <script src="assets/js/s7-tokens.js"></script>
-    <script src="assets/js/s8-proof.js"></script>
-    <script src="assets/js/s9-lockup.js"></script>
+    <script src="assets/js/film-v3.js"></script>
     <script>
       Promise.all([
-        document.fonts.load('700 150px "Inter"'),
+        document.fonts.load('700 100px "Inter"'),
         document.fonts.load('500 20px "Inter"'),
+        document.fonts.load('italic 400 100px "Fraunces"'),
         document.fonts.load('500 20px "JetBrains Mono"'),
-        document.fonts.load('700 44px "JetBrains Mono"'),
       ]).then(() => {
         const tl = gsap.timeline({ paused: true });
         FILM.scenes.forEach((fn) => fn(tl));

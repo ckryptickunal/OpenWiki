@@ -1,0 +1,11 @@
+When starting out, you should identify who to email by following these steps:
+
+*   **Analyze existing data:** Look at your current customers, specifically those who signed the contract, paid, or pushed the deal to close, and target people with similar job profiles [1].
+*   **Identify the pain point:** If you do not have customers yet, ask yourself who in an organization has the most to gain from buying your software [1].
+*   **Leverage your network:** Reach out to people you have previously worked or interned with, or look for individuals online whose work you respect and who could provide helpful feedback [6].
+
+The provided passages do not cover who to email if you have no existing network, customers, or clear organizational beneficiaries for your product.
+
+Sources:
+  [1] Why You're Getting Zero Replies To Your Cold Emails [1:39]  (Y Combinator/wr6PMD06hP0.txt)  https://www.youtube.com/watch?v=wr6PMD06hP0&t=99s
+  [6] Dylan Field: Scaling Figma and the Future of Design [6:08]  (Y Combinator/-7Qz7tSTfUU.txt)  https://www.youtube.com/watch?v=-7Qz7tSTfUU&t=368s

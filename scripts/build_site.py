@@ -353,11 +353,11 @@ def home() -> str:
             "@context": "https://schema.org",
             "@type": "VideoObject",
             "name": "OpenWiki launch film",
-            "description": "OpenWiki compiles YouTube channels, essays and notes into a linked Markdown wiki your AI agents can read. 56 seconds.",
+            "description": "OpenWiki compiles YouTube videos, essays and notes into linked Markdown pages that you and your AI agents can use. 57 seconds.",
             "thumbnailUrl": SITE_URL + "img/launch-poster.jpg",
             "contentUrl": SITE_URL + "assets/openwiki-launch.mp4",
             "uploadDate": "2026-09-27",
-            "duration": "PT56S",
+            "duration": "PT57S",
         },
         {
             "@context": "https://schema.org",
@@ -385,10 +385,10 @@ def home() -> str:
 <p class="body3 stagger" style="--s:0">OpenWiki turns YouTube videos, blogs and your own notes into a linked Markdown wiki you keep. It's an open-source command-line tool: it downloads transcripts and articles, then an LLM writes a page for every source, person, company and topic, all cross-linked and ready for <a class="link" href="{BASE}obsidian/">Obsidian</a>.</p>
 <p class="body3 secondary stagger" style="--s:1"><a class="link" href="{REPO}">source on github</a>, <a class="link" href="#start">get started</a>, or <a class="link" href="{SPONSOR}">sponsor the project</a>.</p>
 <figure class="film stagger" id="film" style="--s:1">
-<video controls playsinline preload="none" poster="{BASE}img/launch-poster.jpg" width="1280" height="720" aria-label="OpenWiki launch film, 56 seconds">
+<video controls playsinline preload="none" poster="{BASE}img/launch-poster.jpg" width="1280" height="720" aria-label="OpenWiki launch film, 57 seconds">
 <source src="{BASE}assets/openwiki-launch.mp4" type="video/mp4">
 </video>
-<figcaption class="sub2 secondary">The 56-second launch film. Every number in it is measured on <a class="link" href="https://github.com/ckryptickunal/Founder-Book">Founder Book</a>.</figcaption>
+<figcaption class="sub2 secondary">The 57-second launch film. Every claim in it is sourced in <a class="link" href="https://github.com/ckryptickunal/OpenWiki/blob/main/Marketing/launch-video/CLAIMS.md">CLAIMS.md</a>.</figcaption>
 </figure>
 </header>
 {chr(10).join(sections)}

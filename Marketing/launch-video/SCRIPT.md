@@ -2,47 +2,45 @@
 
 **Message:** Everything you watch and read can compile itself into a wiki you own.
 **Format:** 16:9 master at 1920x1080 for Product Hunt (YouTube link), X and LinkedIn on desktop. A 1:1 or 4:5 cut for mobile feeds is a follow-up.
-**Length:** 56 seconds. No voiceover: sound-off autoplay means the type tells the story.
-**Music:** 120 BPM bed (Happy Beats vol. 1 by ende.app, CC BY 4.0, starting at 16.02s). Sparse, quiet SFX: typing, soft whooshes on transitions, soft impacts on the big numbers.
+**Length:** 57 seconds. No voiceover and no music: sound effects only, each tied to something on screen (chips, typing, cuts, cards, the lockup).
+**Message:** the same problem hurts people and agents. You save hours of video and can't find the part that mattered; an agent faces a pile of raw text where one idea is spread across 68 files. OpenWiki compiles it once into linked pages that both can use.
 
-## Look (v2): Revolut's visual system, researched on Mobbin
-- Pure black and deep-navy fields; an electric-blue hero gradient (`#2437ff` → `#0a1260` → black) for the turn and the lockup; one light scene (`#f2f2f4`) for the ingest step.
-- Dark glass cards (`#141418`, 1px white 8% border, 26–36px radius), transaction-style rows (round icon, title, grey meta, value on the right), balance-style big numbers over a pill label, round action buttons, a white pill CTA.
-- Type: **Inter Display** (opsz 32), Bold 700 at most, uppercase for headlines with tight tracking; JetBrains Mono for terminals. No serif, no grain.
-- Accents: blue `#3d5afe` / `#6f86ff`, teal `#2ec4a0` (good), red `#f0506e` (cost).
-- Motion (Emil Kowalski's rules): entrances 0.7–1.0s on `cubic-bezier(0.23, 1, 0.32, 1)`; on-screen moves and scene changes 0.8–1.0s on `cubic-bezier(0.77, 0, 0.175, 1)`; exits 0.35–0.4s and always faster than entrances; staggers 60–80ms; blur ≤ 3px; nothing enters from scale(0); every headline holds for 1.5s or more.
+## Look (v3)
+- Craft modelled on Anthropic's "Introducing Claude Opus 4.6": full-bleed documentary photos, each carrying a small caption chip of real, specific text, alternating with macro type on paper. Notion Mail's rhythm: one short claim, then real product.
+- OpenWiki's own warm paper (`#faf6f2`) and brown ink; real Unsplash photography (PHOTOS.md) with a light warm grade; no grain.
+- Type: Inter Display Bold at most; Fraunces italic for two accent words only; JetBrains Mono for the terminal.
+- Everything on screen is real: YC titles and durations from Founder Book, real OpenWiki 0.3.0 terminal, page, search and ask output (research/demo-0.3.0), Founder Book's real link graph.
+- Motion (Emil Kowalski): 0.8–0.9s ease-out entrances, ease-in-out moves, faster exits, slow documentary pushes on photos, holds of 1.5s or more.
 
-## Beat sheet (v2, 56s)
+## Shots
 
-| # | Time | Scene | On screen |
-|---|------|-------|-----------|
-| 1 | 0.0–6.0 | **Hook** | Saved videos, essays and notes arrive as Revolut-style rows. "YOU WATCHED IT." → "SAVED" → "FORGOT"; the rows dim and the line fades letter by letter. |
-| 2 | 6.0–10.3 | **The turn** | A search-style prompt types `openwiki`; the rows are pulled into it; the blue hero rises; "COMPILE IT." |
-| 3 | 10.2–16.5 | **The agent problem** | "YOUR AI STARTS FROM ZERO." An analytics card counts the 68 real files a plain search hits: 611,954 tokens. "THAT'S ONE QUESTION." |
-| 4 | 16.3–23.2 | **Ingest** (light) | "POINT IT AT [a video / a playlist / a channel / a blog / your notes / all of it]." Real commands in a terminal, flanked by balance cards: 887 YC videos, 233 Paul Graham essays → 8,768 pages. |
-| 5 | 23.0–30.2 | **Compile** | A real Dylan Field transcript with `[m:ss]` cues; blue highlights become Person, Company, Topic and verified-quote cards linked back to the text. "EVERY PERSON, COMPANY AND IDEA GETS A PAGE." |
-| 6 | 30.0–35.6 | **The graph** | Founder Book's real link graph as a planet horizon under "8,768 · Linked Markdown pages". |
-| 7 | 35.5–45.0 | **Tokens** | Two cards: 65,097 vs 8,171 tokens → "8× FEWER TOKENS." Then "YOUR AGENT READS THE PAGE, NOT THE PILE." with a real `openwiki ask` answer and its citations. |
-| 8 | 45.0–49.2 | **Works with** | Gemini, OpenAI, OpenRouter, Ollama as round buttons (official marks), then three facts as pills. |
-| 9 | 48.8–56.0 | **Lockup** | Blue hero: `>OW` OpenWiki, "Turn what you watch into what you know.", white pill `pip install openwiki-cli`, GitHub URL. |
+| # | Time | Shot | On screen |
+|---|------|------|-----------|
+| A | 0.0–3.2 | Photo: watching at night | Chip: Y Combinator · 43:49 · *How To Get AI Startup Ideas* (progress bar fills). "You watched it." |
+| B | 3.2–6.4 | Photo: paper pile | Chip: paulgraham.com · saved for later · *Do Things that Don't Scale*. "You saved it." |
+| C | 6.4–10.2 | Photo: sticky-note wall | Chip types: "which video had the warm network advice?". "Now find the part that mattered." |
+| D | 10.2–13.2 | Paper type | "Your AI agent has the *same* problem." |
+| E | 13.2–17.0 | Photo: laptop at night | Chip: search the raw files for "don't scale" → 68 files, 611,954 tokens. "One idea, spread across 68 files." |
+| F | 17.0–20.6 | Paper type | "Longer inputs make models less reliable." Footnote: Chroma, Context Rot (2025), 18 models. |
+| G | 20.6–23.6 | Paper type | "OpenWiki compiles it *once*." / "Videos, essays and notes become linked Markdown pages you keep." |
+| H | 23.6–29.0 | Terminal | Real commands and output: two `openwiki youtube` runs, `openwiki ingest --all` → processed=2; comment: a whole channel works too, no API key. |
+| I | 29.0–35.2 | The real page | The generated Dylan Field page; highlights become Person, Company, Topic and checked-quote cards. "People, companies and ideas get their own pages." → "Every quote is checked against the transcript." |
+| J | 35.2–39.2 | Graph (night) | The pipeline behind Founder Book: 1,219 videos + 354 essays → 8,768 linked pages. |
+| K | 39.2–43.4 | Photo: woman at laptop | Real `openwiki search warm network` → *Why You're Getting Zero Replies To Your Cold Emails [3:46]*. "For you: the exact moment, one search away." |
+| L | 43.4–48.0 | Photo: hands typing | Real `openwiki ask` answer with citations; medians 786 vs 3,397 tokens. "For your agents: short pages, with sources." |
+| M | 48.0–51.4 | Paper type | Works with Gemini, OpenAI, OpenRouter, or a local model. Free and open source (MIT). |
+| N | 51.4–57.0 | Lockup | >OW OpenWiki · "Turn what you watch into what you know." · github.com/ckryptickunal/OpenWiki |
 
-Every number is sourced in [FACTS.md](FACTS.md).
-
-## Facts checked for the copy
-- The CTA uses `pip install openwiki-cli`. The package is built from the 0.3.0 tag and published to PyPI before launch.
-- The commands and flags shown come from the README: `openwiki youtube`, `openwiki essay --url … --folder … --id-prefix`, `openwiki ingest --all`, `openwiki lint --fix-index`.
-- Providers come from the README: Gemini, OpenAI, OpenRouter, Ollama and LM Studio.
-- Karpathy's LLM Wiki gist (2026-04-04) is the idea the README cites. An optional small credit line reads "Built on the LLM Wiki pattern". The film never implies endorsement.
-- The cards show real public titles, like PG's "How to Do Great Work". Their thumbnails are the site's own photography, not third-party images.
+Every line is traced to its evidence in [CLAIMS.md](CLAIMS.md).
 
 ## Render
 ```bash
-npx hyperframes@0.8.80 render -f 60 -o renders/openwiki-launch-v4.mp4
+npx hyperframes@0.8.80 render -f 60 -o renders/openwiki-launch-v5.mp4
 ```
-Bake the poster (the scene 6 graph, frame at 34.0s) into frame 0:
+Bake the poster (shot A at 2.9s) into frame 0 and lift the SFX mix by 7 dB with a limiter:
 ```bash
-ffmpeg -ss 34.0 -i renders/openwiki-launch-v4.mp4 -frames:v 1 -q:v 2 renders/openwiki-launch-poster.jpg
-ffmpeg -i renders/openwiki-launch-v4.mp4 -loop 1 -i renders/openwiki-launch-poster.jpg \
-  -filter_complex "[0:v][1:v]overlay=enable='eq(n,0)':shortest=1[v]" -map "[v]" -map 0:a \
+ffmpeg -ss 2.9 -i renders/openwiki-launch-v5.mp4 -frames:v 1 -q:v 2 renders/openwiki-launch-poster.jpg
+ffmpeg -i renders/openwiki-launch-v5.mp4 -loop 1 -i renders/openwiki-launch-poster.jpg \
+  -filter_complex "[0:v][1:v]overlay=enable='eq(n,0)':shortest=1[v];[0:a]volume=7dB,alimiter=limit=0.7:level=disabled[a]" -map "[v]" -map "[a]" \
   -c:v libx264 -crf 16 -preset slow -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart renders/openwiki-launch.mp4
 ```
