@@ -248,7 +248,15 @@ PILE_VARS = [
 TOP_VARS = ["--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg", "--rot:1deg;--rot-from:8deg;--hover-tilt:-3deg", "--rot:-.5deg;--rot-from:-7deg;--hover-tilt:2.5deg"]
 
 
-def head(page_title: str, description: str, url: str, depth: int, jsonld: list[dict], image: str = "img/og.jpg") -> str:
+# Link previews: an animated GIF cut of the launch film (made by scripts/share_gif.sh).
+# Discord, Slack and Telegram play it; X gets the sharp still. WhatsApp drops images
+# over 600 KB, so vercel.json serves share.jpg to its crawler instead of the GIF.
+SHARE_GIF = "img/share.gif"
+SHARE_STILL = "img/share.jpg"
+SHARE_ALT = "OpenWiki: turn YouTube videos, blogs and notes into a linked Markdown wiki"
+
+
+def head(page_title: str, description: str, url: str, depth: int, jsonld: list[dict]) -> str:
     prefix = BASE
     ld = "\n".join(f'<script type="application/ld+json">{json.dumps(item, ensure_ascii=False)}</script>' for item in jsonld)
     return f"""<!doctype html>
@@ -266,14 +274,17 @@ def head(page_title: str, description: str, url: str, depth: int, jsonld: list[d
 <meta property="og:title" content="{esc(page_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE_URL}{image}">
+<meta property="og:image" content="{SITE_URL}{SHARE_GIF}">
+<meta property="og:image:type" content="image/gif">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{esc(SHARE_ALT)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:creator" content="@kunalbairwa232">
 <meta name="twitter:title" content="{esc(page_title)}">
 <meta name="twitter:description" content="{esc(description)}">
-<meta name="twitter:image" content="{SITE_URL}{image}">
+<meta name="twitter:image" content="{SITE_URL}{SHARE_STILL}">
+<meta name="twitter:image:alt" content="{esc(SHARE_ALT)}">
 <link rel="icon" href="{prefix}favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,7 +456,7 @@ def detail(page: Page, next_page: Page) -> str:
             ],
         },
     ]
-    return head(page.title, page.description, page.url, 1, jsonld, image=page.image) + f"""<body>
+    return head(page.title, page.description, page.url, 1, jsonld) + f"""<body>
 <a class="skip" href="#main">Skip to content</a>
 <a class="back" href="{BASE}" aria-label="Back to OpenWiki home">{ICON_BACK}</a>
 <main class="ow" id="main">

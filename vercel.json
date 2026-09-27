@@ -20,11 +20,33 @@
           "value": "public, max-age=604800, stale-while-revalidate=86400"
         }
       ]
+    },
+    {
+      "source": "/openwiki/img/share.gif",
+      "headers": [
+        {
+          "key": "Vary",
+          "value": "User-Agent"
+        }
+      ]
     }
   ],
   "git": {
     "deploymentEnabled": {
       "gh-pages": false
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/openwiki/img/share.gif",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*WhatsApp.*"
+        }
+      ],
+      "destination": "/openwiki/img/share.jpg"
+    }
+  ]
 }
