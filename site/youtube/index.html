@@ -52,7 +52,7 @@
 <div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki youtube https://www.youtube.com/watch?v=jNQXAC9IVRw --folder Talks</span></code></pre></div>
 <p>That writes <code>Talks/jNQXAC9IVRw.txt</code>: a short header (title, channel, language) followed by the full transcript.</p>
 <h3>Playlists and channels</h3>
-<p>With a free <a class="link" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com">YouTube Data API key</a>, OpenWiki lists every upload on a channel, newest first, or every video in a playlist, and only downloads what you don't have yet.</p>
+<p>No API key needed. OpenWiki lists every upload on a channel, newest first, or every video in a playlist, and only downloads what you don't have yet. There is no 50-source cap; check the LLM cost first with <code>openwiki ingest --dry-run</code>. A free <a class="link" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com">YouTube Data API key</a> adds publish dates and view counts.</p>
 <div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki youtube --channel @ycombinator --limit 20</span>
 <span class="p">$ </span><span class="cmd">openwiki youtube --playlist https://www.youtube.com/playlist?list=PL... --folder Course</span></code></pre></div>
 <h3>Any language</h3>

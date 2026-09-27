@@ -4,12 +4,23 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-27
+
+Shaped by public feedback research (Reddit r/ObsidianMD, r/PKMS, r/notebooklm, r/ClaudeAI, r/LocalLLaMA; see `docs/research/2026-09-icp-and-roadmap.md`).
+
 ### Added
+- `openwiki search`: offline full-text search across transcripts, articles and wiki pages (BM25, no LLM). Transcript hits link to the exact second in the video.
+- `openwiki ask`: answers from your own sources with numbered citations and timestamp links; replies "Not in your sources." when nothing relevant is found.
+- Channels and playlists no longer need `YOUTUBE_API_KEY`: without a key they are listed with yt-dlp (now a dependency). `openwiki sync` uses the same fallback.
+- Long transcripts are analyzed in parts and merged instead of being cut off at `--max-chars`.
+- `openwiki ingest --dry-run` shows how many files, characters, LLM calls and approximate input tokens a run would use.
+- Entity and topic pages record the moment each source first mentions them, with a timestamp link.
 - YouTube transcripts keep caption timestamps as `[m:ss]` lines. Quotes that appear in the source get a timestamp link; quotes that do not appear are left out of the wiki page.
 - Caption failures record a reason. HTTP 429 is `rate_limited` (wait and rerun) and is separate from `ip_blocked`.
 
 ### Fixed
 - Ingest no longer writes a wiki page for an empty transcript or an empty model analysis.
+- Consecutive quotes on a source page render as separate blockquotes.
 
 ## [0.2.0] - 2026-09-24
 

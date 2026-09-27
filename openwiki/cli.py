@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import warnings
 from pathlib import Path
@@ -43,6 +44,7 @@ def cmd_init(args) -> int:
 
 def cmd_youtube(args) -> int:
     from openwiki.youtube import (
+        ListingUnavailable,
         extract_channel,
         extract_one_video,
         extract_playlist,
@@ -57,19 +59,23 @@ def cmd_youtube(args) -> int:
     languages = _languages(args)
 
     if args.channel or args.playlist:
-        if args.channel:
-            result = extract_channel(
-                ws, args.channel, folder=args.folder, dry_run=args.dry_run,
-                limit=args.limit, languages=languages,
-            )
-        else:
-            if not args.folder:
-                print("--folder is required with --playlist", file=sys.stderr)
-                return 2
-            result = extract_playlist(
-                ws, args.playlist, folder=args.folder, dry_run=args.dry_run,
-                limit=args.limit, languages=languages,
-            )
+        if args.playlist and not args.folder:
+            print("--folder is required with --playlist", file=sys.stderr)
+            return 2
+        try:
+            if args.channel:
+                result = extract_channel(
+                    ws, args.channel, folder=args.folder, dry_run=args.dry_run,
+                    limit=args.limit, languages=languages,
+                )
+            else:
+                result = extract_playlist(
+                    ws, args.playlist, folder=args.folder, dry_run=args.dry_run,
+                    limit=args.limit, languages=languages,
+                )
+        except ListingUnavailable as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
         new = result.pop("new", [])
         print(json.dumps(result | {"new_count": len(new)}, indent=2))
         if args.dry_run:
@@ -234,13 +240,23 @@ def cmd_ingest(args) -> int:
         paths = ws.discover_source_files(args.folder)
         if args.limit:
             paths = paths[: args.limit]
+    if args.dry_run:
+        from openwiki.wiki import ingest_plan
+
+        plan = ingest_plan(ws, paths, force=args.force, max_chars=args.max_chars)
+        print(
+            f"Would ingest {plan['files']} file(s) ({plan['characters']:,} characters) in "
+            f"{plan['llm_calls']} LLM call(s), about {plan['approx_input_tokens']:,} input tokens. "
+            f"Unchanged: {plan['skipped']}. Empty: {plan['empty']}."
+        )
+        return 0
     return _ingest(ws, paths, analysis=analysis, force=args.force, max_chars=args.max_chars, provider=args.provider)
 
 
 def cmd_sync(args) -> int:
     """Pull every source in sources.json, then ingest whatever is new."""
     from openwiki.env import env_value
-    from openwiki.youtube import extract_channel
+    from openwiki.youtube import LISTING_HELP, extract_channel, ytdlp_available
 
     ws = _workspace(args)
     config = ws.load_sources_config()
@@ -250,8 +266,8 @@ def cmd_sync(args) -> int:
         return 1
 
     failed = 0
-    if channels and not env_value("YOUTUBE_API_KEY"):
-        print(f"Skipping {len(channels)} YouTube channel(s): set YOUTUBE_API_KEY to list channel uploads.", file=sys.stderr)
+    if channels and not env_value("YOUTUBE_API_KEY") and not ytdlp_available():
+        print(f"Skipping {len(channels)} YouTube channel(s). {LISTING_HELP}", file=sys.stderr)
         channels = []
     for channel in channels:
         target = channel.get("channel_id") or channel.get("query") or channel.get("name")
@@ -279,6 +295,47 @@ def cmd_sync(args) -> int:
         return 0 if failed == 0 else 1
     code = _ingest(ws, ws.discover_source_files(), provider=args.provider)
     return code if code else (0 if failed == 0 else 1)
+
+
+def cmd_search(args) -> int:
+    from openwiki.search import search, snippet
+
+    ws = _workspace(args)
+    query = " ".join(args.query)
+    hits = search(ws, query, scope=args.scope, limit=args.limit)
+    if not hits:
+        print(f"No matches for {query!r}.")
+        return 1
+    for i, hit in enumerate(hits, 1):
+        where = f" [{hit.stamp}]" if hit.stamp else ""
+        print(f"{i}. {hit.title}{where}  ({ws.rel(hit.path)})")
+        if hit.link:
+            print(f"   {hit.link}")
+        print(f"   {snippet(hit, query)}")
+    return 0
+
+
+def cmd_ask(args) -> int:
+    from openwiki.llm import LLMNotConfigured
+    from openwiki.search import ask
+
+    ws = _workspace(args)
+    try:
+        answer, passages = ask(ws, " ".join(args.question), provider=args.provider, k=args.k)
+    except LLMNotConfigured as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    print(answer)
+    numbers = [int(n) for group in re.findall(r"\[([\d,\s]+)\]", answer) for n in re.findall(r"\d+", group)]
+    cited = sorted({n for n in numbers if 0 < n <= len(passages)})
+    if cited:
+        print("\nSources:")
+        for i in cited:
+            passage = passages[i - 1]
+            where = f" [{passage.stamp}]" if passage.stamp else ""
+            link = f"  {passage.link}" if passage.link else ""
+            print(f"  [{i}] {passage.title}{where}  ({ws.rel(passage.path)}){link}")
+    return 0
 
 
 def cmd_lint(args) -> int:
@@ -325,8 +382,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     yt = add("youtube", "Download captions for a video, URL list, playlist, or channel.", cmd_youtube)
     yt.add_argument("video", nargs="?", help="YouTube URL or video ID.")
-    yt.add_argument("--channel", help="Channel URL, @handle, name, or UC... id (needs YOUTUBE_API_KEY).")
-    yt.add_argument("--playlist", help="Playlist URL or id (needs YOUTUBE_API_KEY).")
+    yt.add_argument("--channel", help="Channel URL, @handle, or UC... id (listed with YOUTUBE_API_KEY or yt-dlp).")
+    yt.add_argument("--playlist", help="Playlist URL or id (listed with YOUTUBE_API_KEY or yt-dlp).")
     yt.add_argument("--urls-file", help="File with one YouTube URL per line.")
     yt.add_argument("--folder", help="Output folder under the workspace (default: Videos or channel title).")
     yt.add_argument("--lang", help="Preferred caption languages, comma-separated (default: en, then any).")
@@ -360,7 +417,8 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--provider", choices=["gemini", "openai"], help="Override LLM_PROVIDER.")
     ingest.add_argument("--force", action="store_true", help="Re-ingest files that did not change.")
     ingest.add_argument("--limit", type=int)
-    ingest.add_argument("--max-chars", type=int, default=120_000, help="Transcript characters sent to the LLM.")
+    ingest.add_argument("--max-chars", type=int, default=120_000, help="Characters per LLM call; longer sources are analyzed in parts.")
+    ingest.add_argument("--dry-run", action="store_true", help="Show how many files, characters and LLM calls a run would use.")
 
     sync = add("sync", "Pull every channel and essay site in sources.json, then ingest new files.", cmd_sync)
     sync.add_argument("--no-ingest", action="store_true", help="Only download; skip the LLM step.")
@@ -369,6 +427,16 @@ def build_parser() -> argparse.ArgumentParser:
     sync.add_argument("--limit", type=int, help="Max new items per source.")
     sync.add_argument("--min-chars", type=int, default=400)
     sync.add_argument("--dry-run", action="store_true")
+
+    search = add("search", "Full-text search of your transcripts, articles and wiki pages (offline, no LLM).", cmd_search)
+    search.add_argument("query", nargs="+", help="Words to find. Every word must appear in a matching file.")
+    search.add_argument("--scope", choices=["all", "sources", "wiki"], default="all")
+    search.add_argument("--limit", type=int, default=10)
+
+    ask = add("ask", "Answer a question from your own sources, with citations.", cmd_ask)
+    ask.add_argument("question", nargs="+")
+    ask.add_argument("--provider", choices=["gemini", "openai"], help="Override LLM_PROVIDER.")
+    ask.add_argument("-k", type=int, default=6, help="Passages to send to the LLM (default 6).")
 
     lint = add("lint", "Check wikilinks, frontmatter, and orphans; rebuild the index.", cmd_lint)
     lint.add_argument("--fix-index", action="store_true", help="Rebuild wiki/index.md first.")

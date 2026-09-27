@@ -20,10 +20,12 @@ An open-source Python CLI that downloads YouTube transcripts and web articles, t
 
 Hours of talks, lectures, podcasts, and essays are hard to search and easy to forget. OpenWiki turns them into a **second brain made of plain Markdown files you own**:
 
-- **YouTube to text:** captions for a single video, a URL list, a whole playlist, or every upload on a channel. Non-English captions work too.
+- **YouTube to text:** captions for a single video, a URL list, a whole playlist, or every upload on a channel, with no API key and no source cap. Each line keeps its `[m:ss]` timestamp. Non-English captions work too.
 - **Blog and essay scraper:** any article URL or blog index page, with the main text, title, and publish date pulled out automatically.
 - **Your own notes:** add local `.txt`, `.md`, or `.html` files.
-- **LLM wiki builder:** each source becomes a page with a summary, key ideas, claims, and quotes. People, companies, and topics get their own pages with backlinks to every source that mentions them.
+- **LLM wiki builder:** each source becomes a page with a summary, key ideas, claims, and quotes. People, companies, and topics get their own pages with backlinks to every source that mentions them, and the moment in the video where they come up.
+- **Grounded, not invented:** quotes are checked against the transcript and link to the second they were said; quotes the model made up are dropped. Long videos are read in full, in parts, not truncated.
+- **Find it again:** `openwiki search` is offline full-text search across everything you saved, and `openwiki ask` answers from your own sources with citations, or says "Not in your sources."
 - **Obsidian-ready:** YAML frontmatter and `[[wikilinks]]`. Open the `wiki/` folder as an Obsidian vault and the graph view just works.
 - **Incremental:** re-run any time. Downloaded videos and essays are skipped, unchanged files are not re-ingested, and videos without captions are remembered.
 - **Works offline:** point it at Ollama or LM Studio and nothing leaves your machine.
@@ -149,14 +151,17 @@ Every command accepts `--root DIR` (before or after the command name). Without i
 | `openwiki init` | Create `wiki/`, `sources.json`, `wiki/schema.md`, and a `.gitignore` | none |
 | `openwiki youtube URL` | Captions for one video (title and channel via YouTube oEmbed) | none |
 | `openwiki youtube --urls-file urls.txt --folder X` | Captions for a list of videos | none |
-| `openwiki youtube --playlist URL --folder X` | Every video in a playlist | `YOUTUBE_API_KEY` |
-| `openwiki youtube --channel @handle` | Every upload on a channel, newest first | `YOUTUBE_API_KEY` |
+| `openwiki youtube --playlist URL --folder X` | Every video in a playlist | none (uses yt-dlp; `YOUTUBE_API_KEY` adds metadata) |
+| `openwiki youtube --channel @handle` | Every upload on a channel, newest first | none (uses yt-dlp; `YOUTUBE_API_KEY` adds metadata) |
 | `openwiki essay --url URL` | One article (title and date detected) | none |
 | `openwiki essay [--source NAME]` | New articles from the blogs in `sources.json` | none |
 | `openwiki text notes.md ...` | Add local `.txt`, `.md`, or `.html` files | none |
 | `openwiki ingest --all` | Build wiki pages for new or changed sources | an [LLM](#llm-providers) |
 | `openwiki ingest --file F --analysis-file A.json` | Ingest with precomputed analysis | none |
-| `openwiki sync` | Pull every channel and blog in `sources.json`, then ingest | YouTube key for channels, LLM for ingest |
+| `openwiki ingest --dry-run` | Show files, characters, LLM calls and approximate tokens before spending anything | none |
+| `openwiki search WORDS` | Offline full-text search; transcript hits link to the exact second | none |
+| `openwiki ask "QUESTION"` | Answer from your own sources with numbered citations | an LLM |
+| `openwiki sync` | Pull every channel and blog in `sources.json`, then ingest | LLM for ingest |
 | `openwiki lint --fix-index` | Report broken links, missing frontmatter, orphans; rebuild the index | none |
 | `openwiki lint --review` | Also ask the LLM for maintenance suggestions | an LLM |
 
@@ -164,7 +169,9 @@ Useful options:
 
 - `--lang es,en` on `youtube`/`sync`: preferred caption languages. If none match, the first available track is used instead of skipping the video.
 - `--limit N`: cap how many new items are fetched or ingested.
-- `--dry-run`: show what would be downloaded.
+- `--dry-run`: show what would be downloaded (on `ingest`: what the LLM run would cost in calls and tokens).
+- `ingest --max-chars N`: characters per LLM call (default 120,000). Longer sources are analyzed in parts and merged.
+- `search --scope sources|wiki`: search only raw sources or only wiki pages. `ask -k N`: how many passages to send to the LLM.
 - `ingest --force`: re-ingest files even if they have not changed.
 - `lint --strict`: exit with status 1 on broken links or missing frontmatter (handy in CI).
 
@@ -238,7 +245,7 @@ Put these in `.env` in your workspace (see [`.env.example`](.env.example)) or ex
 
 | Variable | Used for | Default |
 |---|---|---|
-| `YOUTUBE_API_KEY` | Channel and playlist listing, full video metadata | unset (single videos still work) |
+| `YOUTUBE_API_KEY` | Full video metadata (publish date, views, description) and API-based listing | unset (listing falls back to yt-dlp) |
 | `YOUTUBE_PROXY` | Route caption requests through a proxy, e.g. `socks5://127.0.0.1:9050` (Tor) | direct |
 | `LLM_PROVIDER` | `gemini` or `openai` | auto-detect |
 | `GEMINI_API_KEY` | Gemini ingest and review | unset |
@@ -274,7 +281,15 @@ Raw `.txt` files are the source of truth, and the wiki can always be regenerated
 
 ### How do I turn a whole YouTube channel or playlist into notes?
 
-Get a free YouTube Data API key, set `YOUTUBE_API_KEY`, then run `openwiki youtube --channel @handle` or `openwiki youtube --playlist <url> --folder Course`, followed by `openwiki ingest --all`.
+Run `openwiki youtube --channel @handle` or `openwiki youtube --playlist <url> --folder Course`, then `openwiki ingest --all`. No API key is needed: listing uses yt-dlp. There is no cap on the number of videos; run `openwiki ingest --dry-run` first to see how many LLM calls it will take. A free `YOUTUBE_API_KEY` adds publish dates, view counts and descriptions.
+
+### How do I find something I watched but can't remember where?
+
+`openwiki search cold email reply rates` searches every transcript, article and wiki page offline and prints the matching passage with a link to the exact second in the video. For a direct answer, `openwiki ask "What reply rate is good for cold email?"` answers from those passages with numbered citations, or says "Not in your sources." instead of guessing.
+
+### Does the AI change or overwrite my own notes?
+
+No. OpenWiki only writes inside the workspace's `wiki/` folder (and the raw `.txt` source folders it creates). Your own notes are never edited. Every generated page has frontmatter and links back to its source, and quotes are checked against the transcript before they are written. Keeping the workspace in git lets you review and undo any ingest.
 
 ### Does it work with non-English videos?
 
@@ -286,7 +301,7 @@ Yes. Open the `wiki/` folder as a vault. Pages use YAML frontmatter and `[[folde
 
 ### Can I run it without sending data to the cloud?
 
-Yes. Use Ollama or LM Studio as described in [LLM providers](#ollama-or-lm-studio-fully-offline). Caption and article downloads still come from YouTube and the websites you choose.
+Yes. Use Ollama or LM Studio as described in [LLM providers](#ollama-or-lm-studio-fully-offline). Caption and article downloads still come from YouTube and the websites you choose. With a cloud LLM (Gemini, OpenAI), your transcripts are sent to that provider during `ingest` and `ask`; `search` never leaves your machine.
 
 ### What does it cost?
 

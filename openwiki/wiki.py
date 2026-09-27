@@ -14,6 +14,7 @@ from pathlib import Path
 
 from openwiki.textfmt import (
     YOUTUBE_ID_RE,
+    first_mention,
     format_cue_timestamp,
     locate_in_transcript,
     parse_source_file,
@@ -183,16 +184,16 @@ def render_source_page(record: dict, analysis: dict) -> str:
         lines.append(f"- {claim.get('claim', '')} Evidence: {evidence}{stamp}")
     quote_blocks, _dropped = ground_quotes(record, analysis.get("quotes", []))
     lines.extend(["", "## Quotes", ""])
-    lines.extend(quote_blocks)
+    lines.append("\n\n".join(quote_blocks))  # a blank line keeps each quote its own blockquote
     lines.append("")
     return "\n".join(lines)
 
 
 def upsert_reference_page(
-    path: Path, page_type: str, title: str, description: str, source: str
+    path: Path, page_type: str, title: str, description: str, source: str, stamp: str = ""
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    mention = f"- {source}: {description}".strip()
+    mention = f"- {source}{stamp}: {description}".strip()
 
     if path.exists():
         content = path.read_text(encoding="utf-8")
@@ -232,21 +233,27 @@ def upsert_reference_page(
 
 
 def update_reference_pages(workspace: Workspace, record: dict, analysis: dict) -> None:
+    """Add a Source Mention to each entity/topic page, with the moment it is first named."""
     link = source_link(record)
+    transcript = record.get("transcript") or ""
+
+    def stamp(name: str) -> str:
+        return _stamp_suffix(record, first_mention(transcript, name))
+
     for entity in analysis.get("entities", []):
         name = (entity.get("name") or "").strip()
         if not name:
             continue
         path = workspace.entities_dir / f"{slugify(name)}.md"
         description = entity.get("description") or entity.get("importance", "")
-        upsert_reference_page(path, "entity", name, description, link)
+        upsert_reference_page(path, "entity", name, description, link, stamp(name))
 
     for topic in analysis.get("topics", []):
         name = (topic.get("name") or "").strip()
         if not name:
             continue
         path = workspace.topics_dir / f"{slugify(name)}.md"
-        upsert_reference_page(path, "topic", name, topic.get("summary", ""), link)
+        upsert_reference_page(path, "topic", name, topic.get("summary", ""), link, stamp(name))
 
 
 def read_title(path: Path) -> str:
@@ -292,6 +299,30 @@ def rebuild_index(workspace: Workspace) -> None:
             lines.append(f"- [[{rel}|{title}]]")
         lines.append("")
     workspace.index_path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def ingest_plan(workspace: Workspace, paths: list[Path], *, force: bool = False, max_chars: int = 120_000) -> dict:
+    """What an ingest run would send to the LLM, without calling it."""
+    from openwiki.llm import split_transcript
+
+    manifest = load_manifest(workspace)
+    plan = {"files": 0, "skipped": 0, "empty": 0, "characters": 0, "llm_calls": 0}
+    for path in paths:
+        record = parse_source_file(path)
+        if should_skip(manifest, record, Path(path), force):
+            plan["skipped"] += 1
+            continue
+        transcript = record.get("transcript") or ""
+        if not transcript.strip():
+            plan["empty"] += 1
+            continue
+        parts = len(split_transcript(transcript, max_chars))
+        plan["files"] += 1
+        plan["characters"] += len(transcript)
+        plan["llm_calls"] += parts + (1 if parts > 1 else 0)
+    # Rough English estimate: ~4 characters per token plus ~600 tokens of prompt per call.
+    plan["approx_input_tokens"] = plan["characters"] // 4 + plan["llm_calls"] * 600
+    return plan
 
 
 def should_skip(manifest: dict, record: dict, path: Path, force: bool) -> bool:

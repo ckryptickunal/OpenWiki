@@ -227,15 +227,47 @@ def make_client(*, provider: str | None = None, lint: bool = False):
     raise LLMNotConfigured(f"Unknown provider {provider!r}. Use one of: {', '.join(PROVIDERS)}")
 
 
-def analyze_record(client, record: dict, max_chars: int) -> dict:
+MAX_PARTS = 12
+MERGE_PROMPT = """These are summaries of consecutive parts of one source titled "{title}".
+Write one concise summary of the whole source (one short paragraph). Plain text only.
+
+{summaries}
+"""
+
+
+def split_transcript(text: str, max_chars: int) -> list[str]:
+    """Split on line boundaries into parts of at most max_chars (a line longer than that is cut)."""
+    if len(text) <= max_chars:
+        return [text]
+    parts: list[str] = []
+    buf: list[str] = []
+    size = 0
+    for line in text.splitlines(keepends=True):
+        while len(line) > max_chars:
+            if buf:
+                parts.append("".join(buf))
+                buf, size = [], 0
+            parts.append(line[:max_chars])
+            line = line[max_chars:]
+        if size + len(line) > max_chars and buf:
+            parts.append("".join(buf))
+            buf, size = [], 0
+        buf.append(line)
+        size += len(line)
+    if buf:
+        parts.append("".join(buf))
+    return parts
+
+
+def _analyze_text(client, record: dict, transcript: str, part: str = "") -> dict:
     metadata = record["metadata"]
     prompt = ANALYZE_PROMPT.format(
-        title=record["title"],
+        title=record["title"] + part,
         video_id=record["video_id"],
         channel=metadata.get("channel", metadata.get("channel_title", "Unknown")),
         published=metadata.get("published", metadata.get("published_at", "Unknown")),
         url=metadata.get("url") or metadata.get("source", ""),
-        transcript=record["transcript"][:max_chars],
+        transcript=transcript,
     )
     last_error: Exception | None = None
     for attempt in range(3):
@@ -251,3 +283,59 @@ def analyze_record(client, record: dict, max_chars: int) -> dict:
         except ValueError as exc:
             last_error = exc
     raise ValueError(f"{client.provider} analysis failed after 3 attempts: {last_error}")
+
+
+def _dedupe(items: list, key) -> list:
+    seen: set = set()
+    out = []
+    for item in items:
+        k = key(item)
+        if not k or k in seen:
+            continue
+        seen.add(k)
+        out.append(item)
+    return out
+
+
+def merge_analyses(parts: list[dict], summary: str) -> dict:
+    """Combine per-part analyses: union entities/topics by name, keep ideas, claims and quotes in order."""
+    def named(item):
+        return str(item.get("name", "")).strip().casefold() if isinstance(item, dict) else ""
+
+    def text(item):
+        return str(item.get("claim", item) if isinstance(item, dict) else item).strip().casefold()
+
+    collect = lambda key: [x for p in parts for x in (p.get(key) or [])]  # noqa: E731
+    return {
+        "summary": summary,
+        "key_ideas": _dedupe(collect("key_ideas"), text)[:15],
+        "entities": _dedupe(collect("entities"), named),
+        "topics": _dedupe(collect("topics"), named),
+        "claims": _dedupe(collect("claims"), text)[:15],
+        "quotes": _dedupe(collect("quotes"), text)[:12],
+        "tags": _dedupe(collect("tags"), text)[:12],
+    }
+
+
+def analyze_record(client, record: dict, max_chars: int) -> dict:
+    """Analyze a source. Long transcripts are analyzed in parts and merged, not truncated."""
+    parts = split_transcript(record["transcript"], max_chars)
+    if len(parts) == 1:
+        return _analyze_text(client, record, parts[0])
+    if len(parts) > MAX_PARTS:
+        raise ValueError(
+            f"source is {len(record['transcript']):,} characters ({len(parts)} parts of {max_chars:,}); "
+            f"raise --max-chars or split the file (limit {MAX_PARTS} parts)"
+        )
+    analyses = [
+        _analyze_text(client, record, part, f" (part {i} of {len(parts)})")
+        for i, part in enumerate(parts, 1)
+    ]
+    summaries = [a.get("summary", "").strip() for a in analyses if a.get("summary")]
+    try:
+        summary = client.generate(
+            MERGE_PROMPT.format(title=record["title"], summaries="\n\n".join(summaries)), temperature=0.2
+        ).strip()
+    except Exception:
+        summary = ""
+    return merge_analyses(analyses, summary or " ".join(summaries))

@@ -85,7 +85,7 @@ PAGES: list[Page] = [
 {code("openwiki youtube https://www.youtube.com/watch?v=jNQXAC9IVRw --folder Talks")}
 <p>That writes <code>Talks/jNQXAC9IVRw.txt</code>: a short header (title, channel, language) followed by the full transcript.</p>
 <h3>Playlists and channels</h3>
-<p>With a free <a class="link" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com">YouTube Data API key</a>, OpenWiki lists every upload on a channel, newest first, or every video in a playlist, and only downloads what you don't have yet.</p>
+<p>No API key needed. OpenWiki lists every upload on a channel, newest first, or every video in a playlist, and only downloads what you don't have yet. There is no 50-source cap; check the LLM cost first with <code>openwiki ingest --dry-run</code>. A free <a class="link" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com">YouTube Data API key</a> adds publish dates and view counts.</p>
 {code("openwiki youtube --channel @ycombinator --limit 20", "openwiki youtube --playlist https://www.youtube.com/playlist?list=PL... --folder Course")}
 <h3>Any language</h3>
 <p>Pass <code>--lang hi,en</code> to prefer certain caption languages. If none match, OpenWiki uses whatever track the video has instead of skipping it. Videos with no captions at all are remembered and never retried; rate limits are retried on the next run.</p>
@@ -162,6 +162,9 @@ PAGES: list[Page] = [
   wiki/sources/jNQXAC9IVRw-me-at-the-zoo.md
   wiki/entities/jawed-karim.md
   wiki/topics/internet-history.md</code></pre></div>
+<h3>Find it again</h3>
+<p><code>openwiki search</code> is offline full-text search across every transcript, article and page, and each transcript hit links to the second it was said. <code>openwiki ask</code> answers from your own sources with numbered citations, and says "Not in your sources." instead of guessing.</p>
+{code('openwiki search cold email reply rates', 'openwiki ask "What reply rate is good for cold email?"')}
 <h3>Incremental and safe to re-run</h3>
 <p>Unchanged files are skipped, failures are listed in <code>wiki/ingest_failures.json</code> and retried next time, and <code>openwiki lint</code> reports broken links, missing frontmatter and orphan pages. The raw text files stay the source of truth, so you can always rebuild the wiki.</p>
 """,
@@ -226,7 +229,7 @@ FAQ = [
     ("How do I download the transcript of a YouTube video as text?",
      "Run openwiki youtube <url> --folder Talks. It writes a .txt file with the title, channel, language and full transcript. No API key is needed."),
     ("How do I turn a whole YouTube channel or playlist into notes?",
-     "Set a free YOUTUBE_API_KEY, run openwiki youtube --channel @handle or --playlist <url>, then openwiki ingest --all to build the wiki pages."),
+     "Run openwiki youtube --channel @handle or --playlist <url>, then openwiki ingest --all. No API key is needed and there is no cap on the number of videos."),
     ("Does it work with non-English videos?",
      "Yes. Use --lang to prefer languages; if none match, OpenWiki uses whatever caption track exists. Page names keep non-Latin scripts."),
     ("Can I use it with Obsidian?",

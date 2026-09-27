@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -287,6 +289,80 @@ def discover_new_video_ids(youtube, channel_id: str, known: set[str]) -> list[st
     return select_new_ids(pages, known)
 
 
+
+# ---------- Keyless listing with yt-dlp (no YouTube Data API key) ----------
+
+class ListingUnavailable(RuntimeError):
+    """Neither a YouTube Data API key nor yt-dlp is available for listing."""
+
+
+LISTING_HELP = (
+    "Listing a channel or playlist needs either YOUTUBE_API_KEY or yt-dlp. "
+    "Install yt-dlp for keyless listing: pip install yt-dlp (or brew install yt-dlp)."
+)
+
+
+def ytdlp_available() -> bool:
+    try:
+        import yt_dlp  # noqa: F401
+        return True
+    except ImportError:
+        return shutil.which("yt-dlp") is not None
+
+
+def _ytdlp_json(url: str) -> dict:
+    """Flat listing of a channel/playlist page as yt-dlp JSON (no downloads)."""
+    try:
+        import yt_dlp
+    except ImportError:
+        yt_dlp = None
+    if yt_dlp is not None:
+        options = {"extract_flat": "in_playlist", "quiet": True, "no_warnings": True, "skip_download": True}
+        with yt_dlp.YoutubeDL(options) as ydl:
+            return ydl.extract_info(url, download=False)
+    binary = shutil.which("yt-dlp")
+    if not binary:
+        raise ListingUnavailable(LISTING_HELP)
+    proc = subprocess.run(
+        [binary, "--flat-playlist", "--dump-single-json", "--no-warnings", url],
+        capture_output=True, text=True, timeout=600,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"yt-dlp could not list {url}: {proc.stderr.strip()[-300:]}")
+    return json.loads(proc.stdout)
+
+
+def channel_listing_url(channel_input: str) -> str:
+    """The uploads tab URL for a channel URL, @handle, or UC... id (newest first)."""
+    value = channel_input.strip()
+    if re.match(r"^UC[\w-]{22}$", value):
+        return f"https://www.youtube.com/channel/{value}/videos"
+    if value.startswith("@"):
+        return f"https://www.youtube.com/{value}/videos"
+    if "youtube.com" in value:
+        base = value.split("?")[0].rstrip("/")
+        base = re.sub(r"/(videos|featured|streams|shorts|playlists|about)$", "", base)
+        return base + "/videos"
+    raise ListingUnavailable(
+        f"Without YOUTUBE_API_KEY, pass the channel as a URL, @handle, or UC... id (got {channel_input!r})."
+    )
+
+
+def ytdlp_list(url: str) -> tuple[str, list[str]]:
+    """(title, video ids) for a channel uploads tab or playlist, in page order."""
+    info = _ytdlp_json(url)
+    title = info.get("channel") or info.get("uploader") or info.get("title") or ""
+    title = re.sub(r"\s+-\s+Videos$", "", title)
+    ids: list[str] = []
+    for entry in info.get("entries") or []:
+        if entry and entry.get("_type") == "playlist":  # a channel page nests tabs
+            ids.extend(e["id"] for e in entry.get("entries") or [] if e and e.get("id"))
+        elif entry and entry.get("id") and entry.get("ie_key", "Youtube") in ("Youtube", None):
+            ids.append(entry["id"])
+    seen: set[str] = set()
+    return title, [i for i in ids if not (i in seen or seen.add(i))]
+
+
 def _transcript_api(proxy: str | None = None):
     from youtube_transcript_api import YouTubeTranscriptApi
 
@@ -513,15 +589,30 @@ def extract_channel(
     limit: int | None = None,
     languages: list[str] | None = None,
 ) -> dict:
-    """Resolve a channel, find uploads not on disk yet (newest first), extract their captions."""
-    youtube = get_youtube_service()
-    channel_id, title = resolve_channel_id(youtube, channel_input)
-    folder_name = safe_folder_name(folder or title)
+    """Find uploads not on disk yet (newest first) and extract their captions.
+
+    Uses the YouTube Data API when YOUTUBE_API_KEY is set, otherwise yt-dlp.
+    """
+    youtube = maybe_youtube_client()
+    if youtube is not None:
+        channel_id, title = resolve_channel_id(youtube, channel_input)
+        folder_name = safe_folder_name(folder or title)
+        known = workspace.known_ids_for_folder(workspace.root / folder_name)
+        new_ids = discover_new_video_ids(youtube, channel_id, known)
+        backend = "youtube-api"
+    else:
+        if not ytdlp_available():
+            raise ListingUnavailable(LISTING_HELP)
+        title, ids = ytdlp_list(channel_listing_url(channel_input))
+        channel_id = ""
+        folder_name = safe_folder_name(folder or title or "channel")
+        known = workspace.known_ids_for_folder(workspace.root / folder_name)
+        new_ids = [i for i in ids if i not in known]
+        backend = "yt-dlp"
     out = workspace.root / folder_name
-    new_ids = discover_new_video_ids(youtube, channel_id, workspace.known_ids_for_folder(out))
     if limit is not None:
         new_ids = new_ids[:limit]
-    result = {"channel_id": channel_id, "title": title, "folder": folder_name, "new": new_ids}
+    result = {"channel_id": channel_id, "title": title, "folder": folder_name, "listing": backend, "new": new_ids}
     if not dry_run:
         result["counts"] = extract_videos(
             new_ids, out, channel_name=title, youtube=youtube, languages=languages
@@ -538,17 +629,31 @@ def extract_playlist(
     limit: int | None = None,
     languages: list[str] | None = None,
 ) -> dict:
-    """Extract every video of a playlist that is not on disk yet, in playlist order."""
-    youtube = get_youtube_service()
+    """Extract every video of a playlist that is not on disk yet, in playlist order.
+
+    Uses the YouTube Data API when YOUTUBE_API_KEY is set, otherwise yt-dlp.
+    """
     playlist_id = extract_playlist_id(playlist_input)
     out = workspace.root / safe_folder_name(folder)
     known = workspace.known_ids_for_folder(out)
+    youtube = maybe_youtube_client()
+    ids: list[str] = []
+    if youtube is not None:
+        for page in iter_playlist_pages(youtube, playlist_id, max_pages=200):
+            ids.extend(v["id"] for v in page)
+        backend = "youtube-api"
+    else:
+        if not ytdlp_available():
+            raise ListingUnavailable(LISTING_HELP)
+        _title, ids = ytdlp_list(f"https://www.youtube.com/playlist?list={playlist_id}")
+        backend = "yt-dlp"
     new_ids: list[str] = []
-    for page in iter_playlist_pages(youtube, playlist_id, max_pages=200):
-        new_ids.extend(v["id"] for v in page if v["id"] not in known and v["id"] not in new_ids)
+    for vid in ids:
+        if vid not in known and vid not in new_ids:
+            new_ids.append(vid)
     if limit is not None:
         new_ids = new_ids[:limit]
-    result = {"playlist_id": playlist_id, "folder": out.name, "new": new_ids}
+    result = {"playlist_id": playlist_id, "folder": out.name, "listing": backend, "new": new_ids}
     if not dry_run:
         result["counts"] = extract_videos(
             new_ids, out, channel_name=folder, youtube=youtube, languages=languages

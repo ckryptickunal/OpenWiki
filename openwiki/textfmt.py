@@ -69,6 +69,17 @@ def _loose(text: str) -> str:
     return re.sub(r"\s+", " ", folded).strip()
 
 
+def first_mention(transcript: str, name: str) -> int | None:
+    """Timestamp (seconds) of the first caption cue that mentions `name` as whole words."""
+    needle = _loose(name)
+    if len(needle) < 3:
+        return None
+    for seconds, text in parse_cues(transcript):
+        if seconds is not None and f" {needle} " in f" {_loose(text)} ":
+            return seconds
+    return None
+
+
 def locate_in_transcript(transcript: str, needle: str) -> tuple[bool, int | None]:
     """Find `needle` in a transcript. Returns (found, timestamp seconds or None).
 

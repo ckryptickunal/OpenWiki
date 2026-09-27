@@ -56,6 +56,10 @@
   wiki/sources/jNQXAC9IVRw-me-at-the-zoo.md
   wiki/entities/jawed-karim.md
   wiki/topics/internet-history.md</code></pre></div>
+<h3>Find it again</h3>
+<p><code>openwiki search</code> is offline full-text search across every transcript, article and page, and each transcript hit links to the second it was said. <code>openwiki ask</code> answers from your own sources with numbered citations, and says "Not in your sources." instead of guessing.</p>
+<div class="code"><pre><code><span class="p">$ </span><span class="cmd">openwiki search cold email reply rates</span>
+<span class="p">$ </span><span class="cmd">openwiki ask &quot;What reply rate is good for cold email?&quot;</span></code></pre></div>
 <h3>Incremental and safe to re-run</h3>
 <p>Unchanged files are skipped, failures are listed in <code>wiki/ingest_failures.json</code> and retried next time, and <code>openwiki lint</code> reports broken links, missing frontmatter and orphan pages. The raw text files stay the source of truth, so you can always rebuild the wiki.</p>
 </div>
