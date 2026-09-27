@@ -1,0 +1,7 @@
+renders/
+snapshots/
+assets/audio/
+node_modules/
+*.bak
+sheet.jpg
+.hyperframes/

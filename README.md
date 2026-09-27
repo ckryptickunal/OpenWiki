@@ -12,6 +12,10 @@ An open-source Python CLI that downloads YouTube transcripts and web articles, t
 
 [Website](https://openwiki-delta.vercel.app/openwiki/) · [Quickstart](#quickstart) · [Commands](#commands) · [LLM providers](#llm-providers) · [FAQ](#faq) · [Sponsor](https://github.com/sponsors/ckryptickunal)
 
+<a href="https://openwiki-delta.vercel.app/openwiki/#film"><img src="site/img/launch-poster.jpg" alt="Watch the 44-second OpenWiki launch film: Founder Book's 1,219 videos and 354 essays compiled into 8,768 linked Markdown pages" width="760"></a>
+
+<sub>44-second launch film · <a href="https://openwiki-delta.vercel.app/openwiki/#film">watch on the website</a> · <a href="site/assets/openwiki-launch.mp4">MP4</a> · every number in it is sourced in <a href="Marketing/launch-video/FACTS.md">FACTS.md</a></sub>
+
 </div>
 
 ---

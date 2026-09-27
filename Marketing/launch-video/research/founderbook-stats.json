@@ -1,0 +1,353 @@
+{
+  "meta": {
+    "founder_book_commit": "6104879",
+    "openwiki_head": "35765bb",
+    "tokenizer": "tiktoken o200k_base (cl100k_base also given for totals)",
+    "scripts": [
+      "scratchpad/stats.py",
+      "scratchpad/lookup.py"
+    ],
+    "run_with": "uv run --with tiktoken python <script>"
+  },
+  "corpus": {
+    "raw_files_tracked": 1573,
+    "by_folder": {
+      "Garry Tan": 175,
+      "Paul Graham": 233,
+      "Sam Altman": 121,
+      "Y Combinator": 887,
+      "YC Root Access": 157
+    },
+    "by_channel_header": {
+      "Garry Tan": 175,
+      "Paul Graham Essays": 215,
+      "Paul Graham (web)": 18,
+      "Sam Altman Essays": 112,
+      "Sam Altman (web)": 9,
+      "Y Combinator": 887,
+      "YC Root Access": 113,
+      "null": 44
+    },
+    "youtube_files": 1219,
+    "youtube_unique_video_ids": 1219,
+    "duplicate_video_ids_across_files": 0,
+    "youtube_unique_with_duration": 1162,
+    "youtube_unique_without_duration": 57,
+    "transcript_seconds_known": 1677564,
+    "transcript_hours_known": 465.99,
+    "essay_files": 354,
+    "essay_files_pg": 233,
+    "essay_files_sa": 121,
+    "essay_duplicate_titles": 0,
+    "raw_words_body": 6177500,
+    "raw_words_youtube": 5507503,
+    "raw_words_essays": 669997,
+    "raw_chars": 33965461,
+    "notes": "Raw = git-tracked *.txt in the 5 author/channel folders. Words = whitespace split of transcript body (after TRANSCRIPT header). Hours = sum of ISO-8601 Duration headers for 1162 of 1219 videos; 57 files lack a Duration header, so 465.99h is a lower bound."
+  },
+  "wiki": {
+    "tracked_md_files": 8768,
+    "by_folder": {
+      "entities": 3686,
+      "wiki/index.md": 1,
+      "wiki/schema.md": 1,
+      "sources": 1616,
+      "topics": 3464
+    },
+    "by_frontmatter_type": {
+      "source": 1616,
+      "entity": 3686,
+      "topic": 3464,
+      "index (no frontmatter)": 1,
+      "schema (no frontmatter; its code sample contains type:)": 1
+    },
+    "wikilinks_total_all_files": 38437,
+    "wikilinks_total_excluding_index": 29670,
+    "wikilinks_in_index": 8766,
+    "unique_link_targets_all": 8769,
+    "unique_link_targets_excluding_index": 8702,
+    "unique_targets_resolving_to_a_page": 8766,
+    "unique_targets_unresolved": 3,
+    "pages_with_zero_inbound_links_excl_index": 66,
+    "top10_entities_by_backlinks": [
+      {
+        "target": "entities/y-combinator",
+        "title": "Y Combinator",
+        "backlinking_pages": 945
+      },
+      {
+        "target": "entities/paul-graham",
+        "title": "Paul Graham",
+        "backlinking_pages": 336
+      },
+      {
+        "target": "entities/sam-altman",
+        "title": "Sam Altman",
+        "backlinking_pages": 187
+      },
+      {
+        "target": "entities/garry-tan",
+        "title": "Garry Tan",
+        "backlinking_pages": 175
+      },
+      {
+        "target": "entities/google",
+        "title": "Google",
+        "backlinking_pages": 171
+      },
+      {
+        "target": "entities/airbnb",
+        "title": "Airbnb",
+        "backlinking_pages": 117
+      },
+      {
+        "target": "entities/openai",
+        "title": "OpenAI",
+        "backlinking_pages": 116
+      },
+      {
+        "target": "entities/facebook",
+        "title": "Facebook",
+        "backlinking_pages": 89
+      },
+      {
+        "target": "entities/michael-seibel",
+        "title": "Michael Seibel",
+        "backlinking_pages": 79
+      },
+      {
+        "target": "entities/stripe",
+        "title": "Stripe",
+        "backlinking_pages": 77
+      }
+    ],
+    "top10_topics_by_backlinks": [
+      {
+        "target": "topics/product-market-fit",
+        "title": "Product-Market Fit",
+        "backlinking_pages": 89
+      },
+      {
+        "target": "topics/founder-psychology",
+        "title": "Founder Psychology",
+        "backlinking_pages": 61
+      },
+      {
+        "target": "topics/startup-strategy",
+        "title": "Startup Strategy",
+        "backlinking_pages": 55
+      },
+      {
+        "target": "topics/startup-culture",
+        "title": "Startup Culture",
+        "backlinking_pages": 48
+      },
+      {
+        "target": "topics/entrepreneurship",
+        "title": "Entrepreneurship",
+        "backlinking_pages": 41
+      },
+      {
+        "target": "topics/product-development",
+        "title": "Product Development",
+        "backlinking_pages": 33
+      },
+      {
+        "target": "topics/fundraising-strategy",
+        "title": "Fundraising Strategy",
+        "backlinking_pages": 27
+      },
+      {
+        "target": "topics/startup-growth",
+        "title": "Startup Growth",
+        "backlinking_pages": 27
+      },
+      {
+        "target": "topics/startup-pivoting",
+        "title": "Startup Pivoting",
+        "backlinking_pages": 23
+      },
+      {
+        "target": "topics/startup-scaling",
+        "title": "Startup Scaling",
+        "backlinking_pages": 23
+      }
+    ],
+    "wiki_words": 1412090,
+    "synthesis_pages": 0,
+    "notes": "Pages = git-tracked wiki/*.md. log.md is gitignored and excluded. Backlinks = distinct non-index pages containing [[target]]. Known duplicates exist (e.g. entities/paul-graham and entities/paul-graham-pg; topics/do-things-that-don-t-scale and doing-things-that-don-t-scale)."
+  },
+  "tokens": {
+    "encoding_primary": "o200k_base",
+    "raw_corpus_tokens_o200k": 7854123,
+    "raw_corpus_body_only_tokens_o200k": 7578500,
+    "wiki_tokens_o200k": 2739706,
+    "wiki_tokens_by_folder_o200k": {
+      "entities": 658907,
+      "wiki/index.md": 147646,
+      "wiki/schema.md": 414,
+      "sources": 1379015,
+      "topics": 553724
+    },
+    "index_md_tokens_o200k": 147646,
+    "raw_corpus_tokens_cl100k": 8072867,
+    "wiki_tokens_cl100k": 2768772
+  },
+  "per_source": {
+    "raw_ids_with_source_page": 1573,
+    "raw_ids_total": 1573,
+    "source_pages_total": 1616,
+    "video_ids_with_multiple_source_pages": 43,
+    "median_raw_to_source_ratio": 3.49,
+    "p25": 1.2,
+    "p75": 8.05,
+    "min": 0.27,
+    "max": 100.61,
+    "median_ratio_youtube": 4.52,
+    "n_youtube": 1219,
+    "median_ratio_essays": 2.0,
+    "n_essays": 354,
+    "share_where_source_page_is_larger_than_raw": 0.214,
+    "median_raw_tokens": 3397,
+    "median_source_page_tokens": 786
+  },
+  "agent_lookup": {
+    "encoding": "o200k_base",
+    "method": "wiki path = entry topic/entity page + 3 source pages; raw path = the 3 raw files behind those same source pages (best case for raw: agent already knows which files)",
+    "questions": [
+      {
+        "question": "What does Paul Graham say about doing things that don't scale?",
+        "entry_page": "topics/doing-things-that-don-t-scale.md",
+        "entry_tokens": 232,
+        "source_pages": [
+          "sources/pg-do-things-that-don-t-scale-do-things-that-don-t-scale.md",
+          "sources/oQOC-qy-GDY-lecture-8-how-to-get-started-doing-things-that-don-t-scale-press.md",
+          "sources/sr0UabJd8qE-how-to-get-started-doing-things-that-don-t-scale-and-press-how-to-start-a-startup-2014-8.md"
+        ],
+        "source_page_tokens": [
+          874,
+          873,
+          895
+        ],
+        "raw_files": [
+          "Paul Graham/pg-do-things-that-don-t-scale.txt",
+          "YC Root Access/oQOC-qy-GDY.txt",
+          "Y Combinator/sr0UabJd8qE.txt"
+        ],
+        "raw_file_tokens": [
+          5263,
+          13104,
+          13085
+        ],
+        "wiki_path_tokens": 2874,
+        "raw_same_sources_tokens": 31452,
+        "ratio_raw_over_wiki": 10.94,
+        "naive_raw_grep": {
+          "pattern": "don['\u2019]?t scale",
+          "files_matched": 68,
+          "tokens_in_matched_files": 611954
+        }
+      },
+      {
+        "question": "What does Dylan Field say about design and AI?",
+        "entry_page": "entities/dylan-field.md",
+        "entry_tokens": 279,
+        "source_pages": [
+          "sources/-7Qz7tSTfUU-dylan-field-scaling-figma-and-the-future-of-design.md",
+          "sources/4UE4e6b2qtA-figma-s-dylan-field-exploring-the-idea-maze-vibe-coding-and-the-power-of-locking-in.md",
+          "sources/Rb3QHKjOWqQ-figma-s-20b-10-year-overnight-success.md"
+        ],
+        "source_page_tokens": [
+          864,
+          883,
+          693
+        ],
+        "raw_files": [
+          "Y Combinator/-7Qz7tSTfUU.txt",
+          "Y Combinator/4UE4e6b2qtA.txt",
+          "Garry Tan/Rb3QHKjOWqQ.txt"
+        ],
+        "raw_file_tokens": [
+          10474,
+          9220,
+          2597
+        ],
+        "wiki_path_tokens": 2719,
+        "raw_same_sources_tokens": 22291,
+        "ratio_raw_over_wiki": 8.2,
+        "naive_raw_grep": {
+          "pattern": "dylan field",
+          "files_matched": 7,
+          "tokens_in_matched_files": 51727
+        }
+      },
+      {
+        "question": "What does 'default alive' mean and how do I tell if my startup is?",
+        "entry_page": "topics/default-alive.md",
+        "entry_tokens": 205,
+        "source_pages": [
+          "sources/pg-default-alive-or-default-dead-default-alive-or-default-dead.md",
+          "sources/ANrzH3ra8e8-reham-fagiri-and-kalam-dennis-at-startup-school-sv-2016.md",
+          "sources/khY3REOst-A-startup-next-steps-after-raising-your-first-million-from-a-forbes-top-100-vc-office-hours-.md"
+        ],
+        "source_page_tokens": [
+          732,
+          810,
+          831
+        ],
+        "raw_files": [
+          "Paul Graham/pg-default-alive-or-default-dead.txt",
+          "Y Combinator/ANrzH3ra8e8.txt",
+          "Garry Tan/khY3REOst-A.txt"
+        ],
+        "raw_file_tokens": [
+          1850,
+          5360,
+          4144
+        ],
+        "wiki_path_tokens": 2578,
+        "raw_same_sources_tokens": 11354,
+        "ratio_raw_over_wiki": 4.4,
+        "naive_raw_grep": {
+          "pattern": "default alive",
+          "files_matched": 14,
+          "tokens_in_matched_files": 73696
+        }
+      }
+    ],
+    "total_wiki_tokens": 8171,
+    "total_raw_tokens": 65097,
+    "aggregate_ratio": 7.97,
+    "median_per_question_ratio": 8.2
+  },
+  "snippets": [
+    {
+      "kind": "entity backlinks",
+      "page": "entities/y-combinator.md",
+      "title": "Y Combinator",
+      "backlinking_pages": 945
+    },
+    {
+      "kind": "topic",
+      "page": "topics/product-market-fit.md",
+      "title": "Product-Market Fit",
+      "backlinking_pages": 89,
+      "overview": "The process of identifying a critical customer pain point and developing a solution that elicits a strong, positive emotional response, as exemplified by the 'goosebumps' moment."
+    },
+    {
+      "kind": "person",
+      "page": "entities/dylan-field.md",
+      "title": "Dylan Field",
+      "overview": "Co-founder and CEO of Figma.",
+      "backlinking_pages": 4,
+      "verified_quote": "It feels intuitively like we're in the MS DOS era of AI right now.",
+      "quote_source": "Y Combinator/-7Qz7tSTfUU.txt (verified by grep)"
+    },
+    {
+      "kind": "person",
+      "page": "entities/paul-graham.md",
+      "title": "Paul Graham",
+      "backlinking_pages": 336
+    }
+  ]
+}

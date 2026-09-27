@@ -393,3 +393,10 @@ img { display: block; max-width: 100%; }
   .js .wordmark-veil { animation: none; }
   .pile-card, .polaroid, .divider, .h2, .head, .cta, .faq-sign, .faq-sign::after { transition: none; }
 }
+
+/* ---------- launch film ---------- */
+
+.film { margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 12px; background: #15100c;
+  box-shadow: var(--shadow-soft); }
+.film figcaption { margin: 0; }
