@@ -310,6 +310,15 @@ def ytdlp_available() -> bool:
         return shutil.which("yt-dlp") is not None
 
 
+class _SilentLogger:
+    def debug(self, msg: str) -> None: ...
+    def info(self, msg: str) -> None: ...
+    def warning(self, msg: str) -> None: ...
+
+    def error(self, msg: str) -> None:
+        print(msg, file=sys.stderr)
+
+
 def _ytdlp_json(url: str) -> dict:
     """Flat listing of a channel/playlist page as yt-dlp JSON (no downloads)."""
     try:
@@ -317,7 +326,10 @@ def _ytdlp_json(url: str) -> dict:
     except ImportError:
         yt_dlp = None
     if yt_dlp is not None:
-        options = {"extract_flat": "in_playlist", "quiet": True, "no_warnings": True, "skip_download": True}
+        options = {
+            "extract_flat": "in_playlist", "quiet": True, "no_warnings": True, "skip_download": True,
+            "logger": _SilentLogger(),  # yt-dlp otherwise prints notices (e.g. Python version) to stdout
+        }
         with yt_dlp.YoutubeDL(options) as ydl:
             return ydl.extract_info(url, download=False)
     binary = shutil.which("yt-dlp")
