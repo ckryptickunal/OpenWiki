@@ -1,0 +1,6 @@
+renders/
+snapshots/
+assets/shots/
+music/take-*.mp3
+music/*.wav
+music/log-*.txt

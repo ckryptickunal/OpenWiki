@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>OpenWiki: turn what you watch into what you know</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+      @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono.ttf") format("truetype"); font-weight: 100 800; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #15100c; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #15100c; color: #faf6f2; -webkit-font-smoothing: antialiased; }
+      #stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+      .shot { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+      canvas { position: absolute; inset: 0; }
+      .vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(21,16,12,0) 45%, rgba(21,16,12,.85) 100%); pointer-events: none; }
+      .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; background: linear-gradient(180deg, rgba(21,16,12,0), rgba(21,16,12,.92)); }
+      #lyric { position: absolute; left: 0; right: 0; bottom: 104px; text-align: center; z-index: 5; font: 500 34px/1 "JetBrains Mono"; letter-spacing: -0.01em; color: rgba(250,246,242,.95); white-space: pre; }
+      #lyric .cur { display: inline-block; width: 0.58em; height: 1.05em; margin-left: 2px; vertical-align: -0.16em; background: #f5c451; }
+      #term { position: absolute; left: 330px; top: 250px; width: 1260px; border-radius: 16px; background: rgba(27,20,15,.94); border: 1px solid rgba(250,246,242,.14);
+        box-shadow: 0 40px 120px -30px rgba(0,0,0,.8); overflow: hidden; opacity: 0; z-index: 4; }
+      #term .bar { height: 44px; display: flex; gap: 8px; align-items: center; padding: 0 18px; border-bottom: 1px solid rgba(250,246,242,.08); }
+      #term .bar i { width: 12px; height: 12px; border-radius: 50%; background: rgba(250,246,242,.18); }
+      #term .body { padding: 28px 34px 34px; font: 500 28px/1.6 "JetBrains Mono"; white-space: pre; }
+      #term .pr { color: #f5c451; } #term .mu { color: rgba(250,246,242,.45); } #term .am { color: #f5c451; }
+      #term .row { opacity: 0; }
+      #point { position: absolute; left: 960px; top: 470px; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #fff6dc;
+        box-shadow: 0 0 30px 10px rgba(245,196,81,.75), 0 0 140px 50px rgba(245,196,81,.25); opacity: 0; z-index: 3; }
+      #title { position: absolute; left: 0; right: 0; top: 400px; text-align: center; z-index: 6; opacity: 0; }
+      #title .w { font: 600 150px/1 "Inter Display"; letter-spacing: -0.045em; color: #faf6f2; text-shadow: 0 0 60px rgba(21,16,12,.9); }
+      #title .u { margin-top: 30px; font: 500 26px/1 "JetBrains Mono"; color: rgba(250,246,242,.6); }
+      #flash { position: absolute; inset: 0; background: #ffe7a8; opacity: 0; z-index: 20; }
+      #fade { position: absolute; inset: 0; background: #15100c; opacity: 0; z-index: 21; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1920" data-height="1080">
+      <div id="stage">
+        <video class="clip shot" id="v0" src="assets/shots/0-eyes4.mp4" muted playsinline data-start="0" data-duration="3.8" data-track-index="0"></video>
+        <video class="clip shot" id="v1" src="assets/shots/1-eyes3.mp4" muted playsinline data-start="3.8" data-duration="3.55" data-track-index="1"></video>
+        <video class="clip shot" id="v2" src="assets/shots/2-papers3.mp4" muted playsinline data-start="7.35" data-duration="2.2" data-track-index="0"></video>
+        <video class="clip shot" id="v3" src="assets/shots/3-think0.mp4" muted playsinline data-start="9.55" data-duration="3.65" data-track-index="1"></video>
+        <video class="clip shot" id="v4" src="assets/shots/4-stage2.mp4" muted playsinline data-start="15" data-duration="1.9" data-track-index="0"></video>
+        <video class="clip shot" id="v5" src="assets/shots/5-flip3.mp4" muted playsinline data-start="16.9" data-duration="1.73" data-track-index="1"></video>
+        <video class="clip shot" id="v6" src="assets/shots/6-write3.mp4" muted playsinline data-start="18.63" data-duration="4.77" data-track-index="0"></video>
+        <canvas id="g" width="1920" height="1080"></canvas>
+        <div id="point"></div>
+      </div>
+      <div id="term">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="body"><div class="row" id="r0"><span class="pr">$ </span><span id="cmd"></span></div><div class="row" id="r1">1. Why You're Getting Zero Replies To Your Cold Emails <span class="am">[3:46]</span></div><div class="row mu" id="r2">   Y Combinator/wr6PMD06hP0.txt</div><div class="row" id="r3">   …It's also far easier to start with your warm network.</div></div>
+      </div>
+      <div id="title"><div class="w">OpenWiki</div><div class="u">free and open source · github.com/ckryptickunal/OpenWiki</div></div>
+      <div class="shade"></div>
+      <div id="lyric"><span id="lt"></span><span class="cur" id="cur"></span></div>
+      <div id="flash"></div>
+      <div id="fade"></div>
+    </div>
+
+    <script src="assets/js/graph-data.js"></script>
+    <script>
+      // Lyrics exactly as sung (checked against the audio), typed across the time each line is sung.
+      const LYRICS = [
+        [0.19, 5.4, 7.2, "i watched a thousand hours of light,"],
+        [7.35, 12.5, 14.7, "saved every word, then lost it overnight."],
+        [14.99, 18.1, 18.55, "now every talk, every page i read"],
+        [18.63, 22.4, 23.3, "comes back to me the moment i need."],
+        [23.4, 28.2, 30.0, "turn what you watch into what you know."],
+      ];
+      const DROP = 15.0, BEAT = 0.6733 / 1.047;
+      function type(tl, el, text, a, b) {
+        const o = { n: 0 };
+        tl.fromTo(o, { n: 0 }, { n: text.length, duration: b - a, ease: "none", onUpdate: () => { el.textContent = text.slice(0, Math.round(o.n)); } }, a);
+      }
+      function lyrics(tl) {
+        const lt = document.getElementById("lt");
+        LYRICS.forEach(([a, b, clear, text], i) => {
+          type(tl, lt, text, a, b);
+          if (clear < 30) tl.call(() => {}, null, clear);  // keeps the line until the next one starts typing
+        });
+        tl.set("#cur", { opacity: 1 }, 0);
+        for (let t = 0.1; t < 29.6; t += 0.5) tl.set("#cur", { opacity: (Math.round(t * 2) % 2) ? 0.15 : 1 }, t);
+      }
+      function graph(tl, t0) {
+        const G = window.GRAPH, cv = document.getElementById("g"), ctx = cv.getContext("2d");
+        const n = G.n, E = G.edges, rr = new Float32Array(n);
+        for (let i = 0; i < n; i++) rr[i] = Math.hypot(G.x[i], G.y[i]);
+        const size = G.d.map((d) => 0.9 + Math.sqrt(Math.min(d, 400)) * 0.25);
+        const COL = ["rgba(250,246,242,.9)", "rgba(245,196,81,.95)", "rgba(229,137,90,.9)"];
+        const S = { reveal: 0, rot: -0.2, zoom: 0.7, dim: 1 }, P = new Float32Array(n * 2);
+        const draw = () => {
+          ctx.clearRect(0, 0, 1920, 1080);
+          const c = Math.cos(S.rot), s = Math.sin(S.rot), R = S.reveal * 1.05, RAD = 430 * S.zoom;
+          for (let i = 0; i < n; i++) { P[2*i] = 960 + (G.x[i]*c - G.y[i]*s) * RAD; P[2*i+1] = 470 + (G.x[i]*s + G.y[i]*c) * RAD; }
+          ctx.globalAlpha = S.dim; ctx.lineWidth = 0.6; ctx.strokeStyle = "rgba(245,196,81,.07)"; ctx.beginPath();
+          for (let k = 0; k < E.length; k += 2) { const a = E[k], b = E[k+1]; if (rr[a] > R || rr[b] > R) continue; ctx.moveTo(P[2*a], P[2*a+1]); ctx.lineTo(P[2*b], P[2*b+1]); }
+          ctx.stroke();
+          for (let ty = 0; ty < 3; ty++) { ctx.fillStyle = COL[ty]; ctx.beginPath();
+            for (let i = 0; i < n; i++) { if (G.t[i] !== ty) continue; const k = (R - rr[i]) / 0.07; if (k <= 0) continue; const r = size[i] * Math.min(1, k);
+              ctx.moveTo(P[2*i] + r, P[2*i+1]); ctx.arc(P[2*i], P[2*i+1], r, 0, Math.PI * 2); }
+            ctx.fill(); }
+          ctx.globalAlpha = 1;
+        };
+        tl.fromTo(S, { reveal: 0 }, { reveal: 1, duration: 1.8, ease: "power3.out", onUpdate: draw }, t0);
+        tl.fromTo(S, { rot: -0.2, zoom: 0.7 }, { rot: 0.25, zoom: 1.12, duration: 30 - t0, ease: "none", onUpdate: draw }, t0);
+        tl.fromTo(S, { dim: 1 }, { dim: 0.45, duration: 1.0, ease: "power1.inOut", onUpdate: draw }, 25.3);
+      }
+      document.fonts.load('500 34px "JetBrains Mono"').then(() => document.fonts.load('600 150px "Inter Display"')).then(() => {
+        const tl = gsap.timeline({ paused: true });
+        lyrics(tl);
+        // text-footage shots: a slow push each, the first fades up from the dark
+        [["#v0", 0, 3.8], ["#v1", 3.8, 3.55], ["#v2", 7.35, 2.2], ["#v3", 9.55, 3.65], ["#v4", 15, 1.9], ["#v5", 16.9, 1.73], ["#v6", 18.63, 4.77]]
+          .forEach(([s, a, d], i) => tl.fromTo(s, { scale: 1.0 }, { scale: 1.07, duration: d, ease: "none" }, a));
+        tl.fromTo("#v0", { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power1.out" }, 0);
+        tl.to("#v3", { opacity: 0, duration: 1.2, ease: "power1.in" }, 12.0);          // "lost it overnight": the words fade out
+        tl.fromTo("#v6", { opacity: 0.4 }, { opacity: 0.4, duration: 0.01 }, 18.63);
+        // the breath before the drop: one warm point
+        tl.fromTo("#point", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 13.3);
+        tl.to("#point", { scale: 1.6, duration: 0.5, ease: "power2.in" }, 14.5);
+        tl.set("#point", { opacity: 0 }, DROP);
+        tl.fromTo("#flash", { opacity: 0.75 }, { opacity: 0, duration: 0.35, ease: "power2.out", immediateRender: false }, DROP);
+        // the drums: a small punch on every beat from the drop
+        for (let t = DROP; t < 29.5; t += BEAT) tl.fromTo("#stage", { scale: 1.025 }, { scale: 1, duration: 0.3, ease: "power2.out", immediateRender: false }, t);
+        // "comes back to me the moment I need": the real search result
+        tl.fromTo("#term", { opacity: 0, y: 30, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" }, 18.7);
+        tl.set("#r0", { opacity: 1 }, 18.9);
+        type(tl, document.getElementById("cmd"), "openwiki search warm network", 18.95, 19.9);
+        tl.fromTo("#r1", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 20.25);
+        tl.fromTo("#r2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 20.5);
+        tl.fromTo("#r3", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 20.8);
+        tl.to("#term", { opacity: 0, duration: 0.3, ease: "power1.in" }, 23.05);
+        // "turn what you watch into what you know": the graph blooms, the name lands
+        graph(tl, 23.4);
+        tl.fromTo("#flash", { opacity: 0.35 }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, 23.4);
+        tl.fromTo("#title", { opacity: 0, y: 20, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.1, ease: "power3.out" }, 25.4);
+        tl.to("#fade", { opacity: 1, duration: 0.7, ease: "power1.in" }, 29.3);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      });
+    </script>
+  </body>
+</html>

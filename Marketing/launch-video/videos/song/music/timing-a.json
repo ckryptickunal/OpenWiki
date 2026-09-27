@@ -1,0 +1,102 @@
+{
+  "lines": [
+    {
+      "text": "I watched a thousand hours of light",
+      "start": 0.6,
+      "end": 6.0
+    },
+    {
+      "text": "Saved every word and lost it overnight",
+      "start": 8.0,
+      "end": 14.3
+    },
+    {
+      "text": "And now every talk",
+      "start": 15.3,
+      "end": 18.0
+    },
+    {
+      "text": "Every page I read",
+      "start": 18.0,
+      "end": 20.5
+    },
+    {
+      "text": "Comes back to me the moment I need",
+      "start": 20.5,
+      "end": 23.5
+    },
+    {
+      "text": "Turn what you watch into what you know",
+      "start": 23.5,
+      "end": 26.5
+    },
+    {
+      "text": "Know what you know",
+      "start": 26.5,
+      "end": 29.5
+    },
+    {
+      "text": "Never around ohhh",
+      "start": 30.0,
+      "end": 36.7
+    },
+    {
+      "text": "I remember it all now",
+      "start": 36.7,
+      "end": 42.5
+    },
+    {
+      "text": "Mmm",
+      "start": 43.0,
+      "end": 46.5
+    },
+    {
+      "text": "Now every talk",
+      "start": 47.4,
+      "end": 49.0
+    },
+    {
+      "text": "Every page I read",
+      "start": 49.0,
+      "end": 51.5
+    },
+    {
+      "text": "Comes back to me the moment I need",
+      "start": 51.5,
+      "end": 54.6
+    },
+    {
+      "text": "Turn what you watch into what you know",
+      "start": 54.6,
+      "end": 57.6
+    },
+    {
+      "text": "Know what you know",
+      "start": 57.6,
+      "end": 60.6
+    }
+  ],
+  "sections": [
+    {
+      "name": "Intro",
+      "start": 0.0,
+      "end": 15.3
+    },
+    {
+      "name": "Chorus",
+      "start": 15.3,
+      "end": 29.5
+    },
+    {
+      "name": "Bridge",
+      "start": 29.5,
+      "end": 47.4
+    },
+    {
+      "name": "Outro",
+      "start": 47.4,
+      "end": 63.0
+    }
+  ],
+  "notes": "The drums come in with a big hit at 30.5 seconds and stop playing at 46.5 seconds."
+}

@@ -1,0 +1,29 @@
+{
+  "model_id": "music_v2_5",
+  "with_timestamps": true,
+  "composition_plan": {
+    "chunks": [
+      {
+        "text": "I watched a thousand hours of light,\nsaved every word, then lost it overnight.",
+        "duration_ms": 10000,
+        "positive_styles": ["intimate", "warm female vocal", "soft felt piano", "late night", "cinematic indie", "close-mic breathy vocal", "90 bpm"],
+        "negative_styles": ["drums", "rap", "autotune", "EDM"],
+        "context_adherence": "high"
+      },
+      {
+        "text": "Now every talk, every page I read\ncomes back to me the moment I need.\nTurn what you watch into what you know.",
+        "duration_ms": 14000,
+        "positive_styles": ["anthemic chorus", "big cinematic drums enter", "warm analog synth pulse", "soaring female vocal", "emotional lift", "90 bpm"],
+        "negative_styles": ["rap", "autotune", "EDM drop", "screaming"],
+        "context_adherence": "high"
+      },
+      {
+        "text": "",
+        "duration_ms": 6000,
+        "positive_styles": ["instrumental outro", "piano motif rings out", "drums stop", "gentle ending", "fade to silence"],
+        "negative_styles": ["vocals", "drums"],
+        "context_adherence": "high"
+      }
+    ]
+  }
+}
