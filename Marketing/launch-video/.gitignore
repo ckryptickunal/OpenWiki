@@ -6,3 +6,9 @@ node_modules/
 sheet.jpg
 .hyperframes/
 .media/
+
+# v4 (motion-launch-videos): renders, stills and the font binaries are rebuilt locally
+videos/*/renders/
+videos/*/stills/
+videos/*/fonts/*.woff2
+videos/*/src/film.html

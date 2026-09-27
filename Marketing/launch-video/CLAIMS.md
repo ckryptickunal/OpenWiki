@@ -2,6 +2,20 @@
 
 Rule: a line goes into the film only if it is either (a) a measured fact with a reproducible method, (b) verified behaviour of OpenWiki 0.3.0 code, (c) a primary-sourced external finding, or (d) plainly rhetorical and not a factual claim. Checked 2026-09-27.
 
+## v4 (26 s kinetic-type cut, current)
+
+Source: `videos/openwiki-launch/` (made with the motion-launch-videos skill). Every line reuses evidence from the v3 rows below; the row-by-row table is in `videos/openwiki-launch/BRIEF.md`.
+
+| On screen | Evidence |
+|---|---|
+| "You watched it." / "You saved it." / "You can’t find it." + real YC and Paul Graham titles, the typed question | rhetorical; see "The problem, for people" |
+| "Your AI starts over." · `ONE IDEA MATCHES 68 RAW FILES · 611,954 TOKENS` | an agent answering from raw files re-reads them per question; numbers from `research/naive_list.py` ("matches", not "reads") |
+| "OpenWiki compiles it once." | ingest writes pages once; re-runs read only new or changed sources |
+| "A wiki you own." · `FOUNDER BOOK, SAME PIPELINE:` `1,219 VIDEOS + 354 ESSAYS → 8,768 PAGES` + the real link graph | Markdown files on your disk, MIT; "same pipeline", not "built with OpenWiki" |
+| "You find the moment." · `$ openwiki search warm network` → the real 0.3.0 result at `[3:46]` | `research/demo-0.3.0/search-output.txt` |
+| "Your AI reads less." · `MEDIAN SUMMARY PAGE: 786 TOKENS` · `MEDIAN RAW SOURCE: 3,397 TOKENS` | `founderbook-stats.json`: `median_source_page_tokens` 786, `median_raw_tokens` 3397, over all 1,573 sources. A median statement, not a guarantee: 21% of pages are longer than their source |
+| End card: github.com/ckryptickunal/OpenWiki · FREE AND OPEN SOURCE · MIT | LICENSE; no pip line until PyPI is live |
+
 ## The problem, for people
 
 | On screen | Type | Evidence |

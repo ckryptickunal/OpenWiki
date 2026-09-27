@@ -1,5 +1,37 @@
 # OpenWiki launch film: script and plan
 
+## v4 (current): 26-second kinetic-type film
+
+Feedback on v3: too long, too slow, the message unclear. v4 keeps v1's hook, cuts to one idea per beat, and is built with the [motion-launch-videos](https://github.com/Kimeur/motion-launch-videos) skill: one canvas HTML file, closed-form springs, per-letter motion, real subframe motion blur (up to 64 samples a frame), smash-pans, a mask wipe through the letterforms, and a seamless loop.
+
+| Time | Beat | Small print (real text) |
+|---|---|---|
+| 0.0 | You watched it. | Y COMBINATOR · HOW TO GET AI STARTUP IDEAS · 43:49 |
+| 2.0 | You saved it. | PAULGRAHAM.COM · DO THINGS THAT DON’T SCALE |
+| 4.0 | You can’t find it. | which video had the warm network advice? |
+| 7.0 | Your AI starts over. | ONE IDEA MATCHES 68 RAW FILES · 611,954 TOKENS |
+| 10.0 | OpenWiki compiles it once. | (mask wipe through “starts over.”) |
+| 12.25 | A wiki you own. | FOUNDER BOOK, SAME PIPELINE: 1,219 VIDEOS + 354 ESSAYS → 8,768 PAGES, with the real link graph |
+| 15.5 | You find the moment. | $ openwiki search warm network → Why You're Getting Zero Replies To Your Cold Emails [3:46] |
+| 18.4 | Your AI reads less. | MEDIAN SUMMARY PAGE: 786 TOKENS · MEDIAN RAW SOURCE: 3,397 TOKENS |
+| 21.5 | OpenWiki · github.com/ckryptickunal/OpenWiki | FREE AND OPEN SOURCE · MIT |
+
+Look: OpenWiki's night palette (espresso `#15100C`, paper `#FAF6F2`, amber `#F5C451`), Inter Display Bold in sentence case, JetBrains Mono for the small print. Sound: effects only, each on an on-screen event (`mix-sfx.sh`); no music.
+
+Build and render (from `videos/openwiki-launch/`; `S=~/.claude/skills/motion-launch-videos/scripts`):
+```bash
+node src/assemble.mjs                 # engine template + src/film-block.js + src/graph.json -> src/film.html
+node $S/render.mjs stills .           # critique + stills
+node $S/render.mjs loopcheck .        # must be 0
+node $S/render.mjs render .           # renders/openwiki-launch.mp4 (silent), preview.gif, poster.png
+bash mix-sfx.sh                       # renders/openwiki-launch-sfx.mp4
+```
+The fonts are Inter 4.0 (instanced at opsz 32, wght 700/600) and JetBrains Mono 500, subset to WOFF2 with fontTools into `fonts/` (not committed).
+
+---
+
+## v3 (57 s, retired)
+
 **Message:** Everything you watch and read can compile itself into a wiki you own.
 **Format:** 16:9 master at 1920x1080 for Product Hunt (YouTube link), X and LinkedIn on desktop. A 1:1 or 4:5 cut for mobile feeds is a follow-up.
 **Length:** 57 seconds. No voiceover and no music: sound effects only, each tied to something on screen (chips, typing, cuts, cards, the lockup).
