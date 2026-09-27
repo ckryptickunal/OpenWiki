@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>A certain kind of person</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: "Inter Display", sans-serif; -webkit-font-smoothing: antialiased; }
+      .scene { position: absolute; inset: 0; overflow: hidden; background: #000; }
+      .photo { position: absolute; left: -144px; top: -81px; width: 2208px; height: 1242px; transform-origin: 50% 50%; }
+      canvas { position: absolute; inset: 0; }
+      .scene::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 480px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.72)); pointer-events: none; }
+      .line { position: absolute; left: 128px; bottom: 112px; z-index: 2; font: 600 46px/1.2 "Inter Display"; letter-spacing: -0.012em; color: rgba(255,255,255,.94); opacity: 0; text-shadow: 0 2px 24px rgba(0,0,0,.35); }
+      .line.center { left: 0; right: 0; bottom: auto; top: 50%; transform: translateY(-50%); text-align: center; }
+      #lg { opacity: 1; }
+      .gw { display: inline-block; opacity: 0; margin-right: 0.28em; }
+      #end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; }
+      .tile { width: 132px; height: 132px; border-radius: 30px; background: linear-gradient(180deg, #2a2a2a, #0d0d0d); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 0 0 1px rgba(255,255,255,.06); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+      .tile b { font-weight: 700; line-height: 1; background: linear-gradient(180deg, #f4f4f4, #b8b8b8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .tile .a1 { font-size: 34px; } .tile .a2 { font-size: 50px; letter-spacing: -0.02em; }
+      .word { margin-top: 34px; font: 700 64px/1 "Inter Display"; letter-spacing: -0.03em; color: #fff; }
+      .tag { margin-top: 22px; font: 600 30px/1.2 "Inter Display"; color: rgba(255,255,255,.72); letter-spacing: -0.005em; }
+      .url { position: absolute; bottom: 96px; left: 0; right: 0; text-align: center; font: 600 22px/1 "Inter Display"; color: rgba(255,255,255,.5); letter-spacing: 0.01em; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="61.6" data-width="1920" data-height="1080">
+      <section id="s0" class="clip scene" data-start="0.0" data-duration="3.41" data-track-index="0">
+        <img class="photo" id="p0" src="assets/photos/win2.jpg" alt="" />
+        <div class="line" id="l0">there’s a certain kind of person</div>
+      </section>
+      <section id="s1" class="clip scene" data-start="3.41" data-duration="3.34" data-track-index="0">
+        <img class="photo" id="p1" src="assets/photos/night1.jpg" alt="" />
+        <div class="line" id="l1">who watches the whole talk</div>
+      </section>
+      <section id="s2" class="clip scene" data-start="6.75" data-duration="3.33" data-track-index="0">
+        <img class="photo" id="p2" src="assets/photos/read3.jpg" alt="" />
+        <div class="line" id="l2">who reads the essay twice</div>
+      </section>
+      <section id="s3" class="clip scene" data-start="10.08" data-duration="2.66" data-track-index="0">
+        <img class="photo" id="p3" src="assets/photos/write2.jpg" alt="" />
+        <div class="line" id="l3">who writes it all down at 2 a.m.</div>
+      </section>
+      <section id="s4" class="clip scene" data-start="12.74" data-duration="2.67" data-track-index="0">
+        <img class="photo" id="p4" src="assets/photos/note3.jpg" alt="" />
+        <div class="line" id="l4">and can’t find it by morning</div>
+      </section>
+      <section id="s5" class="clip scene" data-start="15.41" data-duration="2.67" data-track-index="0">
+        <img class="photo" id="p5" src="assets/photos/win1.jpg" alt="" />
+        <div class="line" id="l5">who remembers the idea</div>
+      </section>
+      <section id="s6" class="clip scene" data-start="18.08" data-duration="3.0" data-track-index="0">
+        <img class="photo" id="p6" src="assets/photos/night4.jpg" alt="" />
+        <div class="line" id="l6">but not where it was</div>
+      </section>
+      <section id="s7" class="clip scene" data-start="21.08" data-duration="2.33" data-track-index="0">
+        <img class="photo" id="p7" src="assets/photos/code3.jpg" alt="" />
+        <div class="line" id="l7">who builds with an AI beside them</div>
+      </section>
+      <section id="s8" class="clip scene" data-start="23.41" data-duration="1.33" data-track-index="0">
+        <img class="photo" id="p8" src="assets/photos/lamp2.jpg" alt="" />
+        
+      </section>
+      <section id="s9" class="clip scene" data-start="24.74" data-duration="2.0" data-track-index="0">
+        <img class="photo" id="p9" src="assets/photos/code2.jpg" alt="" />
+        <div class="line" id="l9">and wants it to know what they know</div>
+      </section>
+      <section id="s10" class="clip scene" data-start="26.74" data-duration="2.0" data-track-index="0">
+        <img class="photo" id="p10" src="assets/photos/mic5.jpg" alt="" />
+        <div class="line" id="l10">every talk.</div>
+      </section>
+      <section id="s11" class="clip scene" data-start="28.74" data-duration="0.67" data-track-index="0">
+        <img class="photo" id="p11" src="assets/photos/lect3.jpg" alt="" />
+        
+      </section>
+      <section id="s12" class="clip scene" data-start="29.41" data-duration="1.0" data-track-index="0">
+        <img class="photo" id="p12" src="assets/photos/read2.jpg" alt="" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.42)"></div>
+        <div class="line" id="l12">every essay.</div>
+      </section>
+      <section id="s13" class="clip scene" data-start="30.41" data-duration="1.0" data-track-index="0">
+        <img class="photo" id="p13" src="assets/photos/paper1.jpg" alt="" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.25)"></div>
+        
+      </section>
+      <section id="s14" class="clip scene" data-start="31.41" data-duration="2.33" data-track-index="0">
+        <img class="photo" id="p14" src="assets/photos/write1.jpg" alt="" />
+        <div class="line" id="l14">every note.</div>
+      </section>
+      <section id="s15" class="clip scene" data-start="33.74" data-duration="0.67" data-track-index="0">
+        <img class="photo" id="p15" src="assets/photos/note5.jpg" alt="" />
+        
+      </section>
+      <section id="s16" class="clip scene" data-start="34.41" data-duration="6.33" data-track-index="0">
+        <canvas id="g" width="1920" height="1080"></canvas>
+        <div class="line" id="lg"><span class="gw" id="gw0">becomes a page.</span> <span class="gw" id="gw1">linked.</span> <span class="gw" id="gw2">searchable.</span> <span class="gw" id="gw3">yours.</span></div>
+      </section>
+      <section id="s17" class="clip scene" data-start="40.74" data-duration="2.46" data-track-index="0">
+        <img class="photo" id="p17" src="assets/photos/lib4.jpg" alt="" />
+        
+      </section>
+      <section id="s18" class="clip scene" data-start="43.2" data-duration="5.1" data-track-index="0">
+        <img class="photo" id="p18" src="assets/photos/win4.jpg" alt="" />
+        <div class="line" id="l18">for the ones who keep learning</div>
+      </section>
+      <section id="s19" class="clip scene" data-start="48.3" data-duration="5.1" data-track-index="0">
+        
+        <div class="line center" id="l19">and never want to lose a thing</div>
+      </section>
+      <section id="send" class="clip scene" data-start="53.4" data-duration="8.2" data-track-index="0">
+        <div id="end">
+          <div class="tile" id="tile"><b class="a1">&gt;</b><b class="a2">OW</b></div>
+          <div class="word" id="word">OpenWiki</div>
+          <div class="tag" id="tag">turn what you watch into what you know.</div>
+        </div>
+        <div class="url" id="url">free and open source · github.com/ckryptickunal/OpenWiki</div>
+      </section>
+      <div id="fade" style="position:absolute;inset:0;background:#000;opacity:0;z-index:9"></div>
+    </div>
+
+    <script src="assets/js/graph-data.js"></script>
+    <script>
+      const out = "power3.out";
+      function push(tl, sel, t0, dur, dir) {
+        tl.fromTo(sel, { scale: 1.0, x: -18 * dir }, { scale: 1.07, x: 18 * dir, duration: dur, ease: "none" }, t0);
+      }
+      function lineIn(tl, sel, at, t1) {
+        tl.fromTo(sel, { opacity: 0, y: 12, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: out }, at);
+        tl.to(sel, { opacity: 0, duration: 0.3, ease: "power1.in" }, t1 - 0.32);
+      }
+      function wordIn(tl, sel, at) {
+        tl.fromTo(sel, { opacity: 0, y: 10, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: out }, at);
+      }
+      function graph(tl, t0, dur) {
+        const G = window.GRAPH, cv = document.getElementById("g"), ctx = cv.getContext("2d");
+        const n = G.n, E = G.edges, rr = new Float32Array(n);
+        for (let i = 0; i < n; i++) rr[i] = Math.hypot(G.x[i], G.y[i]);
+        const size = G.d.map((d) => 0.8 + Math.sqrt(Math.min(d, 400)) * 0.22);
+        const S = { reveal: 0, edges: 0, rot: -0.1, zoom: 0.92 }, P = new Float32Array(n * 2);
+        const draw = () => {
+          ctx.clearRect(0, 0, 1920, 1080);
+          const c = Math.cos(S.rot), s = Math.sin(S.rot), R = S.reveal * 1.05, RAD = 430 * S.zoom;
+          for (let i = 0; i < n; i++) { P[2*i] = 960 + (G.x[i]*c - G.y[i]*s) * RAD; P[2*i+1] = 500 + (G.x[i]*s + G.y[i]*c) * RAD; }
+          if (S.edges > 0) { ctx.lineWidth = 0.6; ctx.strokeStyle = `rgba(255,255,255,${0.07 * S.edges})`; ctx.beginPath();
+            for (let k = 0; k < E.length; k += 2) { const a = E[k], b = E[k+1]; if (rr[a] > R || rr[b] > R) continue; ctx.moveTo(P[2*a], P[2*a+1]); ctx.lineTo(P[2*b], P[2*b+1]); }
+            ctx.stroke(); }
+          ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.beginPath();
+          for (let i = 0; i < n; i++) { const k = (R - rr[i]) / 0.08; if (k <= 0) continue; const r = size[i] * Math.min(1, k);
+            ctx.moveTo(P[2*i] + r, P[2*i+1]); ctx.arc(P[2*i], P[2*i+1], r, 0, Math.PI * 2); }
+          ctx.fill();
+        };
+        tl.fromTo(S, { reveal: 0 }, { reveal: 1, duration: 2.6, ease: "power2.inOut", onUpdate: draw }, t0);
+        tl.fromTo(S, { edges: 0 }, { edges: 1, duration: 2.4, ease: "power1.inOut", onUpdate: draw }, t0 + 0.4);
+        tl.fromTo(S, { rot: -0.1, zoom: 0.92 }, { rot: 0.06, zoom: 1.08, duration: dur, ease: "none", onUpdate: draw }, t0);
+      }
+      document.fonts.load('600 46px "Inter Display"').then(() => document.fonts.load('700 64px "Inter Display"')).then(() => {
+        const tl = gsap.timeline({ paused: true });
+  push(tl, "#p0", 0.0, 3.41, 1);
+  lineIn(tl, "#l0", 0.0 + 0.9, 3.41);
+  push(tl, "#p1", 3.41, 3.34, -1);
+  lineIn(tl, "#l1", 3.41 + 0.35, 6.75);
+  push(tl, "#p2", 6.75, 3.33, 1);
+  lineIn(tl, "#l2", 6.75 + 0.35, 10.08);
+  push(tl, "#p3", 10.08, 2.66, -1);
+  lineIn(tl, "#l3", 10.08 + 0.35, 12.74);
+  push(tl, "#p4", 12.74, 2.67, 1);
+  lineIn(tl, "#l4", 12.74 + 0.35, 15.41);
+  push(tl, "#p5", 15.41, 2.67, -1);
+  lineIn(tl, "#l5", 15.41 + 0.35, 18.08);
+  push(tl, "#p6", 18.08, 3.0, 1);
+  lineIn(tl, "#l6", 18.08 + 0.35, 21.08);
+  push(tl, "#p7", 21.08, 2.33, -1);
+  lineIn(tl, "#l7", 21.08 + 0.35, 23.41);
+  push(tl, "#p8", 23.41, 1.33, 1);
+  push(tl, "#p9", 24.74, 2.0, -1);
+  lineIn(tl, "#l9", 24.74 + 0.35, 26.74);
+  push(tl, "#p10", 26.74, 2.0, 1);
+  lineIn(tl, "#l10", 26.74 + 0.35, 28.74);
+  push(tl, "#p11", 28.74, 0.67, -1);
+  push(tl, "#p12", 29.41, 1.0, 1);
+  lineIn(tl, "#l12", 29.41 + 0.35, 30.41);
+  push(tl, "#p13", 30.41, 1.0, -1);
+  push(tl, "#p14", 31.41, 2.33, 1);
+  lineIn(tl, "#l14", 31.41 + 0.35, 33.74);
+  push(tl, "#p15", 33.74, 0.67, -1);
+  graph(tl, 34.41, 6.33);
+  wordIn(tl, "#gw0", 34.9);
+  wordIn(tl, "#gw1", 37.41);
+  wordIn(tl, "#gw2", 38.07);
+  wordIn(tl, "#gw3", 39.4);
+  tl.to("#lg", { opacity: 0, duration: 0.3, ease: "power1.in" }, 40.74 - 0.35);
+  push(tl, "#p17", 40.74, 2.46, -1);
+  push(tl, "#p18", 43.2, 5.1, 1);
+  lineIn(tl, "#l18", 43.2 + 0.35, 48.3);
+  lineIn(tl, "#l19", 48.3 + 0.6, 53.4);
+        // end card on the final hit
+        tl.fromTo("#tile", { opacity: 0, scale: 0.94, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.4, ease: out }, 53.4 + 0.05);
+        tl.fromTo("#word", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 1.2, ease: out }, 53.4 + 0.7);
+        tl.fromTo("#tag", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1.2, ease: out }, 53.4 + 2.2);
+        tl.fromTo("#url", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out" }, 53.4 + 3.6);
+        tl.fromTo("#end", { scale: 1 }, { scale: 1.025, duration: 8.2, ease: "none" }, 53.4);
+        tl.to("#fade", { opacity: 1, duration: 1.0, ease: "power1.in" }, 61.6 - 1.1);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      });
+    </script>
+  </body>
+</html>
