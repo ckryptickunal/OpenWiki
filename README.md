@@ -294,7 +294,7 @@ OpenWiki is free and MIT-licensed. You pay only for the LLM calls your provider 
 
 ### YouTube is blocking my requests. What can I do?
 
-Caption downloads are rate-limited, especially from cloud servers. Retry later, use `--limit`, or set `YOUTUBE_PROXY` (for example, a local Tor proxy; install `pysocks` for SOCKS support). Blocked videos are not marked as skipped, so the next run retries them.
+Caption downloads can fail in two different ways. An IP block (`ip_blocked`) is common from cloud servers: retry later or set `YOUTUBE_PROXY` (for example a local Tor proxy; install `pysocks` for SOCKS). An HTTP 429 (`rate_limited`) means wait and rerun, or use `--limit`; it is not treated as a ban and is not retried in the same run. Neither is marked as a permanent skip. The reason is stored in `<folder>/_extract_state.json`.
 
 ### Is it legal to download transcripts and articles?
 

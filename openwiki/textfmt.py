@@ -14,6 +14,94 @@ from typing import Any
 SEPARATOR = "=" * 60
 YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
 TRANSCRIPT_MARKER = "TRANSCRIPT"
+CUE_RE = re.compile(r"^\[(\d+):(\d{2})(?::(\d{2}))?\]\s*(.*)$")
+
+
+def format_cue_timestamp(seconds: float) -> str:
+    """Render a caption offset as `m:ss` or `h:mm:ss`."""
+    total = max(0, int(seconds))
+    hours, rem = divmod(total, 3600)
+    minutes, secs = divmod(rem, 60)
+    if hours:
+        return f"{hours}:{minutes:02d}:{secs:02d}"
+    return f"{minutes}:{secs:02d}"
+
+
+def format_timed_transcript(snippets) -> str:
+    """Readable caption text with a `[m:ss]` prefix on each cue."""
+    lines: list[str] = []
+    for snippet in snippets:
+        text = str(getattr(snippet, "text", "") or "").replace("\n", " ").strip()
+        if not text:
+            continue
+        start = getattr(snippet, "start", None)
+        if start is None:
+            lines.append(text)
+        else:
+            lines.append(f"[{format_cue_timestamp(float(start))}] {text}")
+    return "\n".join(lines)
+
+
+def parse_cues(transcript: str) -> list[tuple[int | None, str]]:
+    """Split a transcript into (seconds or None, text) cues."""
+    cues: list[tuple[int | None, str]] = []
+    for raw in (transcript or "").splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        match = CUE_RE.match(line)
+        if not match:
+            cues.append((None, line))
+            continue
+        if match.group(3) is None:
+            seconds = int(match.group(1)) * 60 + int(match.group(2))
+        else:
+            seconds = int(match.group(1)) * 3600 + int(match.group(2)) * 60 + int(match.group(3))
+        text = match.group(4).strip()
+        if text:
+            cues.append((seconds, text))
+    return cues
+
+
+def _loose(text: str) -> str:
+    folded = re.sub(r"\s+", " ", (text or "").casefold())
+    folded = re.sub(r"[^\w\s]", "", folded, flags=re.UNICODE)
+    return re.sub(r"\s+", " ", folded).strip()
+
+
+def locate_in_transcript(transcript: str, needle: str) -> tuple[bool, int | None]:
+    """Find `needle` in a transcript. Returns (found, timestamp seconds or None).
+
+    Quotes shorter than a few words are ignored so a common word is not treated as provenance.
+    """
+    needle_loose = _loose(needle)
+    if len(needle_loose) < 12:
+        return False, None
+    pieces: list[str] = []
+    spans: list[tuple[int, int | None]] = []
+    cursor = 0
+    for seconds, text in parse_cues(transcript):
+        piece = _loose(text)
+        if not piece:
+            continue
+        if pieces:
+            cursor += 1
+        spans.append((cursor, seconds))
+        pieces.append(piece)
+        cursor += len(piece)
+    if not pieces:
+        return False, None
+    haystack = " ".join(pieces)
+    pos = haystack.find(needle_loose)
+    if pos < 0:
+        return False, None
+    stamp: int | None = None
+    for start, seconds in spans:
+        if start <= pos:
+            stamp = seconds
+        else:
+            break
+    return True, stamp
 
 
 def slugify(value: str, fallback: str = "untitled", max_len: int = 90) -> str:

@@ -85,7 +85,8 @@ def test_classify_by_exception_class():
 def test_classify_by_message_fallback():
     assert classify_fetch_error(RuntimeError("Subtitles are disabled for this video")) == "no_captions"
     assert classify_fetch_error(RuntimeError("unplayable live event")) == "unplayable"
-    assert classify_fetch_error(RuntimeError("429 Too Many Requests")) == "ip_blocked"
+    assert classify_fetch_error(RuntimeError("429 Too Many Requests")) == "rate_limited"
+    assert classify_fetch_error(RuntimeError("HTTP 429: too many requests")) == "rate_limited"
     assert classify_fetch_error(RuntimeError("connection reset")) == "error"
 
 

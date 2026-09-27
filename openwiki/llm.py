@@ -36,8 +36,8 @@ Analyze this source and produce:
 - key ideas
 - entities (people, companies, products, organizations)
 - topics
-- notable claims
-- useful quotes
+- notable claims, with an evidence string copied verbatim from the transcript when you can
+- useful quotes copied verbatim from the transcript. Do not paraphrase or invent a quote.
 - tags
 
 JSON schema:

@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- YouTube transcripts keep caption timestamps as `[m:ss]` lines. Quotes that appear in the source get a timestamp link; quotes that do not appear are left out of the wiki page.
+- Caption failures record a reason. HTTP 429 is `rate_limited` (wait and rerun) and is separate from `ip_blocked`.
+
+### Fixed
+- Ingest no longer writes a wiki page for an empty transcript or an empty model analysis.
+
 ## [0.2.0] - 2026-09-24
 
 Renamed from Wiki-Blocks to **OpenWiki**. The Python package is now `openwiki` and the command is `openwiki` (`python -m openwiki` also works). `WIKI_BLOCKS_ROOT` is now `OPENWIKI_ROOT`.

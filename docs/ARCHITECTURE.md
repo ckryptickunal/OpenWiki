@@ -85,8 +85,8 @@ Filename rules:
 1. `extract_video_id` — watch URL, `youtu.be`, shorts, live, embed, or bare ID. `extract_playlist_id` for `list=` URLs.
 2. `resolve_channel_id` — `channels.list` by id, `forHandle`, or `forUsername` (1 quota unit each); free-text names fall back to `search.list` (100 units). Needs `YOUTUBE_API_KEY`.
 3. `select_new_ids` — walk uploads newest-first; stop after two pages that add nothing new.
-4. `fetch_transcript` / `pick_transcript` — `youtube-transcript-api`; preferred languages first, then any manual track, then any auto-generated track. Optional `YOUTUBE_PROXY`.
-5. `classify_fetch_error` — by exception class first, then message. `no_captions` and `unplayable` are permanent skips; `ip_blocked` and other errors are retried on the next run.
+4. `fetch_transcript` / `pick_transcript` — `youtube-transcript-api`; preferred languages first, then any manual track, then any auto-generated track. Each caption cue is written as `[m:ss] text` so the readable transcript keeps its timestamp. Optional `YOUTUBE_PROXY`.
+5. `classify_fetch_error` — by exception class first, then message. `no_captions` and `unplayable` are permanent skips. `ip_blocked` is retried on the next run. `rate_limited` (HTTP 429) is also retryable, but it is not retried in the same run and it is not reported as an IP ban.
 6. `_extract_state.json` — `done` and `permanent_skip` lists so a rerun does not refetch.
 
 A single video works without the Data API: title and channel come from YouTube's public oEmbed endpoint; published date and view counts stay `Unknown`.

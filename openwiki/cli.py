@@ -103,9 +103,10 @@ def cmd_youtube(args) -> int:
     if args.dry_run:
         print(f"would extract {video_id} into {target}")
         return 0
-    result = extract_one_video(video_id, folder, youtube=youtube, languages=languages)
+    detail: dict = {}
+    result = extract_one_video(video_id, folder, youtube=youtube, languages=languages, detail=detail)
     if result == "skip":
-        print(f"SKIP {video_id} (no captions or unplayable)")
+        print(f"SKIP {video_id} ({detail.get('kind') or 'no captions or unplayable'})")
         return 0
     if result in {"ok", "exists"}:
         print(f"{'WROTE' if result == 'ok' else 'EXISTS'} {target}")

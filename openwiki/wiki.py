@@ -12,7 +12,14 @@ from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
-from openwiki.textfmt import parse_source_file, slugify, source_url
+from openwiki.textfmt import (
+    YOUTUBE_ID_RE,
+    format_cue_timestamp,
+    locate_in_transcript,
+    parse_source_file,
+    slugify,
+    source_url,
+)
 from openwiki.workspace import Workspace
 
 
@@ -76,6 +83,46 @@ def source_link(record: dict) -> str:
     return f"[[sources/{source_stem(record)}|{record['title']}]]"
 
 
+def _stamp_suffix(record: dict, seconds: int | None) -> str:
+    if seconds is None:
+        return ""
+    label = format_cue_timestamp(seconds)
+    video_id = record.get("video_id") or ""
+    if YOUTUBE_ID_RE.match(video_id):
+        return f" [{label}](https://www.youtube.com/watch?v={video_id}&t={seconds}s)"
+    return f" [{label}]"
+
+
+def ground_quotes(record: dict, quotes) -> tuple[list[str], int]:
+    """Keep quotes that appear in the transcript and attach a timestamp when one exists."""
+    transcript = record.get("transcript") or ""
+    kept: list[str] = []
+    dropped = 0
+    for quote in quotes or []:
+        text = str(quote).strip()
+        if not text:
+            continue
+        found, seconds = locate_in_transcript(transcript, text)
+        if not found:
+            dropped += 1
+            continue
+        block = f"> {text}"
+        suffix = _stamp_suffix(record, seconds)
+        if suffix:
+            block += f"\n> —{suffix}"
+        kept.append(block)
+    return kept, dropped
+
+
+def analysis_is_empty(analysis: dict) -> bool:
+    if (analysis.get("summary") or "").strip():
+        return False
+    for key in ("key_ideas", "entities", "topics", "claims", "quotes", "tags"):
+        if any(str(item).strip() for item in analysis.get(key) or []):
+            return False
+    return True
+
+
 def render_source_page(record: dict, analysis: dict) -> str:
     metadata = record["metadata"]
     tags = [slugify(tag) for tag in analysis.get("tags", [])[:12]]
@@ -128,12 +175,15 @@ def render_source_page(record: dict, analysis: dict) -> str:
         for topic in topics
     )
     lines.extend(["", "## Notable Claims", ""])
-    lines.extend(
-        f"- {claim.get('claim', '')} Evidence: {claim.get('evidence', '')}"
-        for claim in analysis.get("claims", [])
-    )
+    transcript = record.get("transcript") or ""
+    for claim in analysis.get("claims", []):
+        evidence = claim.get("evidence", "") or ""
+        found, seconds = locate_in_transcript(transcript, evidence)
+        stamp = _stamp_suffix(record, seconds) if found else ""
+        lines.append(f"- {claim.get('claim', '')} Evidence: {evidence}{stamp}")
+    quote_blocks, _dropped = ground_quotes(record, analysis.get("quotes", []))
     lines.extend(["", "## Quotes", ""])
-    lines.extend(f"> {quote}" for quote in analysis.get("quotes", []))
+    lines.extend(quote_blocks)
     lines.append("")
     return "\n".join(lines)
 
@@ -269,12 +319,17 @@ def ingest_path(
     record = parse_source_file(path)
     if should_skip(manifest, record, path, force):
         return "skipped"
+    if not (record.get("transcript") or "").strip():
+        raise ValueError("empty transcript; refusing to write a wiki page")
 
     if analysis is None:
         if analyzer is None:
             analyzer = default_analyzer()
         analysis = analyzer(record, max_chars)
+    if analysis_is_empty(analysis):
+        raise ValueError("model returned an empty analysis; refusing to write a wiki page")
 
+    _quotes, dropped_quotes = ground_quotes(record, analysis.get("quotes", []))
     workspace.ensure_dirs()
     output_path = workspace.sources_dir / f"{source_stem(record)}.md"
     output_path.write_text(render_source_page(record, analysis), encoding="utf-8")
@@ -292,7 +347,8 @@ def ingest_path(
         workspace,
         "ingest",
         record["title"],
-        f"- Source: `{workspace.rel(path)}`\n- Wiki page: `{workspace.rel(output_path)}`",
+        f"- Source: `{workspace.rel(path)}`\n- Wiki page: `{workspace.rel(output_path)}`"
+        + (f"\n- Dropped {dropped_quotes} quote(s) that were not in the transcript." if dropped_quotes else ""),
     )
     return "processed"
 

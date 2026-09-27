@@ -41,7 +41,7 @@ openwiki youtube --urls-file urls.txt --folder "My Channel"
 
 Channels and playlists need `YOUTUBE_API_KEY` for the listing. Individual URLs and URL lists work without it (titles come from YouTube oEmbed).
 
-Captions: `--lang hi,en` sets preferred languages. When none match, the first available track is used. Videos with no captions at all, private videos, and age-restricted videos are recorded as `permanent_skip`; rate-limit blocks are not, so they are retried next run.
+Captions: `--lang hi,en` sets preferred languages. When none match, the first available track is used. Each cue is saved as `[m:ss] text`. Videos with no captions, private videos, and age-restricted videos are recorded as `permanent_skip` with a reason in `skip_reasons`. IP blocks and HTTP 429 rate limits are stored under `failures` and retried next run; a 429 is not retried immediately and is not labeled as an IP block.
 
 Already-downloaded IDs and `permanent_skip` entries in `_extract_state.json` are not fetched again.
 

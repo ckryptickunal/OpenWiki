@@ -85,11 +85,42 @@ def test_extract_videos_records_permanent_skips(tmp_path: Path, monkeypatch):
     state = json.loads((tmp_path / "_extract_state.json").read_text(encoding="utf-8"))
     assert state["done"] == ["okvideo0001"]
     assert state["permanent_skip"] == ["nocaptions1"]
+    assert state["skip_reasons"]["nocaptions1"] == "no_captions"
 
     # Second run: nothing is fetched again.
     monkeypatch.setattr(youtube, "fetch_transcript", lambda *a, **k: pytest.fail("refetched"))
     again = extract_videos(["okvideo0001", "nocaptions1"], tmp_path)
     assert again == {"ok": 0, "skip": 1, "exists": 1, "failed": 0}
+
+
+def test_timed_transcript_keeps_cue_offsets():
+    from openwiki.textfmt import format_timed_transcript
+
+    class Cue:
+        def __init__(self, text, start):
+            self.text = text
+            self.start = start
+
+    body = format_timed_transcript([Cue("hello", 65), Cue("world", 3723)])
+    assert body == "[1:05] hello\n[1:02:03] world"
+
+
+def test_rate_limit_is_not_retried_in_the_same_run(tmp_path: Path, monkeypatch):
+    calls = {"n": 0}
+
+    def fake_fetch(*_args, **_kwargs):
+        calls["n"] += 1
+        raise RuntimeError("HTTP 429 Too Many Requests")
+
+    monkeypatch.setattr(youtube, "get_oembed_metadata", lambda vid: {})
+    monkeypatch.setattr(youtube.time, "sleep", lambda s: pytest.fail("retried a 429"))
+    monkeypatch.setattr(youtube, "fetch_transcript", fake_fetch)
+    counts = extract_videos(["limited0001"], tmp_path)
+    assert counts["failed"] == 1
+    assert calls["n"] == 1
+    state = json.loads((tmp_path / "_extract_state.json").read_text(encoding="utf-8"))
+    assert state["permanent_skip"] == []
+    assert state["failures"]["limited0001"]["kind"] == "rate_limited"
 
 
 def test_ip_block_is_retryable_not_skipped(tmp_path: Path, monkeypatch):

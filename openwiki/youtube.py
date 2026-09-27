@@ -20,7 +20,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from openwiki.env import env_value, require_env
-from openwiki.textfmt import write_youtube_file
+from openwiki.textfmt import format_timed_transcript, write_youtube_file
 from openwiki.workspace import Workspace
 
 DISCOVERY_MAX_PAGES = 40
@@ -85,10 +85,10 @@ def parse_url_file(filepath: Path | str) -> list[str]:
 
 
 def classify_fetch_error(exc: BaseException) -> str:
-    """Return no_captions | unplayable | ip_blocked | error.
+    """Return no_captions | unplayable | ip_blocked | rate_limited | error.
 
     no_captions and unplayable are permanent: the video is never retried.
-    Anything else (blocks, network errors) stays retryable on the next run.
+    ip_blocked and rate_limited stay retryable on a later run. A 429 is not an IP ban.
     """
     name = type(exc).__name__.lower()
     if name in BLOCKED_ERRORS:
@@ -98,7 +98,9 @@ def classify_fetch_error(exc: BaseException) -> str:
     if name in UNPLAYABLE_ERRORS:
         return "unplayable"
     message = str(exc).lower()
-    if "429" in message or "blocking requests" in message or "ip blocked" in message:
+    if "429" in message or "too many requests" in message or "rate limit" in message:
+        return "rate_limited"
+    if "blocking requests" in message or "ip blocked" in message:
         return "ip_blocked"
     if any(marker in message for marker in PERMANENT_NO_CAPTIONS):
         return "no_captions"
@@ -314,13 +316,14 @@ def fetch_transcript(
     languages: list[str] | None = None,
     proxy: str | None = None,
 ) -> FetchedTranscript:
-    from youtube_transcript_api.formatters import TextFormatter
-
     api = _transcript_api(proxy)
     chosen = pick_transcript(api.list(video_id), languages or DEFAULT_LANGUAGES)
     transcript = chosen.fetch()
+    text = format_timed_transcript(transcript)
+    if not text.strip():
+        raise RuntimeError("transcript was empty")
     return FetchedTranscript(
-        text=TextFormatter().format_transcript(transcript),
+        text=text,
         language=getattr(transcript, "language", "English"),
         language_code=getattr(transcript, "language_code", "en"),
         is_generated=bool(getattr(transcript, "is_generated", False)),
@@ -332,8 +335,23 @@ def empty_extract_state() -> dict:
     return {
         "done": [],
         "permanent_skip": [],
+        "skip_reasons": {},
+        "failures": {},
         "stats": {"success": 0, "skipped": 0, "failed": 0},
     }
+
+
+def _ensure_state_keys(state: dict) -> dict:
+    fresh = empty_extract_state()
+    for key, value in fresh.items():
+        state.setdefault(key, value)
+    return state
+
+
+FAILURE_HINTS = {
+    "ip_blocked": " (YouTube blocked this IP; set YOUTUBE_PROXY or retry later. Not a permanent skip.)",
+    "rate_limited": " (rate limited; wait and rerun, or use --limit. Not a permanent skip.)",
+}
 
 
 def load_extract_state(folder: Path) -> dict:
@@ -362,8 +380,12 @@ def extract_one_video(
     languages: list[str] | None = None,
     proxy: str | None = None,
     retries: int = 3,
+    detail: dict | None = None,
 ) -> str:
-    """Fetch one video. Returns ok | skip | exists | failed."""
+    """Fetch one video. Returns ok | skip | exists | failed.
+
+    `detail`, when passed, receives `kind` and `reason` for skips and failures.
+    """
     folder.mkdir(parents=True, exist_ok=True)
     filepath = folder / f"{video_id}.txt"
     if filepath.exists():
@@ -377,6 +399,11 @@ def extract_one_video(
         pass
     meta.setdefault("title", "Unknown")
     meta.setdefault("channel_title", folder.name)
+
+    def _note(kind: str, reason: str) -> None:
+        if detail is not None:
+            detail["kind"] = kind
+            detail["reason"] = reason
 
     last_error: BaseException | None = None
     for attempt in range(retries):
@@ -395,15 +422,21 @@ def extract_one_video(
             return "ok"
         except Exception as exc:
             last_error = exc
-            if classify_fetch_error(exc) in {"no_captions", "unplayable"}:
+            kind = classify_fetch_error(exc)
+            if kind in {"no_captions", "unplayable"}:
+                _note(kind, str(exc).strip().splitlines()[0][:200])
                 return "skip"
+            # A 429 gets worse if we hammer it again in the same run.
+            if kind == "rate_limited":
+                break
             if attempt < retries - 1:
                 time.sleep((attempt + 1) * 2)
 
     kind = classify_fetch_error(last_error) if last_error else "error"
-    hint = " (set YOUTUBE_PROXY, see README)" if kind == "ip_blocked" else ""
     reason = str(last_error).strip().splitlines()[0] if last_error else "unknown error"
-    print(f"  [failed] {video_id}: {kind}{hint}: {reason[:200]}", file=sys.stderr)
+    reason = reason[:200]
+    _note(kind, reason)
+    print(f"  [failed] {video_id}: {kind}{FAILURE_HINTS.get(kind, '')}: {reason}", file=sys.stderr)
     return "failed"
 
 
@@ -419,7 +452,7 @@ def extract_videos(
     """Extract many videos. Skips existing files and videos with no captions."""
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
-    state = load_extract_state(folder)
+    state = _ensure_state_keys(load_extract_state(folder))
     skipped = set(state.get("permanent_skip", []))
     counts = {"ok": 0, "skip": 0, "exists": 0, "failed": 0}
 
@@ -427,6 +460,7 @@ def extract_videos(
         if video_id in skipped:
             counts["skip"] += 1
             continue
+        detail: dict = {}
         result = extract_one_video(
             video_id,
             folder,
@@ -434,14 +468,21 @@ def extract_videos(
             youtube=youtube,
             languages=languages,
             proxy=proxy,
+            detail=detail,
         )
         counts[result] = counts.get(result, 0) + 1
         if result in {"ok", "exists"}:
             if video_id not in state["done"]:
                 state["done"].append(video_id)
+            state["failures"].pop(video_id, None)
         elif result == "skip":
             if video_id not in state["permanent_skip"]:
                 state["permanent_skip"].append(video_id)
+            if detail.get("kind"):
+                state["skip_reasons"][video_id] = detail["kind"]
+            state["failures"].pop(video_id, None)
+        elif result == "failed" and detail.get("kind"):
+            state["failures"][video_id] = {"kind": detail["kind"], "reason": detail.get("reason", "")}
         state["stats"]["success"] = len(state["done"])
         state["stats"]["skipped"] = len(state["permanent_skip"])
         state["stats"]["failed"] = counts["failed"]

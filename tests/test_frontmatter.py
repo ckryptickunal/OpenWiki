@@ -40,6 +40,39 @@ def test_entity_and_topic_frontmatter(workspace: Workspace, fixtures, demo_analy
     assert "title: Lab notebooks" in topic
 
 
+def test_quotes_need_a_transcript_match_and_keep_timestamps():
+    record = {
+        "video_id": "dQw4w9WgXcQ",
+        "title": "Demo",
+        "metadata": {"channel": "C", "published": "Unknown", "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+        "transcript": "[1:05] If a step failed, keep the failure.\n[2:00] Something else entirely.",
+    }
+    page = render_source_page(record, {
+        "summary": "s",
+        "quotes": [
+            "If a step failed, keep the failure.",
+            "This sentence was never spoken.",
+        ],
+        "claims": [{"claim": "Failures belong in the notes.", "evidence": "If a step failed, keep the failure."}],
+    })
+    assert "> If a step failed, keep the failure." in page
+    assert "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=65s" in page
+    assert "This sentence was never spoken." not in page
+    assert "t=65s" in page.split("## Notable Claims", 1)[1].split("## Quotes", 1)[0]
+
+
+def test_empty_analysis_is_not_written(workspace: Workspace, fixtures):
+    from openwiki.wiki import ingest_paths
+
+    src = workspace.root / "Talks"
+    src.mkdir()
+    path = src / "demo-talk.txt"
+    shutil.copy(fixtures / "transcripts" / "demo-talk.txt", path)
+    counts = ingest_paths([path], workspace, analysis={})
+    assert counts["failed"] == 1
+    assert list(workspace.sources_dir.glob("*.md")) == []
+
+
 def test_render_uses_source_url_for_essays(fixtures):
     record = {
         "video_id": "ex-why-indexes",
