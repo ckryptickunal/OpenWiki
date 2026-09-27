@@ -1,82 +1,55 @@
-// Scene 6 (22.0-26.5): the real link graph of Founder Book — 8,653 connected pages, 15,699 page-to-page links,
-// force-directed layout computed offline from its [[wikilinks]]. Drawn on canvas from a timeline proxy.
+// Scene 6 (30.0-35.6): Founder Book's real link graph (8,653 connected pages, 15,699 page-to-page links,
+// laid out offline from its [[wikilinks]]) rendered as a Revolut-style planet horizon under a balance-style number.
 FILM.scene(function (tl) {
   const G = window.GRAPH, F = FACTS;
   const cv = FILM.$("#g-canvas"), ctx = cv.getContext("2d");
-  const CX = 960, CY = 560, RAD = 520;
+  const CX = 960, CY = 1330, RAD = 760; // the top of the disc forms the horizon
   const n = G.n, xs = G.x, ys = G.y, E = G.edges;
-  const rr = new Float32Array(n);
-  for (let i = 0; i < n; i++) rr[i] = Math.hypot(xs[i], ys[i]);
-  const size = G.d.map((d) => 1.1 + Math.sqrt(Math.min(d, 400)) * 0.32);
-  const COL = ["#faf6f2", "#f5c451", "#e5895a"]; // sources, entities, topics
-
-  const S = { reveal: 0, edges: 0, rot: 0, zoom: 1.3 };
-  const proj = (i) => {
-    const c = Math.cos(S.rot), s = Math.sin(S.rot);
-    const x = xs[i] * c - ys[i] * s, y = xs[i] * s + ys[i] * c;
-    return [CX + x * RAD * S.zoom, CY + y * RAD * S.zoom];
-  };
+  // reveal from the rim inward: the rim is what the horizon shows
+  const rr = new Float32Array(n); for (let i = 0; i < n; i++) rr[i] = 1 - Math.min(1, Math.hypot(xs[i], ys[i]));
+  const size = G.d.map((d) => 1.2 + Math.sqrt(Math.min(d, 400)) * 0.3);
+  const COL = ["rgba(255,255,255,0.9)", "#6f86ff", "#a48bff"];
+  const S = { reveal: 0, edges: 0, rot: 0 };
   const P = new Float32Array(n * 2);
   function draw() {
     ctx.clearRect(0, 0, 1920, 1080);
-    for (let i = 0; i < n; i++) { const p = proj(i); P[2 * i] = p[0]; P[2 * i + 1] = p[1]; }
-    const R = S.reveal * 1.05;
-    // links
+    const c = Math.cos(S.rot), s = Math.sin(S.rot);
+    for (let i = 0; i < n; i++) { P[2 * i] = CX + (xs[i] * c - ys[i] * s) * RAD; P[2 * i + 1] = CY + (xs[i] * s + ys[i] * c) * RAD; }
+    const R = S.reveal * 1.04;
     if (S.edges > 0) {
-      ctx.lineWidth = 0.6;
-      ctx.strokeStyle = `rgba(245,196,81,${0.075 * S.edges})`;
-      ctx.beginPath();
-      for (let k = 0; k < E.length; k += 2) {
-        const a = E[k], b = E[k + 1];
-        if (rr[a] > R || rr[b] > R) continue;
-        ctx.moveTo(P[2 * a], P[2 * a + 1]); ctx.lineTo(P[2 * b], P[2 * b + 1]);
-      }
+      ctx.lineWidth = 0.7; ctx.strokeStyle = `rgba(111,134,255,${0.09 * S.edges})`; ctx.beginPath();
+      for (let k = 0; k < E.length; k += 2) { const a = E[k], b = E[k + 1]; if (rr[a] > R || rr[b] > R) continue;
+        ctx.moveTo(P[2 * a], P[2 * a + 1]); ctx.lineTo(P[2 * b], P[2 * b + 1]); }
       ctx.stroke();
     }
-    // nodes: each pops in as the reveal front passes it
     for (let t = 0; t < 3; t++) {
-      ctx.fillStyle = COL[t];
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        if (G.t[i] !== t) continue;
-        const k = (R - rr[i]) / 0.08; if (k <= 0) continue;
-        const s = size[i] * S.zoom * 0.8 * Math.min(1, k) * (k < 1 ? 1 + (1 - k) * 0.8 : 1);
-        ctx.moveTo(P[2 * i] + s, P[2 * i + 1]); ctx.arc(P[2 * i], P[2 * i + 1], s, 0, Math.PI * 2);
-      }
+      ctx.fillStyle = COL[t]; ctx.beginPath();
+      for (let i = 0; i < n; i++) { if (G.t[i] !== t) continue; const k = (R - rr[i]) / 0.1; if (k <= 0) continue;
+        const r = size[i] * Math.min(1, k); ctx.moveTo(P[2 * i] + r, P[2 * i + 1]); ctx.arc(P[2 * i], P[2 * i + 1], r, 0, Math.PI * 2); }
       ctx.fill();
     }
   }
-  const upd = () => { draw(); placeLabels(); };
-
-  // hub labels (real page names and how many pages link to them)
-  const hubs = [["entities/y-combinator", "Y Combinator", 945], ["entities/paul-graham", "Paul Graham", 336], ["entities/sam-altman", "Sam Altman", 187],
-    ["entities/garry-tan", "Garry Tan", 175], ["entities/figma", "Figma", 19], ["entities/dylan-field", "Dylan Field", 4]];
+  // the hub pages sit at the centre of the disc, below the horizon, so no labels here
+  const hubs = [];
   const idx = {}; Object.entries(G.labels).forEach(([i, slug]) => (idx[slug] = +i));
   const box = FILM.$("#g-labels");
-  const labels = hubs.map(([slug, name, links]) => {
-    const d = document.createElement("div"); d.className = "gl";
-    d.innerHTML = `${name}<b>${links}</b>`; box.appendChild(d);
-    return { el: d, i: idx[slug] };
-  });
-  function placeLabels() {
-    labels.forEach((l) => { const p = proj(l.i); l.el.style.left = p[0] + 14 + "px"; l.el.style.top = p[1] - 18 + "px"; });
-  }
+  const labels = hubs.map(([slug, name, links]) => { const d = document.createElement("div"); d.className = "gl"; d.innerHTML = `${name}<b>${links}</b>`; box.appendChild(d); return { el: d, i: idx[slug] }; });
+  const place = () => labels.forEach((l) => { const x = P[2 * l.i], y = P[2 * l.i + 1]; l.el.style.left = x + 12 + "px"; l.el.style.top = y - 20 + "px"; l.el.style.visibility = y > 640 && y < 1040 && x > 60 && x < 1760 ? "visible" : "hidden"; });
+  const upd = () => { draw(); place(); };
 
-  // night iris opens from the centre, where the previous scene collapsed
-  tl.fromTo("#s6", { clipPath: "circle(0px at 960px 520px)" }, { clipPath: "circle(1300px at 960px 520px)", duration: 0.6, ease: "expo.inOut" }, 22.0);
-  tl.fromTo(S, { reveal: 0 }, { reveal: 1, duration: 1.9, ease: "power2.inOut", onUpdate: upd }, 22.1);
-  tl.fromTo(S, { edges: 0 }, { edges: 1, duration: 1.6, ease: "power1.in", onUpdate: upd }, 22.5);
-  tl.fromTo(S, { rot: -0.25, zoom: 1.35 }, { rot: 0.12, zoom: 0.92, duration: 4.5, ease: "sine.out", onUpdate: upd }, 22.0);
+  tl.fromTo("#s6-arc", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 1.4, ease: "out" }, 30.0);
+  tl.fromTo(S, { reveal: 0 }, { reveal: 1, duration: 2.6, ease: "out", onUpdate: upd }, 30.1);
+  tl.fromTo(S, { edges: 0 }, { edges: 1, duration: 2.0, ease: "inOut", onUpdate: upd }, 30.6);
+  tl.fromTo(S, { rot: -0.18 }, { rot: 0.06, duration: 5.6, ease: "none", onUpdate: upd }, 30.0);
   gsap.set(labels.map((l) => l.el), { opacity: 0 });
-  labels.forEach((l, k) => tl.fromTo(l.el, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", transformOrigin: "0% 50%" }, 23.3 + k * 0.12));
+  labels.forEach((l, k) => tl.fromTo(l.el, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.6, ease: "out" }, 32.2 + k * 0.08));
 
-  // title and real counts
-  tl.fromTo("#s6-top .kick-top", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 22.45);
-  const tw = FILM.words("#s6-title");
-  FILM.inkIn(tl, tw, 22.5, { stagger: 0.08, dur: 0.6, swell: "#s6-title" });
-  tl.fromTo("#s6-stats .st", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "expo.out", stagger: 0.1 }, 22.9);
-  FILM.count(tl, "#s6-v", 0, F.videos, 22.95, 1.2);
-  FILM.count(tl, "#s6-e", 0, F.essays, 23.05, 1.1);
-  FILM.count(tl, "#s6-p", 0, F.pages, 23.25, 1.4);
-  tl.fromTo("#s6-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 23.9);
+  FILM.appear(tl, "#s6-lbl", 30.5, { y: 12, dur: 0.8 });
+  FILM.appear(tl, "#s6-num", 30.65, { y: 24, dur: 0.9 });
+  FILM.count(tl, "#s6-num", 0, F.pages, 30.65, 1.8);
+  FILM.appear(tl, "#s6-pill", 31.0, { y: 14, dur: 0.8 });
+  FILM.appear(tl, "#s6-sub", 31.3, { y: 12, dur: 0.8 });
+
+  FILM.vanish(tl, ["#s6-lbl", "#s6-num", "#s6-pill", "#s6-sub", "#g-labels"], 35.2, { dur: 0.35 });
+  tl.to(["#g-canvas", "#s6-arc"], { opacity: 0, duration: 0.4, ease: "exit" }, 35.2);
 });
