@@ -1,6 +1,6 @@
 """OpenWiki: YouTube transcripts, essay/article extraction, and LLM wiki ingest."""
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from openwiki.textfmt import (
     parse_source_file,

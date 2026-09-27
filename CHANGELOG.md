@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-27
+
+### Fixed
+- Listing a channel or playlist without `YOUTUBE_API_KEY` no longer prints yt-dlp's own notices (for example about the Python version) into OpenWiki's output. yt-dlp errors still go to stderr.
+
 ## [0.3.0] - 2026-09-27
 
 Shaped by public feedback research (Reddit r/ObsidianMD, r/PKMS, r/notebooklm, r/ClaudeAI, r/LocalLLaMA; see `docs/research/2026-09-icp-and-roadmap.md`).

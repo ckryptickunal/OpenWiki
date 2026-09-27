@@ -47,3 +47,9 @@ Commit `site/` and push to `main`. Vercel deploys it automatically to https://op
 - Be kind. See the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).
+
+## Releasing (maintainers)
+
+1. Bump `__version__` in `openwiki/__init__.py` and `version` in `CITATION.cff`, and move the "Unreleased" notes in `CHANGELOG.md` under the new version.
+2. Commit, tag `vX.Y.Z`, push the tag, and create the GitHub release with the built wheel and sdist attached.
+3. Publish to PyPI by running the **Publish to PyPI** workflow (`.github/workflows/publish.yml`) on the tag. It uses PyPI trusted publishing, so no token is stored; the one-time PyPI setup is described at the top of the workflow.
