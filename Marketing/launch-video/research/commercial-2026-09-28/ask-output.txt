@@ -1,0 +1,7 @@
+$ openwiki ask "Who should I email first when I start selling?"   (five-talk wiki, 1.74 s)
+When you are at the earliest stages of your journey and do not have any customers or replies yet, you should email the person in the organization who has the most to gain from buying your software [1].
+
+To identify this person, you should ask yourself who would benefit most from your product and who would be most interested in it, while avoiding those who might be negatively impacted by it [1].
+
+Sources:
+  [1] Why You're Getting Zero Replies To Your Cold Emails [1:39]  (Y Combinator/wr6PMD06hP0.txt)  https://www.youtube.com/watch?v=wr6PMD06hP0&t=99s

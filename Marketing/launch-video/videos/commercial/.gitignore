@@ -1,0 +1,11 @@
+renders/
+snapshots/
+assets/shots/
+footage/hd/
+footage/th/
+footage/strips/
+footage/*.jpg
+music/rejected/
+music/take-*
+music/log-*.txt
+music/*.wav

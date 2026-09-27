@@ -2,6 +2,24 @@
 
 Rule: a line goes into the film only if it is either (a) a measured fact with a reproducible method, (b) verified behaviour of OpenWiki 0.3.0 code, (c) a primary-sourced external finding, or (d) plainly rhetorical and not a factual claim. Checked 2026-09-27.
 
+## The commercial (49 s, `videos/commercial/`, 2026-09-28)
+
+Evidence: `research/commercial-2026-09-28/README.md` (all measured that day, OpenWiki 0.3.1, Gemini 3.1 Flash-Lite).
+
+| On screen | Evidence |
+|---|---|
+| "34.6 s" · "Four hours of talks, compiled into a linked wiki." | Clean run of `openwiki youtube --urls-file talks.txt` + `openwiki ingest --all` on five YC talks totalling 3 h 57 min 48 s: 8.13 s + 26.49 s. A second run took 32.5 s. One Mac, home Wi-Fi; times will vary with network and model latency. |
+| The terminal lines `ok=5 exists=0 skip=0 failed=0`, `processed=5 skipped=0 failed=0` | Verbatim CLI output (`yt-out.txt`, `ingest-out.txt`). |
+| "49 linked pages. People, companies and ideas get their own." + graph | That run's wiki: 5 sources, 26 entities, 18 topics; graph drawn from its `[[wikilinks]]`. "get their own", not "every". |
+| "< 2 s across 10,339 files. Offline." | `candidate_files` on Founder Book at `6104879` = 1,573 sources + 8,766 pages; six CLI searches 0.45–1.77 s wall, start-up included. BM25, no model, no network. |
+| "[1:39] Ask anything. The answer cites the minute." | Real `openwiki ask` output on the five-talk wiki, trimmed with "…" (no words changed). Citations link to the cue time; "cites the minute" describes that link. |
+| "< 1¢ per hour of video." | 102,288 input + 5,016 output tokens (Gemini `usage_metadata`) for 3.96 h of talks = $0.0331 at $0.25 / $1.50 per 1M (ai.google.dev pricing, standard tier) = 0.84¢/h. Default model only; other models cost more or less. |
+| "$0 with a model on your own machine." | README documents Ollama; local means no API bill. Hardware and electricity are not counted, and the footnote says "no API bill". |
+| "Free. Open source. Yours." · "MIT licence. Plain Markdown files, on your disk." | LICENSE; the wiki is Markdown in the workspace. |
+| Audience words, "Some people learn from everything", "Most of it, you'll never find again." | Rhetorical. |
+
+Not claimed: speed on other hardware or providers, a cost for long-form essays, anything about accuracy of summaries.
+
 ## v4 (26 s kinetic-type cut, current)
 
 Source: `videos/openwiki-launch/` (made with the motion-launch-videos skill). Every line reuses evidence from the v3 rows below; the row-by-row table is in `videos/openwiki-launch/BRIEF.md`.

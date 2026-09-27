@@ -1,0 +1,70 @@
+{
+ "videos": [
+  {
+   "id": "-7Qz7tSTfUU",
+   "fetch_s": 2.3,
+   "ingest_s": 5.62,
+   "llm_calls": 1,
+   "tokens_in": 18748,
+   "tokens_out": 957,
+   "usd": 0.00612,
+   "duration": null
+  },
+  {
+   "id": "wr6PMD06hP0",
+   "fetch_s": 1.35,
+   "ingest_s": 4.29,
+   "llm_calls": 1,
+   "tokens_in": 6669,
+   "tokens_out": 885,
+   "usd": 0.00299,
+   "duration": null
+  },
+  {
+   "id": "0LNQxT9LvM0",
+   "fetch_s": 1.23,
+   "ingest_s": 4.46,
+   "llm_calls": 1,
+   "tokens_in": 25301,
+   "tokens_out": 1019,
+   "usd": 0.00785,
+   "duration": null
+  },
+  {
+   "id": "12D8zEdOPYo",
+   "fetch_s": 1.41,
+   "ingest_s": 5.91,
+   "llm_calls": 1,
+   "tokens_in": 21463,
+   "tokens_out": 1135,
+   "usd": 0.00707,
+   "duration": null
+  },
+  {
+   "id": "1D2j8nTjOZ4",
+   "fetch_s": 1.32,
+   "ingest_s": 4.58,
+   "llm_calls": 1,
+   "tokens_in": 30107,
+   "tokens_out": 1020,
+   "usd": 0.00906,
+   "duration": null
+  }
+ ],
+ "search_s": [
+  0.007,
+  0.006,
+  0.007
+ ],
+ "ask": {
+  "s": 1.49,
+  "calls": [
+   {
+    "model": "gemini-3.1-flash-lite",
+    "s": 1.4624047079996672,
+    "in": 2325,
+    "out": 63
+   }
+  ]
+ }
+}

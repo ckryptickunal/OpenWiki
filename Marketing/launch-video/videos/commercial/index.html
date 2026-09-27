@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>OpenWiki: the commercial</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+      @font-face { font-family: "Inter Display"; src: url("assets/fonts/inter-display-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+      @font-face { font-family: "Inter"; src: url("assets/fonts/Inter.ttf") format("truetype"); font-weight: 100 900; }
+      @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono.ttf") format("truetype"); font-weight: 100 800; }
+      :root { --gray: #86868b; --dim: #6e6e73; --amber: #f5c451; --grad: linear-gradient(100deg, #ffd66b 0%, #ff9d5c 55%, #ff6f61 100%); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #000; color: #f5f5f7; -webkit-font-smoothing: antialiased; font-family: "Inter", sans-serif; }
+      #stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+      .shot { position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; }
+      .scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 520px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.72)); z-index: 5; pointer-events: none; }
+      .line { position: absolute; left: 128px; bottom: 118px; z-index: 6; font: 600 76px/1.04 "Inter Display"; letter-spacing: -0.035em; color: #fff; opacity: 0; white-space: pre; }
+      .scene { position: absolute; inset: 0; background: transparent; z-index: 8; }
+      .eyebrow { font: 500 30px/1 "Inter"; letter-spacing: -0.005em; color: var(--gray); }
+      .fig { font: 600 210px/0.95 "Inter Display"; letter-spacing: -0.055em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 0.06em; }
+      .cap { font: 600 54px/1.1 "Inter Display"; letter-spacing: -0.03em; color: #f5f5f7; }
+      .foot { position: absolute; left: 150px; bottom: 64px; width: 1620px; font: 400 21px/1.4 "Inter"; color: var(--dim); }
+      .col { position: absolute; left: 150px; top: 300px; width: 800px; }
+      .col .fig { margin: 26px 0 22px; }
+      .panel { position: absolute; left: 990px; top: 300px; width: 800px; border-radius: 22px; background: #111113; border: 1px solid rgba(255,255,255,.09); box-shadow: 0 50px 120px -40px rgba(0,0,0,.9); overflow: hidden; }
+      .panel .bar { height: 46px; display: flex; gap: 9px; align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,.07); font: 500 18px "Inter"; color: var(--dim); }
+      .panel .bar i { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,.16); }
+      .panel .bar span { margin-left: 12px; }
+      .term { padding: 28px 30px 32px; font: 500 28px/1.6 "JetBrains Mono"; white-space: pre-wrap; color: #e8e8ed; }
+      .term .p { color: var(--amber); } .term .m { color: var(--gray); } .term .a { color: var(--amber); } .term .ok { color: #7fd99a; }
+      .term div { opacity: 0; }
+      .center { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .center .fig { font-size: 330px; }
+      .center .cap { margin-top: 10px; font-size: 64px; }
+      #quote { padding: 34px 38px 38px; }
+      #quote .path { font: 500 17px "JetBrains Mono"; color: var(--dim); }
+      #quote h3 { margin-top: 14px; font: 600 38px/1.12 "Inter Display"; letter-spacing: -0.02em; }
+      #quote blockquote { margin-top: 26px; padding-left: 22px; border-left: 3px solid var(--amber); font: 500 30px/1.35 "Inter"; letter-spacing: -0.01em; color: #fff; }
+      #quote .ts { display: inline-block; margin-top: 18px; margin-left: 25px; padding: 6px 14px; border-radius: 999px; background: rgba(245,196,81,.14); color: var(--amber); font: 600 20px "JetBrains Mono"; }
+      #g { position: absolute; left: 1000px; top: 190px; }
+      #reveal { position: absolute; inset: 0; z-index: 12; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #000; }
+      #reveal .name { font: 700 230px/1 "Inter Display"; letter-spacing: -0.055em; color: #fff; }
+      #reveal .vp { margin-top: 44px; font: 600 58px/1.18 "Inter Display"; letter-spacing: -0.03em; color: #f5f5f7; }
+      #reveal .vp em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      #free { position: absolute; inset: 0; z-index: 12; background: #000; }
+      #free .words { display: flex; gap: 38px; font: 600 150px/1 "Inter Display"; letter-spacing: -0.05em; }
+      #free .words span { opacity: 0; }
+      #free .words span:last-child { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 0.04em; }
+      #free .cap { font: 500 36px/1.3 "Inter"; color: var(--gray); margin-top: 44px; opacity: 0; }
+      .who { position: absolute; left: 128px; bottom: 112px; z-index: 6; font: 600 150px/1 "Inter Display"; letter-spacing: -0.05em; color: #fff; opacity: 0; white-space: pre; }
+      #tag { position: absolute; left: 0; right: 0; top: 440px; text-align: center; z-index: 9; font: 600 96px/1.05 "Inter Display"; letter-spacing: -0.045em; color: #fff; opacity: 0; text-shadow: 0 0 80px rgba(0,0,0,.6); }
+      #tagscrim { position: absolute; inset: 0; background: rgba(0,0,0,.45); z-index: 8; opacity: 0; }
+      #end { position: absolute; inset: 0; z-index: 14; background: #000; }
+      #end .name { font: 700 200px/1 "Inter Display"; letter-spacing: -0.055em; color: #fff; }
+      #end .t1 { margin-top: 34px; font: 600 50px/1.1 "Inter Display"; letter-spacing: -0.03em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      #end .t2 { margin-top: 50px; font: 500 30px/1 "JetBrains Mono"; color: var(--gray); }
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 30; pointer-events: none; }
+      #fade { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 31; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="49.42" data-width="1920" data-height="1080">
+      <div id="stage">
+        <!-- Act I: the curious -->
+        <video class="clip shot" id="v-paint" src="assets/shots/paint.mp4" muted playsinline data-start="0" data-duration="1.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-code" src="assets/shots/code.mp4" muted playsinline data-start="1.5" data-duration="1.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-train" src="assets/shots/train.mp4" muted playsinline data-start="3" data-duration="1.4" data-track-index="0"></video>
+        <video class="clip shot" id="v-coder" src="assets/shots/coder.mp4" muted playsinline data-start="4.4" data-duration="1.3" data-track-index="1"></video>
+        <video class="clip shot" id="v-window" src="assets/shots/window.mp4" muted playsinline data-start="5.7" data-duration="1.4" data-track-index="0"></video>
+        <!-- Acts III and IV: the footage keeps running, blurred, behind the cards -->
+        <video class="clip shot" id="v-bg_speed" src="assets/shots/bg_speed.mp4" muted playsinline data-start="12" data-duration="3.5" data-track-index="2"></video>
+        <video class="clip shot" id="v-bg_graph" src="assets/shots/bg_graph.mp4" muted playsinline data-start="15.5" data-duration="3" data-track-index="3"></video>
+        <video class="clip shot" id="v-bg_search" src="assets/shots/bg_search.mp4" muted playsinline data-start="18.5" data-duration="2.7" data-track-index="2"></video>
+        <video class="clip shot" id="v-bg_ask" src="assets/shots/bg_ask.mp4" muted playsinline data-start="21.2" data-duration="2.72" data-track-index="3"></video>
+        <video class="clip shot" id="v-bg_cost" src="assets/shots/bg_cost.mp4" muted playsinline data-start="23.92" data-duration="4.05" data-track-index="2"></video>
+        <video class="clip shot" id="v-bg_zero" src="assets/shots/bg_zero.mp4" muted playsinline data-start="27.97" data-duration="3.77" data-track-index="3"></video>
+        <!-- Act V: who it is for -->
+        <video class="clip shot" id="v-artist" src="assets/shots/artist.mp4" muted playsinline data-start="33.74" data-duration="1" data-track-index="0"></video>
+        <video class="clip shot" id="v-womancode" src="assets/shots/womancode.mp4" muted playsinline data-start="34.74" data-duration="1" data-track-index="1"></video>
+        <video class="clip shot" id="v-engineer" src="assets/shots/engineer.mp4" muted playsinline data-start="35.74" data-duration="1" data-track-index="0"></video>
+        <video class="clip shot" id="v-geek" src="assets/shots/geek.mp4" muted playsinline data-start="36.74" data-duration="1" data-track-index="1"></video>
+        <video class="clip shot" id="v-sculpt2" src="assets/shots/sculpt2.mp4" muted playsinline data-start="37.74" data-duration="1" data-track-index="0"></video>
+        <video class="clip shot" id="v-reader" src="assets/shots/reader.mp4" muted playsinline data-start="38.74" data-duration="1.25" data-track-index="1"></video>
+        <!-- Act VI: montage on the beat -->
+        <video class="clip shot" id="v-m_film" src="assets/shots/m_film.mp4" muted playsinline data-start="39.99" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-m_arch" src="assets/shots/m_arch.mp4" muted playsinline data-start="40.49" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-m_keys" src="assets/shots/m_keys.mp4" muted playsinline data-start="40.99" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-m_producer2" src="assets/shots/m_producer2.mp4" muted playsinline data-start="41.49" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-m_board2" src="assets/shots/m_board2.mp4" muted playsinline data-start="41.99" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-m_print2" src="assets/shots/m_print2.mp4" muted playsinline data-start="42.49" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-m_lamp" src="assets/shots/m_lamp.mp4" muted playsinline data-start="42.99" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-m_lamp2" src="assets/shots/m_lamp2.mp4" muted playsinline data-start="43.49" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-m_scope2" src="assets/shots/m_scope2.mp4" muted playsinline data-start="43.99" data-duration="0.5" data-track-index="0"></video>
+        <video class="clip shot" id="v-m_robot2" src="assets/shots/m_robot2.mp4" muted playsinline data-start="44.49" data-duration="0.5" data-track-index="1"></video>
+        <video class="clip shot" id="v-m_scope" src="assets/shots/m_scope.mp4" muted playsinline data-start="44.99" data-duration="0.75" data-track-index="0"></video>
+      </div>
+      <div class="scrim"></div>
+      <div class="line" id="l1">Some people learn
+from everything.</div>
+      <div class="line" id="l2">A lecture on the train.</div>
+      <div class="line" id="l3">A talk at 2 a.m.</div>
+      <div class="line" id="l6">Most of it, you’ll
+never find again.</div>
+
+      <div class="who" id="w1">Artists.</div>
+      <div class="who" id="w2">Coders.</div>
+      <div class="who" id="w3">Engineers.</div>
+      <div class="who" id="w4">Geeks.</div>
+      <div class="who" id="w5">Creatives.</div>
+      <div class="who" id="w6">The endlessly
+curious.</div>
+      <div id="tagscrim"></div>
+      <div id="tag">Turn what you watch<br />into what you know.</div>
+
+      <!-- Act II: the reveal -->
+      <div id="reveal" class="clip" data-start="6.92" data-duration="5.08" data-track-index="3">
+        <div class="name" id="rv-name">OpenWiki</div>
+        <div class="vp" id="rv-vp">Everything you watch and read,<br /><em>compiled into a wiki you own.</em></div>
+      </div>
+
+      <!-- Act III: what it does, measured -->
+      <div class="scene clip" id="sA" data-start="12" data-duration="3.5" data-track-index="4">
+        <div class="col"><div class="eyebrow">Speed</div><div class="fig"><span id="cA">0.0</span> s</div><div class="cap">Four hours of talks, compiled into a linked wiki.</div></div>
+        <div class="panel"><div class="bar"><i></i><i></i><i></i><span>~/my-wiki · talks.txt: 5 YC talks, 3 h 58 min</span></div>
+          <div class="term"><div id="tA0"><span class="p">$ </span>openwiki youtube --urls-file talks.txt</div><div id="tA1" class="ok">ok=5 exists=0 skip=0 failed=0</div><div id="tA2"><span class="p">$ </span>openwiki ingest --all</div><div id="tA3" class="ok">processed=5 skipped=0 failed=0</div></div></div>
+        <div class="foot">Measured 28 Sep 2026: five YC talks, 3 h 58 min in total. OpenWiki 0.3.1, Gemini 3.1 Flash-Lite, a Mac on home Wi-Fi.</div>
+      </div>
+      <div class="scene clip" id="sB" data-start="15.5" data-duration="3" data-track-index="5">
+        <div class="col"><div class="eyebrow">Structure</div><div class="fig"><span id="cB">0</span></div><div class="cap">linked pages. People, companies and ideas get their own.</div></div>
+        <canvas id="g" width="780" height="740"></canvas>
+        <div class="foot">From the same five talks: 5 sources, 26 entities, 18 topics, joined by [[wikilinks]].</div>
+      </div>
+      <div class="scene clip" id="sD" data-start="18.5" data-duration="2.7" data-track-index="5">
+        <div class="col"><div class="eyebrow">Search</div><div class="fig">&lt; 2 s</div><div class="cap">across 10,339 files. Offline.</div></div>
+        <div class="panel"><div class="bar"><i></i><i></i><i></i><span>~/founder-book</span></div>
+          <div class="term"><div id="tD0"><span class="p">$ </span>openwiki search warm network</div><div id="tD1">1. Why You're Getting Zero Replies
+   To Your Cold Emails <span class="a">[3:46]</span></div><div id="tD2" class="m">   …start with your warm network.</div></div></div>
+        <div class="foot">Founder Book: 1,573 sources + 8,766 pages. Six searches, 0.45 to 1.77 s each.</div>
+      </div>
+      <div class="scene clip" id="sE" data-start="21.2" data-duration="2.8" data-track-index="4">
+        <div class="col"><div class="eyebrow">Ask</div><div class="fig">[1:39]</div><div class="cap">Ask anything. The answer cites the minute.</div></div>
+        <div class="panel"><div class="bar"><i></i><i></i><i></i><span>~/my-wiki</span></div>
+          <div class="term"><div id="tE0"><span class="p">$ </span>openwiki ask "Who should I email
+  first when I start selling?"</div><div id="tE1">…email the person in the organization
+who has the most to gain from buying
+your software <span class="a">[1]</span>.</div><div id="tE2" class="m">[1] Why You're Getting Zero Replies
+    To Your Cold Emails <span class="a">[1:39]</span></div></div></div>
+        <div class="foot">Real output, trimmed.</div>
+      </div>
+
+      <!-- Act IV: the economics -->
+      <div class="scene clip" id="sF" data-start="23.92" data-duration="4.05" data-track-index="5">
+        <div class="center"><div class="eyebrow">Cost</div><div class="fig">&lt; 1¢</div><div class="cap">per hour of video.</div></div>
+        <div class="foot" style="text-align:center">3 h 58 min of talks cost $0.033 in Gemini 3.1 Flash-Lite tokens at list price: 0.84¢ an hour.</div>
+      </div>
+      <div class="scene clip" id="sG" data-start="27.97" data-duration="3.77" data-track-index="4">
+        <div class="center"><div class="eyebrow">Or</div><div class="fig">$0</div><div class="cap">with a model on your own machine.</div></div>
+        <div class="foot" style="text-align:center">Gemini, OpenAI, OpenRouter, or a local model through Ollama, with no API bill.</div>
+      </div>
+      <div id="free" class="clip" data-start="31.74" data-duration="2.0" data-track-index="3">
+        <div class="center"><div class="words"><span>Free.</span><span>Open source.</span><span>Yours.</span></div><div class="cap">MIT licence. Plain Markdown files, on your disk.</div></div>
+      </div>
+
+      <div id="end" class="clip" data-start="45.74" data-duration="3.68" data-track-index="3">
+        <div class="center"><div class="name" id="e-name">OpenWiki</div><div class="t1" id="e-t1">Turn what you watch into what you know.</div><div class="t2" id="e-t2">Free and open source · github.com/ckryptickunal/OpenWiki</div></div>
+      </div>
+      <div id="flash"></div>
+      <div id="fade"></div>
+    </div>
+
+    <script src="assets/js/mini-graph.js"></script>
+    <script>
+      const BEAT = 0.5;  // the score is 120 BPM; the beat lands at 8.00 s
+      function rise(tl, targets, t, stagger = 0.08, d = 0.75) {
+        tl.fromTo(targets, { opacity: 0, y: 34, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: d, ease: "power3.out", stagger }, t);
+      }
+      function out(tl, targets, t, d = 0.28) { tl.to(targets, { opacity: 0, filter: "blur(8px)", duration: d, ease: "power2.in" }, t); }
+      function count(tl, el, to, t, d, dec) {
+        const o = { v: 0 };
+        tl.fromTo(o, { v: 0 }, { v: to, duration: d, ease: "power2.out", onUpdate: () => { el.textContent = o.v.toFixed(dec); } }, t);
+      }
+      function graph(tl, t0) {
+        const G = window.MINI, cv = document.getElementById("g"), ctx = cv.getContext("2d");
+        const N = G.nodes, E = G.edges, W = 780, H = 740, R = 300;
+        const COL = { s: "#ffffff", e: "#f5c451", t: "#ff8a6b" };
+        const LABEL = { 0: "Scaling Figma", 1: "Product-market fit", 2: "Products users love", 3: "Gravitational waves", 4: "Cold emails", 30: "Y Combinator", 5: "Airbnb", 9: "Dropbox", 7: "Caltech", 10: "Dylan Field" };
+        const S = { k: 0, rot: 0 };
+        const draw = () => {
+          ctx.clearRect(0, 0, W, H);
+          const c = Math.cos(S.rot), s = Math.sin(S.rot);
+          const P = N.map((n) => [W / 2 + (n.x * c - n.y * s) * R * (0.6 + 0.4 * S.k), H / 2 + (n.x * s + n.y * c) * R * (0.6 + 0.4 * S.k)]);
+          ctx.globalAlpha = S.k; ctx.strokeStyle = "rgba(255,255,255,.22)"; ctx.lineWidth = 1.2; ctx.beginPath();
+          E.forEach(([a, b]) => { ctx.moveTo(P[a][0], P[a][1]); ctx.lineTo(P[b][0], P[b][1]); }); ctx.stroke();
+          N.forEach((n, i) => { const r = n.t === "s" ? 11 : 5.5; ctx.fillStyle = COL[n.t]; ctx.beginPath(); ctx.arc(P[i][0], P[i][1], r * Math.min(1, S.k * 1.4), 0, 7); ctx.fill(); });
+          ctx.font = '500 17px "Inter"'; ctx.textAlign = "center";
+          Object.entries(LABEL).forEach(([i, t]) => { const n = N[i]; ctx.fillStyle = n.t === "s" ? "rgba(255,255,255,.9)" : "rgba(245,196,81,.85)"; ctx.fillText(t, P[i][0], P[i][1] + (n.t === "s" ? 32 : 24)); });
+          ctx.globalAlpha = 1;
+        };
+        tl.fromTo(S, { k: 0 }, { k: 1, duration: 1.1, ease: "power3.out", onUpdate: draw }, t0);
+        tl.fromTo(S, { rot: -0.25 }, { rot: 0.05, duration: 2.5, ease: "none", onUpdate: draw }, t0);
+      }
+
+      Promise.all([document.fonts.load('600 60px "Inter Display"'), document.fonts.load('700 60px "Inter Display"'), document.fonts.load('500 20px "Inter"'), document.fonts.load('500 20px "JetBrains Mono"')]).then(() => {
+        const tl = gsap.timeline({ paused: true });
+
+        // Act I: the curious (8 s), a slow push on every shot
+        tl.fromTo("#stage", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power1.out" }, 0);
+        [["#v-paint", 0, 1.5], ["#v-code", 1.5, 1.5], ["#v-train", 3, 1.4], ["#v-coder", 4.4, 1.3], ["#v-window", 5.7, 1.4]]
+          .forEach(([s, a, d]) => tl.fromTo(s, { scale: 1.0 }, { scale: 1.05, duration: d, ease: "none" }, a));
+        [["#l1", 0.3, 2.78], ["#l2", 3.05, 4.2], ["#l3", 4.45, 5.5], ["#l6", 5.75, 6.75]]
+          .forEach(([s, a, b]) => { rise(tl, s, a, 0.08, 0.6); out(tl, s, b, 0.22); });
+        tl.to("#stage", { opacity: 0, duration: 0.3, ease: "power1.in" }, 6.8);
+        tl.set("#stage", { opacity: 1 }, 11.9);
+
+        // Act II: silence, then the beat lands on the name
+        tl.fromTo("#rv-name", { opacity: 0, scale: 1.12, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 8.0);
+        tl.fromTo("#flash", { opacity: 0.22 }, { opacity: 0, duration: 0.4, ease: "power2.out", immediateRender: false }, 8.0);
+        tl.fromTo("#rv-name", { y: 0 }, { y: -40, duration: 0.8, ease: "power3.inOut", immediateRender: false }, 9.5);
+        rise(tl, "#rv-vp", 10.0, 0, 0.8);
+        out(tl, ["#rv-name", "#rv-vp"], 11.72);
+
+        // Act III: what it does, measured (the backdrops fade up from black and drift)
+        tl.fromTo("#v-bg_speed", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power1.out" }, 12.0);
+        [["#v-bg_speed", 12, 3.5], ["#v-bg_graph", 15.5, 3], ["#v-bg_search", 18.5, 2.7], ["#v-bg_ask", 21.2, 2.72], ["#v-bg_cost", 23.92, 4.05], ["#v-bg_zero", 27.97, 3.77]]
+          .forEach(([s, a, d]) => tl.fromTo(s, { scale: 1.04 }, { scale: 1.0, duration: d, ease: "none" }, a));
+        tl.to("#v-bg_zero", { opacity: 0, duration: 0.3, ease: "power1.in" }, 31.42);
+        rise(tl, "#sA .col > *", 12.07); tl.fromTo("#sA .panel", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 12.2);
+        count(tl, document.getElementById("cA"), 34.6, 12.2, 1.6, 1);
+        ["#tA0", "#tA1", "#tA2", "#tA3"].forEach((s, i) => tl.to(s, { opacity: 1, duration: 0.2 }, 12.45 + i * 0.12));
+        out(tl, "#sA > *", 15.22);
+
+        rise(tl, "#sB .col > *", 15.57); tl.fromTo("#sB .foot", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 15.8);
+        count(tl, document.getElementById("cB"), 49, 15.6, 1.2, 0);
+        graph(tl, 15.6);
+        out(tl, ["#sB .col", "#sB .foot", "#g"], 18.22);
+
+        rise(tl, "#sD .col > *", 18.57); tl.fromTo("#sD .panel", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 18.62);
+        ["#tD0", "#tD1", "#tD2"].forEach((s, i) => tl.to(s, { opacity: 1, duration: 0.2 }, 18.75 + i * 0.15));
+        out(tl, "#sD > *", 20.92);
+
+        rise(tl, "#sE .col > *", 21.27); tl.fromTo("#sE .panel", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 21.3);
+        ["#tE0", "#tE1", "#tE2"].forEach((s, i) => tl.to(s, { opacity: 1, duration: 0.2 }, 21.4 + i * 0.15));
+        out(tl, "#sE > *", 23.72);
+
+        // Act IV: the economics, in the quiet break
+        rise(tl, "#sF .center > *", 24.1, 0.18, 1.0); tl.fromTo("#sF .foot", { opacity: 0 }, { opacity: 1, duration: 0.8 }, 24.8);
+        out(tl, "#sF > *", 27.67, 0.3);
+        rise(tl, "#sG .center > *", 28.07, 0.18, 1.0); tl.fromTo("#sG .foot", { opacity: 0 }, { opacity: 1, duration: 0.8 }, 28.8);
+        out(tl, "#sG > *", 31.42, 0.3);
+
+        // Act V: free, open, yours; then who it is for, one word a beat
+        tl.fromTo("#free .words span", { opacity: 0, y: 30, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.55, ease: "power3.out", stagger: 0.5 }, 31.74);
+        tl.fromTo("#free .cap", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 32.8);
+        [["#w1", 33.74], ["#w2", 34.74], ["#w3", 35.74], ["#w4", 36.74], ["#w5", 37.74], ["#w6", 38.74]].forEach(([s, a], i, arr) => {
+          tl.fromTo(s, { opacity: 0, y: 24, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, a + 0.02);
+          tl.set(s, { opacity: 0 }, i < arr.length - 1 ? arr[i + 1][1] : 39.99);
+        });
+
+        // Act VI: the montage on the beat, the line, the final hit
+        for (let t = 39.99; t < 45.7; t += BEAT) tl.fromTo("#stage", { scale: 1.03 }, { scale: 1, duration: 0.35, ease: "power2.out", immediateRender: false }, t);
+        tl.fromTo("#tagscrim", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 39.99);
+        rise(tl, "#tag", 40.12, 0, 0.9);
+        tl.fromTo("#flash", { opacity: 0.3 }, { opacity: 0, duration: 0.45, ease: "power2.out", immediateRender: false }, 45.74);
+        tl.fromTo("#e-name", { opacity: 0, scale: 1.08, filter: "blur(14px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 45.74);
+        rise(tl, ["#e-t1", "#e-t2"], 46.32, 0.25, 0.8);
+        tl.to("#fade", { opacity: 1, duration: 0.8, ease: "power1.in" }, 48.62);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      });
+    </script>
+  </body>
+</html>
