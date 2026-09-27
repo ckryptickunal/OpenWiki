@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/openwiki/img/share.gif",
+      "source": "/openwiki/img/preview.gif",
       "headers": [
         {
           "key": "Vary",
@@ -38,7 +38,7 @@
   },
   "rewrites": [
     {
-      "source": "/openwiki/img/share.gif",
+      "source": "/openwiki/img/preview.gif",
       "has": [
         {
           "type": "header",
@@ -47,6 +47,10 @@
         }
       ],
       "destination": "/openwiki/img/share.jpg"
+    },
+    {
+      "source": "/openwiki/img/preview.gif",
+      "destination": "/openwiki/img/share.gif"
     }
   ]
 }

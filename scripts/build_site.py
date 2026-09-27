@@ -250,8 +250,9 @@ TOP_VARS = ["--rot:-1.5deg;--rot-from:-9deg;--hover-tilt:3deg", "--rot:1deg;--ro
 
 # Link previews: an animated GIF cut of the launch film (made by scripts/share_gif.sh).
 # Discord, Slack and Telegram play it; X gets the sharp still. WhatsApp drops images
-# over 600 KB, so vercel.json serves share.jpg to its crawler instead of the GIF.
-SHARE_GIF = "img/share.gif"
+# over 600 KB, so og:image points at img/preview.gif, a route with no file behind it:
+# vercel.json sends WhatsApp's crawler share.jpg and everyone else share.gif.
+SHARE_GIF = "img/preview.gif"
 SHARE_STILL = "img/share.jpg"
 SHARE_ALT = "OpenWiki: turn YouTube videos, blogs and notes into a linked Markdown wiki"
 
