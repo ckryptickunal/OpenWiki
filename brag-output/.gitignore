@@ -1,0 +1,7 @@
+# Georgia is Microsoft's font and may not be redistributed; the page falls back to the system Georgia.
+composition/assets/fonts/Georgia-Italic.ttf
+# Audio is not committed in this repo (see Marketing/launch-video/FACTS.md): the music is
+# "Happy Beats / Business Moves vol. 1" by ende.app (CC BY 4.0), the SFX are Kenney (CC0).
+composition/assets/music/*.mp3
+composition/assets/sfx/
+composition/snapshots/

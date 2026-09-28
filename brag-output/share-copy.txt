@@ -1,0 +1,2 @@
+Introducing OpenWiki: turn YouTube videos, essays, and notes into a linked Markdown knowledge base you keep.
+Free, open source, and MIT licensed.

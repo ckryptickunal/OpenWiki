@@ -1,0 +1,19 @@
+{
+  "duration": 20,
+  "maxStaticSec": 2.4,
+  "assertions": [
+    { "kind": "appearsBy", "selector": "#s1-headline", "bySec": 1.2 },
+    { "kind": "before", "a": "#source-youtube", "b": "#source-notes" },
+    { "kind": "appearsBy", "selector": "#s2-headline", "bySec": 4.3 },
+    { "kind": "appearsBy", "selector": "#node-source", "bySec": 8.4 },
+    { "kind": "appearsBy", "selector": "#wiki-chip", "bySec": 9.4 },
+    { "kind": "before", "a": "#truth-1", "b": "#truth-3" },
+    { "kind": "appearsBy", "selector": "#end-wordmark", "bySec": 18.4 },
+    { "kind": "staysInFrame", "selector": "#source-youtube" },
+    { "kind": "staysInFrame", "selector": "#source-notes" },
+    { "kind": "staysInFrame", "selector": "#node-source" },
+    { "kind": "staysInFrame", "selector": "#node-topic" },
+    { "kind": "staysInFrame", "selector": "#vault-stage" },
+    { "kind": "keepsMoving", "withinSelector": "#root" }
+  ]
+}
