@@ -61,8 +61,8 @@ ASR text from YouTube captions.
   misheard, so downstream LLM steps should expect phonetic errors.
 - Speed measured on an Apple M5 with `mlx-whisper`: a 1-minute short takes 3-8 s to transcribe once the model
   is loaded. End to end, with audio downloads overlapping, that came to roughly 10-15 shorts per minute.
-- Videos with no captions at all now get transcribed too, which matters for regional-language channels where
-  many uploads have no caption track.
+- Videos with no captions at all now get transcribed too, including ones an earlier run without `--asr` skipped,
+  which matters for regional-language channels where many uploads have no caption track.
 
 ## Which to use
 

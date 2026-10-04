@@ -528,7 +528,8 @@ def extract_one_video(
         )
         return "ok"
 
-    tor_port = env_value("YOUTUBE_TOR_CONTROL_PORT")
+    tor_port_value = (env_value("YOUTUBE_TOR_CONTROL_PORT") or "").strip()
+    tor_port = int(tor_port_value) if tor_port_value.isdigit() else None
     last_error: BaseException | None = None
     for attempt in range(retries):
         try:
@@ -542,7 +543,7 @@ def extract_one_video(
             if kind == "no_captions":
                 break
             # Behind Tor, a fresh circuit usually means a fresh exit IP: retry right away.
-            if kind in {"ip_blocked", "rate_limited"} and tor_port and new_tor_circuit(int(tor_port)):
+            if kind in {"ip_blocked", "rate_limited"} and tor_port and new_tor_circuit(tor_port):
                 time.sleep(5)
                 continue
             # A 429 gets worse if we hammer it again in the same run.
@@ -584,10 +585,12 @@ def extract_videos(
     folder.mkdir(parents=True, exist_ok=True)
     state = _ensure_state_keys(load_extract_state(folder))
     skipped = set(state.get("permanent_skip", []))
+    reasons = state.get("skip_reasons", {})
     counts = {"ok": 0, "skip": 0, "exists": 0, "failed": 0}
 
     for video_id in video_ids:
-        if video_id in skipped:
+        # --asr can now handle videos skipped earlier for having no captions (or skipped before reasons were kept).
+        if video_id in skipped and not (asr and reasons.get(video_id) in (None, "no_captions")):
             counts["skip"] += 1
             continue
         detail: dict = {}
@@ -605,6 +608,9 @@ def extract_videos(
         if result in {"ok", "exists"}:
             if video_id not in state["done"]:
                 state["done"].append(video_id)
+            if video_id in state["permanent_skip"]:
+                state["permanent_skip"].remove(video_id)
+            state["skip_reasons"].pop(video_id, None)
             state["failures"].pop(video_id, None)
         elif result == "skip":
             if video_id not in state["permanent_skip"]:
