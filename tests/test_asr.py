@@ -93,3 +93,27 @@ def test_segments_format_like_captions():
 
     text = format_timed_transcript([asr.Segment(0.0, " पहला "), asr.Segment(65.4, "second"), asr.Segment(70, " ")])
     assert text == "[0:00] पहला\n[1:05] second"
+
+
+def test_asr_retries_videos_skipped_for_no_captions(tmp_path: Path, monkeypatch):
+    _no_meta(monkeypatch)
+    youtube.save_extract_state(tmp_path, {**youtube.empty_extract_state(), "permanent_skip": ["abc", "gone"],
+                                          "skip_reasons": {"abc": "no_captions", "gone": "unplayable"}})
+    calls: list = []
+    monkeypatch.setattr(youtube, "fetch_transcript", lambda *a, **k: (_ for _ in ()).throw(NoCaptionsAvailable("no captions")))
+    monkeypatch.setattr(asr, "transcribe_video", _fake_asr(calls))
+
+    assert youtube.extract_videos(["abc", "gone"], tmp_path)["skip"] == 2  # without --asr: still skipped
+    assert calls == []
+    counts = youtube.extract_videos(["abc", "gone"], tmp_path, asr=True)
+    assert counts == {"ok": 1, "skip": 1, "exists": 0, "failed": 0}  # the unplayable one is never retried
+    state = youtube.load_extract_state(tmp_path)
+    assert state["permanent_skip"] == ["gone"] and "abc" not in state["skip_reasons"] and "abc" in state["done"]
+
+
+def test_bad_tor_control_port_is_ignored(tmp_path: Path, monkeypatch):
+    _no_meta(monkeypatch)
+    monkeypatch.setattr(youtube, "fetch_transcript", lambda *a, **k: (_ for _ in ()).throw(RequestBlocked("blocked")))
+    monkeypatch.setattr(youtube, "new_tor_circuit", lambda port: (_ for _ in ()).throw(AssertionError("called")))
+    monkeypatch.setenv("YOUTUBE_TOR_CONTROL_PORT", "not-a-port")
+    assert extract_one_video("abc", tmp_path) == "failed"
