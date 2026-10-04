@@ -157,6 +157,7 @@ Every command accepts `--root DIR` (before or after the command name). Without i
 | `openwiki youtube --urls-file urls.txt --folder X` | Captions for a list of videos | none |
 | `openwiki youtube --playlist URL --folder X` | Every video in a playlist | none (uses yt-dlp; `YOUTUBE_API_KEY` adds metadata) |
 | `openwiki youtube --channel @handle` | Every upload on a channel, newest first | none (uses yt-dlp; `YOUTUBE_API_KEY` adds metadata) |
+| `openwiki youtube ... --asr` | Transcribe locally with Whisper when captions are missing or blocked | none (`pip install "openwiki-cli[asr]"`) |
 | `openwiki essay --url URL` | One article (title and date detected) | none |
 | `openwiki essay [--source NAME]` | New articles from the blogs in `sources.json` | none |
 | `openwiki text notes.md ...` | Add local `.txt`, `.md`, or `.html` files | none |
@@ -251,6 +252,8 @@ Put these in `.env` in your workspace (see [`.env.example`](.env.example)) or ex
 |---|---|---|
 | `YOUTUBE_API_KEY` | Full video metadata (publish date, views, description) and API-based listing | unset (listing falls back to yt-dlp) |
 | `YOUTUBE_PROXY` | Route caption requests through a proxy, e.g. `socks5://127.0.0.1:9050` (Tor) | direct |
+| `YOUTUBE_TOR_CONTROL_PORT` | Local Tor ControlPort; on a block, get a new circuit and retry at once | unset |
+| `OPENWIKI_ASR_MODEL` | Whisper model for `--asr` | `large-v3-turbo` |
 | `LLM_PROVIDER` | `gemini` or `openai` | auto-detect |
 | `GEMINI_API_KEY` | Gemini ingest and review | unset |
 | `GEMINI_MODEL` / `GEMINI_MODEL_LINT` | Gemini model for ingest / `lint --review` | `gemini-3.1-flash-lite` |
@@ -314,6 +317,8 @@ OpenWiki is free and MIT-licensed. You pay only for the LLM calls your provider 
 ### YouTube is blocking my requests. What can I do?
 
 Caption downloads can fail in two different ways. An IP block (`ip_blocked`) is common from cloud servers: retry later or set `YOUTUBE_PROXY` (for example a local Tor proxy; install `pysocks` for SOCKS). An HTTP 429 (`rate_limited`) means wait and rerun, or use `--limit`; it is not treated as a ban and is not retried in the same run. Neither is marked as a permanent skip. The reason is stored in `<folder>/_extract_state.json`.
+
+Two more options: set `YOUTUBE_TOR_CONTROL_PORT` so a Tor proxy switches to a fresh exit on every block, or add `--asr` to transcribe the audio locally when captions can't be fetched (audio downloads use a different YouTube host and usually keep working). [docs/BLOCKED_CAPTIONS.md](docs/BLOCKED_CAPTIONS.md) has measured numbers and when to use which.
 
 ### Is it legal to download transcripts and articles?
 

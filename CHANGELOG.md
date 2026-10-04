@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- `openwiki youtube --asr`: when a video has no captions, or the captions endpoint blocks or rate-limits your IP, the audio is downloaded with yt-dlp and transcribed locally with Whisper (`mlx-whisper` on Apple Silicon, `faster-whisper` or `openai-whisper` elsewhere; `pip install "openwiki-cli[asr]"`). The transcript keeps the `[m:ss]` format and its header names the speech-to-text backend. Model via `OPENWIKI_ASR_MODEL`.
+- `YOUTUBE_TOR_CONTROL_PORT`: with `YOUTUBE_PROXY` pointing at a local Tor, a blocked or rate-limited caption request asks Tor for a new circuit and retries at once instead of failing.
+- `docs/BLOCKED_CAPTIONS.md`: a measured field report on caption IP blocks and which workaround to use when.
+- `docs/case-studies/proastro.md`: using OpenWiki as the ingestion layer for a 10,000-video Hindi/English domain knowledge base.
+
 ## [0.3.1] - 2026-09-27
 
 ### Fixed

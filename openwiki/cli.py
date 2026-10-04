@@ -66,12 +66,12 @@ def cmd_youtube(args) -> int:
             if args.channel:
                 result = extract_channel(
                     ws, args.channel, folder=args.folder, dry_run=args.dry_run,
-                    limit=args.limit, languages=languages,
+                    limit=args.limit, languages=languages, asr=args.asr,
                 )
             else:
                 result = extract_playlist(
                     ws, args.playlist, folder=args.folder, dry_run=args.dry_run,
-                    limit=args.limit, languages=languages,
+                    limit=args.limit, languages=languages, asr=args.asr,
                 )
         except ListingUnavailable as exc:
             print(str(exc), file=sys.stderr)
@@ -96,7 +96,8 @@ def cmd_youtube(args) -> int:
         if args.dry_run:
             print(f"would extract {len(ids)} video(s) into {folder}")
             return 0
-        counts = extract_videos(ids, folder, channel_name=args.folder, youtube=youtube, languages=languages)
+        counts = extract_videos(ids, folder, channel_name=args.folder, youtube=youtube, languages=languages,
+                                asr=args.asr)
         print(f"ok={counts['ok']} exists={counts['exists']} skip={counts['skip']} failed={counts['failed']}")
         return 0 if counts["failed"] == 0 else 1
 
@@ -110,7 +111,7 @@ def cmd_youtube(args) -> int:
         print(f"would extract {video_id} into {target}")
         return 0
     detail: dict = {}
-    result = extract_one_video(video_id, folder, youtube=youtube, languages=languages, detail=detail)
+    result = extract_one_video(video_id, folder, youtube=youtube, languages=languages, detail=detail, asr=args.asr)
     if result == "skip":
         print(f"SKIP {video_id} ({detail.get('kind') or 'no captions or unplayable'})")
         return 0
@@ -388,6 +389,9 @@ def build_parser() -> argparse.ArgumentParser:
     yt.add_argument("--folder", help="Output folder under the workspace (default: Videos or channel title).")
     yt.add_argument("--lang", help="Preferred caption languages, comma-separated (default: en, then any).")
     yt.add_argument("--limit", type=int, help="Max new videos to extract.")
+    yt.add_argument("--asr", action="store_true",
+                    help="If captions are missing or blocked, transcribe the audio locally with Whisper "
+                         '(pip install "openwiki-cli[asr]").')
     yt.add_argument("--dry-run", action="store_true")
 
     essay = add("essay", "Extract one article URL, or every new article from sources.json.", cmd_essay)
