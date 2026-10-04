@@ -15,7 +15,8 @@ fetching shorts back to back with no pause, the IP was blocked after **46 transc
 | `yt-dlp --write-auto-subs` (same `timedtext` host) | `HTTP 429 Too Many Requests` |
 | `yt-dlp --impersonate chrome` (curl-cffi) for subtitles | Still 429; impersonation doesn't help, the block is per IP |
 | `yt-dlp` **audio** download (`googlevideo.com`) | **Works**, ~3 s per short, not blocked |
-| `YOUTUBE_PROXY=socks5://127.0.0.1:9050` (shared local Tor) | 1 of 3 videos succeeded; depends on the exit node |
+| `YOUTUBE_PROXY=socks5://127.0.0.1:9050` (shared local Tor, no rotation) | 1 of 3 videos succeeded; depends on the exit node |
+| Own Tor per fetcher + `SIGNAL NEWNYM` on every block | **216 captions** fetched for one English channel with only 9 blocks, each cleared by a new circuit (~10 videos/min); a Hindi long-video channel: 20 fetched, 6 blocks |
 
 So the captions endpoint and the media endpoint are throttled separately. When captions are blocked you can
 still get the audio, and a local model can turn it into a transcript.
@@ -36,8 +37,10 @@ openwiki youtube --urls-file urls.txt --folder Talks
 ```
 
 With `YOUTUBE_TOR_CONTROL_PORT` set, a blocked or rate-limited caption request sends `SIGNAL NEWNYM` to Tor and
-retries straight away on a fresh exit, instead of sleeping. Many Tor exits are themselves blocked by YouTube,
-so expect a mix of successes and failures; it is a useful accelerator, not a guarantee. Only use the
+retries straight away on a fresh exit, instead of sleeping. In our run this was the single most effective fix:
+once each fetcher had its own Tor instance and rotated on every block, captions flowed at roughly 10 videos a
+minute. Run one Tor instance (different `--SocksPort`/`--ControlPort`) per parallel fetcher so their exits
+don't collide. Some exits are blocked too, so very long videos (hour-long lectures) still fail more often. Only use the
 control port without a password on `127.0.0.1`.
 
 ## Option 3: `--asr`, local speech-to-text (new)
@@ -60,7 +63,11 @@ ASR text from YouTube captions.
   Hinglish about as well as YouTube's own auto-captions: astrology terms such as "कुंडली" sometimes come out
   misheard, so downstream LLM steps should expect phonetic errors.
 - Speed measured on an Apple M5 with `mlx-whisper`: a 1-minute short takes 3-8 s to transcribe once the model
-  is loaded. End to end, with audio downloads overlapping, that came to roughly 10-15 shorts per minute.
+  is loaded, and long English lectures run at about 18x real time. End to end, with audio downloads
+  overlapping, that came to roughly 10-15 shorts per minute.
+- Run **one** Whisper process. MLX shares a single GPU; three parallel processes on a 16 GB Mac pushed 9 GB into
+  swap, filled the disk and slowed every transcription about 10x.
+- Install `deno`: without a JavaScript runtime some audio downloads failed with HTTP 403.
 - Videos with no captions at all now get transcribed too, including ones an earlier run without `--asr` skipped,
   which matters for regional-language channels where many uploads have no caption track.
 
@@ -69,7 +76,7 @@ ASR text from YouTube captions.
 | Situation | Use |
 |---|---|
 | A few hundred English videos | Plain captions, pace with `--limit` |
-| Blocked IP, need captions specifically | Tor + `YOUTUBE_TOR_CONTROL_PORT`, or a residential proxy in `YOUTUBE_PROXY` |
+| Blocked IP, need captions specifically | **Start here:** Tor + `YOUTUBE_TOR_CONTROL_PORT`, one Tor per fetcher; or a residential proxy |
 | Thousands of videos, non-English, or many videos without captions | `--asr` (combine with a proxy so caption hits stay cheap) |
 | Server / CI | A paid residential proxy; cloud IPs are blocked far more aggressively |
 
