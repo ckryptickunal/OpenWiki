@@ -46,6 +46,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.6"]
 tor = ["pysocks>=1.7.1"]
+asr = [
+    "mlx-whisper>=0.4; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "faster-whisper>=1.0; sys_platform != 'darwin' or platform_machine != 'arm64'",
+]
 
 [project.urls]
 Homepage = "https://openwiki-delta.vercel.app/openwiki/"

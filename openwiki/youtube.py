@@ -2,7 +2,9 @@
 
 - Single videos need no API key (title/channel come from YouTube's public oEmbed endpoint).
 - Channel and playlist listing use the YouTube Data API v3 (`YOUTUBE_API_KEY`).
-- Captions come from `youtube-transcript-api`, optionally through `YOUTUBE_PROXY`.
+- Captions come from `youtube-transcript-api`, optionally through `YOUTUBE_PROXY` (a Tor proxy can rotate its
+  circuit on a block via `YOUTUBE_TOR_CONTROL_PORT`).
+- With `--asr`, videos without fetchable captions are transcribed locally from audio (openwiki/asr.py).
 - `<folder>/_extract_state.json` remembers finished and permanently skipped videos.
 """
 
@@ -436,8 +438,10 @@ def _ensure_state_keys(state: dict) -> dict:
     return state
 
 
+ASR_FALLBACK_KINDS = {"no_captions", "ip_blocked", "rate_limited"}
+
 FAILURE_HINTS = {
-    "ip_blocked": " (YouTube blocked this IP; set YOUTUBE_PROXY or retry later. Not a permanent skip.)",
+    "ip_blocked": " (YouTube blocked this IP; set YOUTUBE_PROXY, use --asr, or retry later. Not a permanent skip.)",
     "rate_limited": " (rate limited; wait and rerun, or use --limit. Not a permanent skip.)",
 }
 
@@ -459,6 +463,21 @@ def save_extract_state(folder: Path, state: dict) -> None:
     )
 
 
+def new_tor_circuit(control_port: int, host: str = "127.0.0.1") -> bool:
+    """Ask a local Tor ControlPort (started with `--CookieAuthentication 0`) for a new circuit (SIGNAL NEWNYM)."""
+    import socket
+
+    try:
+        with socket.create_connection((host, control_port), timeout=5) as sock:
+            sock.sendall(b'AUTHENTICATE ""\r\nSIGNAL NEWNYM\r\nQUIT\r\n')
+            reply = b""
+            while chunk := sock.recv(256):  # Tor closes the connection after QUIT
+                reply += chunk
+            return reply.count(b"250 OK") >= 2
+    except OSError:
+        return False
+
+
 def extract_one_video(
     video_id: str,
     folder: Path,
@@ -469,10 +488,13 @@ def extract_one_video(
     proxy: str | None = None,
     retries: int = 3,
     detail: dict | None = None,
+    asr: bool = False,
 ) -> str:
     """Fetch one video. Returns ok | skip | exists | failed.
 
     `detail`, when passed, receives `kind` and `reason` for skips and failures.
+    With `asr=True`, a video with no captions, or whose captions are blocked or rate limited, is transcribed
+    locally from its audio (see openwiki/asr.py).
     """
     folder.mkdir(parents=True, exist_ok=True)
     filepath = folder / f"{video_id}.txt"
@@ -493,27 +515,36 @@ def extract_one_video(
             detail["kind"] = kind
             detail["reason"] = reason
 
+    def _write(transcript: FetchedTranscript) -> str:
+        write_youtube_file(
+            filepath,
+            video_id,
+            meta,
+            body=transcript.text,
+            language=transcript.language,
+            language_code=transcript.language_code,
+            is_generated=transcript.is_generated,
+            snippet_count=transcript.snippet_count,
+        )
+        return "ok"
+
+    tor_port = env_value("YOUTUBE_TOR_CONTROL_PORT")
     last_error: BaseException | None = None
     for attempt in range(retries):
         try:
-            transcript = fetch_transcript(video_id, languages=languages, proxy=proxy)
-            write_youtube_file(
-                filepath,
-                video_id,
-                meta,
-                body=transcript.text,
-                language=transcript.language,
-                language_code=transcript.language_code,
-                is_generated=transcript.is_generated,
-                snippet_count=transcript.snippet_count,
-            )
-            return "ok"
+            return _write(fetch_transcript(video_id, languages=languages, proxy=proxy))
         except Exception as exc:
             last_error = exc
             kind = classify_fetch_error(exc)
-            if kind in {"no_captions", "unplayable"}:
+            if kind == "unplayable" or (kind == "no_captions" and not asr):
                 _note(kind, str(exc).strip().splitlines()[0][:200])
                 return "skip"
+            if kind == "no_captions":
+                break
+            # Behind Tor, a fresh circuit usually means a fresh exit IP: retry right away.
+            if kind in {"ip_blocked", "rate_limited"} and tor_port and new_tor_circuit(int(tor_port)):
+                time.sleep(5)
+                continue
             # A 429 gets worse if we hammer it again in the same run.
             if kind == "rate_limited":
                 break
@@ -522,6 +553,16 @@ def extract_one_video(
 
     kind = classify_fetch_error(last_error) if last_error else "error"
     reason = str(last_error).strip().splitlines()[0] if last_error else "unknown error"
+    if asr and kind in ASR_FALLBACK_KINDS:
+        from openwiki.asr import transcribe_video
+
+        try:
+            return _write(transcribe_video(video_id, languages=languages))
+        except Exception as exc:  # noqa: BLE001 - any ASR/download failure is reported, not raised
+            reason = f"{reason}; speech-to-text fallback failed: {str(exc).strip().splitlines()[0] if str(exc).strip() else type(exc).__name__}"
+            if kind == "no_captions":
+                _note(kind, reason[:200])
+                return "skip"
     reason = reason[:200]
     _note(kind, reason)
     print(f"  [failed] {video_id}: {kind}{FAILURE_HINTS.get(kind, '')}: {reason}", file=sys.stderr)
@@ -536,6 +577,7 @@ def extract_videos(
     youtube=None,
     languages: list[str] | None = None,
     proxy: str | None = None,
+    asr: bool = False,
 ) -> dict[str, int]:
     """Extract many videos. Skips existing files and videos with no captions."""
     folder = Path(folder)
@@ -557,6 +599,7 @@ def extract_videos(
             languages=languages,
             proxy=proxy,
             detail=detail,
+            asr=asr,
         )
         counts[result] = counts.get(result, 0) + 1
         if result in {"ok", "exists"}:
@@ -600,6 +643,7 @@ def extract_channel(
     dry_run: bool = False,
     limit: int | None = None,
     languages: list[str] | None = None,
+    asr: bool = False,
 ) -> dict:
     """Find uploads not on disk yet (newest first) and extract their captions.
 
@@ -627,7 +671,7 @@ def extract_channel(
     result = {"channel_id": channel_id, "title": title, "folder": folder_name, "listing": backend, "new": new_ids}
     if not dry_run:
         result["counts"] = extract_videos(
-            new_ids, out, channel_name=title, youtube=youtube, languages=languages
+            new_ids, out, channel_name=title, youtube=youtube, languages=languages, asr=asr
         )
     return result
 
@@ -640,6 +684,7 @@ def extract_playlist(
     dry_run: bool = False,
     limit: int | None = None,
     languages: list[str] | None = None,
+    asr: bool = False,
 ) -> dict:
     """Extract every video of a playlist that is not on disk yet, in playlist order.
 
@@ -668,6 +713,6 @@ def extract_playlist(
     result = {"playlist_id": playlist_id, "folder": out.name, "listing": backend, "new": new_ids}
     if not dry_run:
         result["counts"] = extract_videos(
-            new_ids, out, channel_name=folder, youtube=youtube, languages=languages
+            new_ids, out, channel_name=folder, youtube=youtube, languages=languages, asr=asr
         )
     return result
