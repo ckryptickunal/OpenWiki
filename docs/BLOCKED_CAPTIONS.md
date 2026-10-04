@@ -67,6 +67,9 @@ ASR text from YouTube captions.
   overlapping, that came to roughly 10-15 shorts per minute.
 - Run **one** Whisper process. MLX shares a single GPU; three parallel processes on a 16 GB Mac pushed 9 GB into
   swap, filled the disk and slowed every transcription about 10x.
+- Even a single `mlx-whisper` process can balloon on hour-long lectures: MLX caches GPU buffers between calls,
+  and in our run swap grew to 13 GB and the disk dropped to 171 MB free. OpenWiki now caps the MLX cache at 1 GB
+  and clears it after every video; splitting very long audio into ~10-minute pieces bounds it further.
 - Install `deno`: without a JavaScript runtime some audio downloads failed with HTTP 403.
 - Videos with no captions at all now get transcribed too, including ones an earlier run without `--asr` skipped,
   which matters for regional-language channels where many uploads have no caption track.

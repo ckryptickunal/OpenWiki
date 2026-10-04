@@ -85,10 +85,17 @@ def transcribe_file(audio: Path, *, language: str | None = None, backend: str | 
     model = model or env_value("OPENWIKI_ASR_MODEL") or DEFAULT_MODELS[backend]
     prompt = env_value("OPENWIKI_ASR_PROMPT") or None
     if backend == "mlx_whisper":
+        import mlx.core as mx
         import mlx_whisper
 
-        out = mlx_whisper.transcribe(str(audio), path_or_hf_repo=model, language=language,
-                                     condition_on_previous_text=False, initial_prompt=prompt)
+        # MLX keeps GPU buffers cached across calls; on long audio this grew swap to 13 GB and filled the
+        # disk in a real run. Cap the cache and release it after every file.
+        mx.set_cache_limit(1 << 30)
+        try:
+            out = mlx_whisper.transcribe(str(audio), path_or_hf_repo=model, language=language,
+                                         condition_on_previous_text=False, initial_prompt=prompt)
+        finally:
+            mx.clear_cache()
         return [Segment(s["start"], s["text"]) for s in out["segments"]]
     if backend == "faster_whisper":
         from faster_whisper import WhisperModel
