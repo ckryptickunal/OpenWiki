@@ -254,6 +254,7 @@ Put these in `.env` in your workspace (see [`.env.example`](.env.example)) or ex
 | `YOUTUBE_PROXY` | Route caption requests through a proxy, e.g. `socks5://127.0.0.1:9050` (Tor) | direct |
 | `YOUTUBE_TOR_CONTROL_PORT` | Local Tor ControlPort; on a block, get a new circuit and retry at once | unset |
 | `OPENWIKI_ASR_MODEL` | Whisper model for `--asr` | `large-v3-turbo` |
+| `OPENWIKI_ASR_PROMPT` | Domain vocabulary to prime Whisper, e.g. `कुंडली, लग्न, Rahu, Ketu` | unset |
 | `LLM_PROVIDER` | `gemini` or `openai` | auto-detect |
 | `GEMINI_API_KEY` | Gemini ingest and review | unset |
 | `GEMINI_MODEL` / `GEMINI_MODEL_LINT` | Gemini model for ingest / `lint --review` | `gemini-3.1-flash-lite` |

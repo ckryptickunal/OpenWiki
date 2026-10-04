@@ -54,6 +54,8 @@ ASR text from YouTube captions.
 
 - The first `--lang` code is passed to Whisper as the language hint (`hi` above); without `--lang`, Whisper
   auto-detects.
+- `OPENWIKI_ASR_PROMPT` primes Whisper with your domain's vocabulary (it becomes Whisper's `initial_prompt`).
+  On noisy shorts with background music it fixed some terms but not all; clean audio matters more.
 - Model: `OPENWIKI_ASR_MODEL` (default `large-v3-turbo`, ~1.6 GB download on first use). It handles Hindi and
   Hinglish about as well as YouTube's own auto-captions: astrology terms such as "कुंडली" sometimes come out
   misheard, so downstream LLM steps should expect phonetic errors.

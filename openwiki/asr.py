@@ -11,6 +11,8 @@ Backends, first one installed wins (install with `pip install "openwiki-cli[asr]
 - `whisper`         the reference openai-whisper package
 
 `OPENWIKI_ASR_MODEL` picks the model (default: large-v3-turbo; good multilingual quality, e.g. Hindi).
+`OPENWIKI_ASR_PROMPT` primes Whisper with domain vocabulary (comma-separated terms, any script), which reduces
+mis-hearings of jargon and names.
 """
 
 from __future__ import annotations
@@ -81,21 +83,23 @@ def transcribe_file(audio: Path, *, language: str | None = None, backend: str | 
     if backend is None:
         raise ASRUnavailable('no speech-to-text backend; pip install "openwiki-cli[asr]"')
     model = model or env_value("OPENWIKI_ASR_MODEL") or DEFAULT_MODELS[backend]
+    prompt = env_value("OPENWIKI_ASR_PROMPT") or None
     if backend == "mlx_whisper":
         import mlx_whisper
 
         out = mlx_whisper.transcribe(str(audio), path_or_hf_repo=model, language=language,
-                                     condition_on_previous_text=False)
+                                     condition_on_previous_text=False, initial_prompt=prompt)
         return [Segment(s["start"], s["text"]) for s in out["segments"]]
     if backend == "faster_whisper":
         from faster_whisper import WhisperModel
 
         segments, _ = WhisperModel(model).transcribe(str(audio), language=language,
-                                                     condition_on_previous_text=False)
+                                                     condition_on_previous_text=False, initial_prompt=prompt)
         return [Segment(s.start, s.text) for s in segments]
     import whisper
 
-    out = whisper.load_model(model).transcribe(str(audio), language=language, condition_on_previous_text=False)
+    out = whisper.load_model(model).transcribe(str(audio), language=language, condition_on_previous_text=False,
+                                               initial_prompt=prompt)
     return [Segment(s["start"], s["text"]) for s in out["segments"]]
 
 
