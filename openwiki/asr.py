@@ -30,7 +30,9 @@ DEFAULT_MODELS = {
     "faster_whisper": "large-v3-turbo",
     "whisper": "turbo",
 }
-AUDIO_FORMAT = "ba[abr<=70]/worstaudio/ba"
+# YouTube auto-dubs many videos (Italian, Indonesian, Hindi, ...). "Lowest-bitrate audio" alone often picks a
+# dubbed track, so Whisper transcribes a machine translation. Prefer the track YouTube marks "original".
+AUDIO_FORMAT = "ba[format_note*=original][abr<=70]/ba[format_note*=original]/ba[abr<=70]/worstaudio/ba"
 
 
 class ASRUnavailable(RuntimeError):

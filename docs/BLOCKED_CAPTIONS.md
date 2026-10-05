@@ -74,6 +74,23 @@ ASR text from YouTube captions.
 - Videos with no captions at all now get transcribed too, including ones an earlier run without `--asr` skipped,
   which matters for regional-language channels where many uploads have no caption track.
 
+## Auto-dubbed audio and mislabelled captions
+
+Two traps found while transcribing ~1,900 videos for ProAstro:
+
+- **Auto-dubbed audio tracks.** YouTube now attaches machine-dubbed tracks (Italian, Indonesian, French, Polish,
+  Hindi, ...) to many videos. The old selector `ba[abr<=70]/worstaudio/ba` picks the lowest-bitrate track, which
+  is often a dub: 101 of 1,857 transcripts (mostly one English channel) were Whisper output of a dub, and forcing
+  `language=en` did not help because the audio itself was Italian or Indonesian. `--asr` now prefers the track
+  whose format note says `original`. Check a video with `yt-dlp -F <url> | grep "audio only"`: dubs say
+  `dubbed-auto`, the real one says `original (default)`.
+- **Use the track's language, not the channel's.** The same check showed some lectures on an English channel
+  are in Hindi, and some shorts on a Hindi channel are in English. Read `%(language)s` of the selected original
+  track and pass that to Whisper; a per-channel language guess mistranscribed 42 more videos.
+- **Mislabelled auto-captions.** YouTube sometimes labels Indian-accented English speech as "Hindi
+  (auto-generated)" and writes the English words in Devanagari script. For channels you know are English-spoken,
+  drop such caption tracks and fall back to `--asr` rather than feeding transliterated English to a model.
+
 ## Which to use
 
 | Situation | Use |
